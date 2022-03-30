@@ -1,0 +1,51 @@
+@font-face { font-family: OpenSans; 
+    src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+@font-face { font-family: Lato; 
+    src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
+
+#TopMenu{
+    background-image: url("../../logos/content/RatioColors.png"); 
+}
+
+#link, #connect{
+    font-size: 1.4em;
+    font-family: Lato;
+    font-weight: bold;
+}
+
+#connect{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 2vh;
+    padding: .2vh;
+}
+
+#link{
+    text-decoration: none;
+    color: black;
+}
+
+#link:hover{
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+}
+
+
+#centerMenu{
+    margin-top: auto;
+}
+
+.networkImg{
+    height: 1.3em;
+}
+
+.cardStyle{
+    width: 500px;
+    background-image: url("../../logos/content/RatioColors.png") !important;
+    background-position: right !important;
+}
+
+
+
+

@@ -1,0 +1,12 @@
+{
+    "content": {
+        "name": "Crypto Monkey",
+        "description": "Rare metaverse creation consisting 10,000 Crypto Monkeys. Collection by Ratio Labs.",
+        "image": "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ/4342.gif",
+        "attributes": [{ "trait_type": "Ears", "value": "Brown" }, { "trait_type": "Mouth", "value": "Red" },
+       			       { "trait_type": "Eyes", "value": "Purple" }, { "trait_type": "Hair", "value": "Green" } ],
+        "contract": "0x021218aeaf56394066a76607C0c31B0Ed625c10D",
+        "distributor": "0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"
+    },
+    "signature": "0x22f2b232caaa65fc494b7f0666df2515cfcdd0e541e2f03a3249fc6ff219bfe61d9e96cc1f7f4148641d16b247b91ef4e2aa6a78f411f54678d9d88cd2f5fa891c"
+}

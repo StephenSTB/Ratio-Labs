@@ -1,0 +1,76 @@
+{
+    "Ganache": {
+        "Ratio Card Base": {
+            "address": "0x1a8fcF47753b4b99dAfE65B65D99a245B1C278d5",
+            "uri": "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ"
+        },
+        "PolyCard Ten Common": {
+            "address": "0x021218aeaf56394066a76607C0c31B0Ed625c10D",
+            "uri": "ipfs://Qmci4x92WCPfTM6ux53gDBzWU2nqcDg8Q9zt5E5SbvfW6G"
+        },
+        "PolyCard Ten Unique": {
+            "address": "0xa5788a3f324872e1A31bD769EF79A68dBE1E1202",
+            "uri": "ipfs://QmNxijH4d85WHmkvtdcni71vEJcuJy3VMFZ1DqP7ET1xDK"
+        },
+        "PolyCard Ten Rare": {
+            "address": "0x3DAaf49699f5DFfeBD048E059282ed3EA9798fBc",
+            "uri": "ipfs://Qme7wMZcBL5VYRgTLfTDBEBVk2GWrEgHoz4Ui3NDDwH39k"
+        },
+        "PolyCard Ten Mythic": {
+            "address": "0xAA5d80175f09A6f9FDc22e933CbE50991A1735ec",
+            "uri": "ipfs://QmTQUP1rwxJSdixR9GtHP81VsfSvc6wJGNuNPMmZS32qrW"
+        },
+        "PolyCard Ten Ledgendary": {
+            "address": "0x6F1c8c8d12a433e3C9C5b595DFC8Fb63468773AE",
+            "uri": "ipfs://QmTCyd65c49duo3azhDXkyWridBxDFCZd5D1kUSmaQaUaX"
+        },
+        "PolyCard OneHundred Common": {
+            "address": "0x26D4c9Da651cb462412fB62f3c10416a5d5eCC18",
+            "uri": "ipfs://QmPSmyxBAhRa5qckBcA7W5LtSF7bAnJ8p2Rs1DLn8FU7BZ"
+        },
+        "PolyCard OneHundred Unique": {
+            "address": "0x41F6AC965c8621B44991E69C7Dce00717f074FE7",
+            "uri": "ipfs://QmUSMExqYA8YVYi6Lm88SC9aUmkiaFUJ2iiCJqW6GDDBah"
+        },
+        "PolyCard OneHundred Rare": {
+            "address": "0xA2399a92d726e88960dd606789F0cc1162D15189",
+            "uri": "ipfs://QmdVX66RwxT3kWwW5Dz2RDbnaiAzQh9ok6dg58i1uWVSPJ"
+        },
+        "PolyCard OneHundred Mythic": {
+            "address": "0x47Ba09E9cDB5625701Bb42cbf2415D0693138787",
+            "uri": "ipfs://QmXjY5bckxBH5qGTxv9ruwtY9zHHsy9DAQ7zoCe2AReCir"
+        },
+        "PolyCard OneHundred Ledgendary": {
+            "address": "0xc7fE3D7732Da6f603cBf60318B3d0cd810bb28A7",
+            "uri": "ipfs://QmZnPekNP6pjdh2rL8sDa21eBpKaJtB3G1BzijtZKF76c1"
+        },
+        "PolyCard OneThousand Common": {
+            "address": "0x8859CFA81804e824A0BC87fd6E0f3e4CeC770dBB",
+            "uri": "ipfs://QmYmL35dqsrP9V6bWQPqQ5vbqJ8wUCV9DrfiKuZweyeVTd"
+        },
+        "PolyCard OneThousand Unique": {
+            "address": "0xC7ccf6Ead85763198E43De6D68b79A24f6b52Cf5",
+            "uri": "ipfs://QmQefKN2GdVQNcM74NFECvRgaMGNpYrub4RW8SP9cDjCap"
+        },
+        "PolyCard OneThousand Rare": {
+            "address": "0x06A12dC3a4e2fC251F16CD2de50ba538fc937B22",
+            "uri": "ipfs://QmUpVbjwaZ8Xx2RAQAKs8EZQbyYBjVacUEedjYGmhf9jJH"
+        },
+        "PolyCard OneThousand Mythic": {
+            "address": "0x91CeC14e38A79578d3893bEE112e2ad05e181d15",
+            "uri": "ipfs://QmNgPvmFr6boMsaR4JhnYkSkVwdd75inQVZxZtJFQR3XNC"
+        },
+        "PolyCard OneThousand Ledgendary": {
+            "address": "0x7e38918F45fac5bDAF3E8Ec2b7a3B0BAd90D315E",
+            "uri": "ipfs://QmUqYcWhyk14Vk738uRErow72sprHcKY85TTE4V8SWF1YH"
+        },
+        "ProtocolNFT": {
+            "address": "0x8a4a216f25d6DE641B8e9B2397E1B399e686614d"
+        }
+    },
+    "developmentCLI": {
+        "ProtocolNFT": {
+            "address": "0xa1990758A9942B60C08D32B7B3c6207972341E4D"
+        }
+    }
+}

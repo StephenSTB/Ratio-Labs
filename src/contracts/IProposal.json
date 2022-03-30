@@ -1,0 +1,846 @@
+{
+  "contractName": "IProposal",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "interfaceId",
+          "type": "bytes4"
+        }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum IProposal.Vote",
+          "name": "_vote",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_weight",
+          "type": "uint256"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_approved",
+          "type": "bool"
+        }
+      ],
+      "name": "setApproved",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_governed",
+          "type": "address[]"
+        }
+      ],
+      "name": "setGoverned",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "governedLength",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_length",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"governedLength\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_length\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"_approved\",\"type\":\"bool\"}],\"name\":\"setApproved\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_governed\",\"type\":\"address[]\"}],\"name\":\"setGoverned\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum IProposal.Vote\",\"name\":\"_vote\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_weight\",\"type\":\"uint256\"}],\"name\":\"vote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"supportsInterface(bytes4)\":{\"details\":\"Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/interfaces/IProposal.sol\":\"IProposal\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0xa28007762d9da9db878dd421960c8cb9a10471f47ab5c1b3309bfe48e9e79ff4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://796ab6e88af7bf0e78def0f059310c903af6a312b565344e0ff524a0f26e81c6\",\"dweb:/ipfs/QmcsVgLgzWdor3UnAztUkXKNGcysm1MPneWksF72AvnwBx\"]},\"project:/contracts/interfaces/IProposal.sol\":{\"keccak256\":\"0xb505dfd58e65800f5d18a88fc0a68f3a94707a2cc24fb0c5c66fe806e06d72a5\",\"urls\":[\"bzz-raw://30eea5bc4518b64130ff6bc40e59efa2f21c92d1788d26556795ad60028d7869\",\"dweb:/ipfs/QmbmNx9kcQwYZPhnJRGARwmfchy22qyiAtDuWYVrEyS8QJ\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.8.0;\r\n\r\nimport \"@openzeppelin/contracts/utils/introspection/IERC165.sol\";\r\n\r\n// Interface to handle Proposal contract adherence.\r\ninterface IProposal is IERC165{\r\n\r\n    // Enum to represnt voting options.\r\n    enum Vote{\r\n        yes,\r\n        no,\r\n        abstain\r\n    }\r\n\r\n    /* \r\n     *   Functions for Proposal Contracts.\r\n     */\r\n\r\n    // Votes on the Proposal.\r\n    function vote(Vote _vote, uint _weight) external;\r\n\r\n    // Sets the approved variable.\r\n    function setApproved(bool _approved) external;\r\n\r\n    // Sets the governed contract array.\r\n    function setGoverned(address[] memory _governed) external;\r\n\r\n    // Return the goverend contract array length.\r\n    function governedLength() external view returns(uint _length);\r\n\r\n\r\n    \r\n}",
+  "sourcePath": "/home/stephenstb/Ratio/ratio/contracts/interfaces/IProposal.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/interfaces/IProposal.sol",
+    "exportedSymbols": {
+      "IERC165": [
+        8855
+      ],
+      "IProposal": [
+        14453
+      ]
+    },
+    "id": 14454,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 14421,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:66"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "file": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "id": 14422,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 14454,
+        "sourceUnit": 8856,
+        "src": "27:65:66",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 14423,
+              "name": "IERC165",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 8855,
+              "src": "172:7:66"
+            },
+            "id": 14424,
+            "nodeType": "InheritanceSpecifier",
+            "src": "172:7:66"
+          }
+        ],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 14453,
+        "linearizedBaseContracts": [
+          14453,
+          8855
+        ],
+        "name": "IProposal",
+        "nameLocation": "159:9:66",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IProposal.Vote",
+            "id": 14428,
+            "members": [
+              {
+                "id": 14425,
+                "name": "yes",
+                "nameLocation": "249:3:66",
+                "nodeType": "EnumValue",
+                "src": "249:3:66"
+              },
+              {
+                "id": 14426,
+                "name": "no",
+                "nameLocation": "263:2:66",
+                "nodeType": "EnumValue",
+                "src": "263:2:66"
+              },
+              {
+                "id": 14427,
+                "name": "abstain",
+                "nameLocation": "276:7:66",
+                "nodeType": "EnumValue",
+                "src": "276:7:66"
+              }
+            ],
+            "name": "Vote",
+            "nameLocation": "234:4:66",
+            "nodeType": "EnumDefinition",
+            "src": "229:61:66"
+          },
+          {
+            "functionSelector": "d3f29ace",
+            "id": 14436,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "vote",
+            "nameLocation": "402:4:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14434,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14431,
+                  "mutability": "mutable",
+                  "name": "_vote",
+                  "nameLocation": "412:5:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14436,
+                  "src": "407:10:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_Vote_$14428",
+                    "typeString": "enum IProposal.Vote"
+                  },
+                  "typeName": {
+                    "id": 14430,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 14429,
+                      "name": "Vote",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 14428,
+                      "src": "407:4:66"
+                    },
+                    "referencedDeclaration": 14428,
+                    "src": "407:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_Vote_$14428",
+                      "typeString": "enum IProposal.Vote"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14433,
+                  "mutability": "mutable",
+                  "name": "_weight",
+                  "nameLocation": "424:7:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14436,
+                  "src": "419:12:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 14432,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "419:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "406:26:66"
+            },
+            "returnParameters": {
+              "id": 14435,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "441:0:66"
+            },
+            "scope": 14453,
+            "src": "393:49:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "46d5a568",
+            "id": 14441,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setApproved",
+            "nameLocation": "495:11:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14439,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14438,
+                  "mutability": "mutable",
+                  "name": "_approved",
+                  "nameLocation": "512:9:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14441,
+                  "src": "507:14:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 14437,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "507:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "506:16:66"
+            },
+            "returnParameters": {
+              "id": 14440,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "531:0:66"
+            },
+            "scope": 14453,
+            "src": "486:46:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "ac56fd51",
+            "id": 14447,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setGoverned",
+            "nameLocation": "591:11:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14445,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14444,
+                  "mutability": "mutable",
+                  "name": "_governed",
+                  "nameLocation": "620:9:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14447,
+                  "src": "603:26:66",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 14442,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "603:7:66",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 14443,
+                    "nodeType": "ArrayTypeName",
+                    "src": "603:9:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "602:28:66"
+            },
+            "returnParameters": {
+              "id": 14446,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "639:0:66"
+            },
+            "scope": 14453,
+            "src": "582:58:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "b17aabe1",
+            "id": 14452,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "governedLength",
+            "nameLocation": "708:14:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14448,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "722:2:66"
+            },
+            "returnParameters": {
+              "id": 14451,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14450,
+                  "mutability": "mutable",
+                  "name": "_length",
+                  "nameLocation": "752:7:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14452,
+                  "src": "747:12:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 14449,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "747:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "746:14:66"
+            },
+            "scope": 14453,
+            "src": "699:62:66",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 14454,
+        "src": "149:625:66",
+        "usedErrors": []
+      }
+    ],
+    "src": "0:774:66"
+  },
+  "legacyAST": {
+    "absolutePath": "project:/contracts/interfaces/IProposal.sol",
+    "exportedSymbols": {
+      "IERC165": [
+        8855
+      ],
+      "IProposal": [
+        14453
+      ]
+    },
+    "id": 14454,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 14421,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:66"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "file": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+        "id": 14422,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 14454,
+        "sourceUnit": 8856,
+        "src": "27:65:66",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 14423,
+              "name": "IERC165",
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 8855,
+              "src": "172:7:66"
+            },
+            "id": 14424,
+            "nodeType": "InheritanceSpecifier",
+            "src": "172:7:66"
+          }
+        ],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 14453,
+        "linearizedBaseContracts": [
+          14453,
+          8855
+        ],
+        "name": "IProposal",
+        "nameLocation": "159:9:66",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IProposal.Vote",
+            "id": 14428,
+            "members": [
+              {
+                "id": 14425,
+                "name": "yes",
+                "nameLocation": "249:3:66",
+                "nodeType": "EnumValue",
+                "src": "249:3:66"
+              },
+              {
+                "id": 14426,
+                "name": "no",
+                "nameLocation": "263:2:66",
+                "nodeType": "EnumValue",
+                "src": "263:2:66"
+              },
+              {
+                "id": 14427,
+                "name": "abstain",
+                "nameLocation": "276:7:66",
+                "nodeType": "EnumValue",
+                "src": "276:7:66"
+              }
+            ],
+            "name": "Vote",
+            "nameLocation": "234:4:66",
+            "nodeType": "EnumDefinition",
+            "src": "229:61:66"
+          },
+          {
+            "functionSelector": "d3f29ace",
+            "id": 14436,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "vote",
+            "nameLocation": "402:4:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14434,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14431,
+                  "mutability": "mutable",
+                  "name": "_vote",
+                  "nameLocation": "412:5:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14436,
+                  "src": "407:10:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_Vote_$14428",
+                    "typeString": "enum IProposal.Vote"
+                  },
+                  "typeName": {
+                    "id": 14430,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 14429,
+                      "name": "Vote",
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 14428,
+                      "src": "407:4:66"
+                    },
+                    "referencedDeclaration": 14428,
+                    "src": "407:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_Vote_$14428",
+                      "typeString": "enum IProposal.Vote"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14433,
+                  "mutability": "mutable",
+                  "name": "_weight",
+                  "nameLocation": "424:7:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14436,
+                  "src": "419:12:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 14432,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "419:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "406:26:66"
+            },
+            "returnParameters": {
+              "id": 14435,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "441:0:66"
+            },
+            "scope": 14453,
+            "src": "393:49:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "46d5a568",
+            "id": 14441,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setApproved",
+            "nameLocation": "495:11:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14439,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14438,
+                  "mutability": "mutable",
+                  "name": "_approved",
+                  "nameLocation": "512:9:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14441,
+                  "src": "507:14:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 14437,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "507:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "506:16:66"
+            },
+            "returnParameters": {
+              "id": 14440,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "531:0:66"
+            },
+            "scope": 14453,
+            "src": "486:46:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "ac56fd51",
+            "id": 14447,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setGoverned",
+            "nameLocation": "591:11:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14445,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14444,
+                  "mutability": "mutable",
+                  "name": "_governed",
+                  "nameLocation": "620:9:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14447,
+                  "src": "603:26:66",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_address_$dyn_memory_ptr",
+                    "typeString": "address[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 14442,
+                      "name": "address",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "603:7:66",
+                      "stateMutability": "nonpayable",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "id": 14443,
+                    "nodeType": "ArrayTypeName",
+                    "src": "603:9:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
+                      "typeString": "address[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "602:28:66"
+            },
+            "returnParameters": {
+              "id": 14446,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "639:0:66"
+            },
+            "scope": 14453,
+            "src": "582:58:66",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "b17aabe1",
+            "id": 14452,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "governedLength",
+            "nameLocation": "708:14:66",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14448,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "722:2:66"
+            },
+            "returnParameters": {
+              "id": 14451,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14450,
+                  "mutability": "mutable",
+                  "name": "_length",
+                  "nameLocation": "752:7:66",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14452,
+                  "src": "747:12:66",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 14449,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "747:4:66",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "746:14:66"
+            },
+            "scope": 14453,
+            "src": "699:62:66",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 14454,
+        "src": "149:625:66",
+        "usedErrors": []
+      }
+    ],
+    "src": "0:774:66"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.5+commit.a4f2e591.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2022-03-18T21:34:02.794Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "supportsInterface(bytes4)": {
+        "details": "Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

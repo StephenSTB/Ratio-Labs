@@ -1,0 +1,56 @@
+@font-face { font-family: Milkshake; 
+  src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
+
+  @font-face { font-family: Lato; 
+    src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
+
+.Home{
+  background-color: black;
+}
+#particles-js{ 
+  background-image: url("../../logos/content/RatioColors.png"); 
+  background-repeat: no-repeat;
+  height: 71vh;
+  
+}
+
+#Ratio-Text{
+  position: absolute;
+  pointer-events: none;
+  width: 100vw;
+  z-index: 1;
+}
+
+#About{
+
+}
+#missionHeader,#designHeader{
+  font-family: Milkshake;
+  margin-top: 5vh; 
+  color: #cbedca;
+}
+
+#missionHeader{
+  font-size: 52pt;
+  
+}
+#designHeader{
+  font-size: 32pt;
+}
+
+.pState{
+  font-family: Lato;
+  margin-top: 3vh;
+  font-size: 12pt;
+  color: #cbedca;
+}
+
+#engageHeader{
+  font-size: x-large;
+  margin-top: 2.5vh;
+}
+
+.listItem{
+  font-size : medium;
+  color: #cbedca;
+}

@@ -1,0 +1,51 @@
+@font-face { font-family: OpenSans; 
+    src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+@font-face { font-family: Milkshake; 
+    src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
+
+#Game{
+    background-color: black;
+    color: white;
+    border: none;
+}
+#GameMenu{
+    background-image: url("../../logos/content/RatioColors.png"); 
+    border: none;
+    margin: auto;
+}
+
+#MintComponent{
+    height: 88vh;
+    background-color: #cbedca;
+}
+
+#MintText{
+    margin-top: 10vh;
+    font-size: 6em;
+    color: #cbedca;
+    font-family: Milkshake;
+}
+
+#MintInterface{
+    
+}
+
+#Select{
+    font-family: OpenSans;
+    background-color: #cbedca;
+}
+
+#Dropdown{
+    background-color: #cbedca;
+    color: black;
+}
+
+
+/*View section*/
+
+
+
+
+
+

@@ -1,0 +1,233 @@
+@font-face { font-family: OpenSans; 
+    src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+@font-face { font-family: Milkshake; 
+    src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
+
+#NFT{
+    background-color: black;
+    color: white;
+    border: none;
+}
+#NFT_Menu{
+    background-image: url("../../logos/content/RatioColors.png"); 
+    border: none;
+    margin: auto;
+}
+
+#createComponent{
+    background-color: #cbedca;
+    min-height: 88vh;
+}
+
+#createText{
+    margin-top: 10vh;
+    font-size: 6em;
+    color: #cbedca;
+    font-family: Milkshake;
+}
+
+#prompt,#required{
+    font-size: medium;
+}
+
+#required{
+    margin-top: 1vh;
+}
+
+#nftForm{
+    /*border: 1px solid black;*/
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#nftContent{
+    /*border: dashed 1px black;*/
+    width: 75%;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.drop{
+    border: 2px solid black;
+    width: 300px;
+    height: 300px;
+    border-radius: 25px;
+    margin-top: 1vh;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.drop:hover{
+    border: 3px solid gray;
+}
+
+#dropLabel{
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /*border: 1px solid gold;*/
+}
+
+#addIcon, #supportedFiles{
+    align-self: center;
+    color: grey;
+}
+
+#fileDialog{
+    display: none;
+    position: absolute;
+    position: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+#supportedFiles{
+    margin-top: 2vh;
+    color : grey;
+}
+
+#contentError{
+    align-self: center;
+    color: red;
+    margin-top: 1vh;
+}
+
+#uploadedContent{
+    max-height: 295px;
+    max-width: 295px;
+    /*border: 1px solid salmon;*/
+    align-self: center;
+}
+
+#contentSize{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    min-width: 301px;
+    min-height: 301px;
+    /*border: 1px dashed purple;*/
+    z-index: 1;
+}
+
+#contentButtons{
+    margin-top: 1vh;
+    align-self: center;
+}
+
+#properties, #submission{
+    /*border: 1px dashed seashell;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#propButtons{
+    align-self: center;
+    margin-top: 1vh;
+}
+
+.prop{
+    /*border: 1px solid black;*/
+    width: 525px;
+    align-self: center;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+#propInput{
+    margin-left: 1vh;
+}
+
+#valuePropLabel{
+    margin-left: 1.75vh;
+}
+
+#subDivide{
+    margin-top: 3vh;
+}
+
+#submitSection{
+    /*border: 1px dashed seashell;*/
+    margin-top: 2vh;
+    margin-bottom: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#submission{
+    align-self: center;
+    width: 525px;
+    margin-top: 3vh;
+    display: flex;
+    flex-direction: row;
+    
+}
+
+.contractVars{
+    width: 525px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#contractInput{
+    width: 325px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.mintLabel{
+    margin-right: 1vw;
+}
+
+#createLabel{
+    font-family: Milkshake;
+    font-size: 4em;
+}
+
+#createAbout{
+    margin-top: 3vh;
+}
+
+#step{
+    align-self: center;
+    margin-top: 5vh;
+    font-size: medium;
+}
+
+#createStep{
+    font-size: large;
+}
+
+#submitError{
+    color:red;
+    align-self: center;
+    margin-top: 2vh;
+}
+
+#verify{
+    display: flex;
+    flex-direction: row;
+    margin-top: 1vh;
+    margin-left: 2vw;
+}
+
+
+
+

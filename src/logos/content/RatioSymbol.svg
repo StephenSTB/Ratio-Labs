@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg865"
+   width="81.919998"
+   height="81.919998"
+   viewBox="0 0 81.919998 81.919998"
+   sodipodi:docname="RatioSymbol.svg"
+   inkscape:export-filename="C:\Users\PC\Documents\Ratio\ratio\src\logos\RatioSymbol.png"
+   inkscape:export-xdpi="48.4557"
+   inkscape:export-ydpi="48.4557"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+  <metadata
+     id="metadata871">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs869" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1858"
+     inkscape:window-height="1057"
+     id="namedview867"
+     showgrid="false"
+     inkscape:zoom="2.7160645"
+     inkscape:cx="-20.865579"
+     inkscape:cy="9.869454"
+     inkscape:window-x="54"
+     inkscape:window-y="2"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g873" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g873">
+    <text
+       xml:space="preserve"
+       style="font-size:133.333px;line-height:1.25;font-family:'Bodoni MT';-inkscape-font-specification:'Bodoni MT'"
+       x="22.893639"
+       y="66.545868"
+       id="text1444"><tspan
+         sodipodi:role="line"
+         id="tspan1442"
+         x="22.893639"
+         y="66.545868">:</tspan></text>
+  </g>
+</svg>
