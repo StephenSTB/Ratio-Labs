@@ -72,7 +72,7 @@ class TopBar extends Component{
                                     : 
                                     <Card.Content>
                                         <Card.Content>
-                                            <Header color="black" style={{"margin-top": "1vh"}}>Connect Wallet</Header>
+                                            <Header color="black" style={{"marginTop": "1vh"}}>Connect Wallet</Header>
                                         </Card.Content>
                                         <Card.Content >
                                             <Card.Header > 
@@ -110,7 +110,7 @@ class TopBar extends Component{
                         <Menu.Menu position="right" />
                         
                         <Menu.Item position="right">
-                            <Button color="black" style={{"margin-right": "1em"}} onClick={this.providerOpen}><img className="networkImg" src={this.props.selectedProviderImage} onClick={this.providerOpen}/></Button>
+                            <Button color="black" style={{"marginRight": "1em"}} onClick={this.providerOpen}><img className="networkImg" src={this.props.selectedProviderImage} onClick={this.providerOpen}/></Button>
                             <Button color="black" title={this.props.selectedAccount} onClick={this.handleOpen}><div id="connect">{this.props.selectedAccount}</div></Button>
                         </Menu.Item>
                         <Menu.Menu position="right"/>
@@ -129,17 +129,17 @@ class TopBar extends Component{
                                 <Card.Content>
                                     <Grid columns={2}>
                                         <Grid.Column textAlign="right">
-                                            <Button color="black"><div style={{"margin-right": "2em"}} onClick={() => this.changeProvider("137") }><img className="networkImg" src={Polygon} style={{marginRight: "1em"}}/>Polygon </div></Button>
+                                            <Button color="black"><div style={{"marginRight": "2em"}} onClick={() => this.changeProvider("137") }><img className="networkImg" src={Polygon} style={{marginRight: "1em"}}/>Polygon </div></Button>
                                         </Grid.Column>
                                         <Grid.Column textAlign="left">
-                                            <Button color="black"><div style={{"margin-right": "2em"}} onClick={() => this.changeProvider("80001")}><img className="networkImg" src={Mumbai} style={{marginRight: "1em"}}/>Mumbai</div></Button>
+                                            <Button color="black"><div style={{"marginRight": "2em"}} onClick={() => this.changeProvider("80001")}><img className="networkImg" src={Mumbai} style={{marginRight: "1em"}}/>Mumbai</div></Button>
                                         </Grid.Column> 
                                     </Grid>
                                 </Card.Content>
                                 <Card.Content>
                                     <Grid columns={2} >
                                         <Grid.Column textAlign="right">
-                                            <Button color="black" ><div style={{"margin-right": "2em"}} onClick={() =>this.changeProvider("1337")}><img className="networkImg" src={Ganache} style={{"margin-right": "1em"}}/>Ganache </div></Button>
+                                            <Button color="black" ><div style={{"marginRight": "2em"}} onClick={() =>this.changeProvider("1337")}><img className="networkImg" src={Ganache} style={{"marginRight": "1em"}}/>Ganache </div></Button>
                                         </Grid.Column>
                                         <Grid.Column textAlign="left">
                                         </Grid.Column> 

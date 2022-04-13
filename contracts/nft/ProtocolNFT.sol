@@ -10,26 +10,45 @@ import "./RatioNFT.sol";
 // Contract to verify nft distributors.
 contract ProtocolNFT is Ownable {
 
+    // minimum amount to be paid for verificaiton/hosting.
     uint public minimumRequestValue;
 
-    mapping(string => address) uriDistributor;
+    // mapping to determine distributor of a baseURI;
+    mapping(string => address) public baseURIdistributor;
 
-    mapping(address => mapping(string => nftStruct)) nftDistributor;
+    // mapping to determine distributor of a subURI;
+    mapping(string => address) public subURIdistributor;
 
+    // mapping to return an nft given the distributor and baseURI;
+    mapping(address => mapping(string => nftStruct)) public distributorNFT;
+
+    // mapping to determine if a baseURI has been added.
+    mapping(string => bool) baseURIadded;
+
+    // mapping to hold all baseURIs
+    string[] public baseURIs;
+
+    // mapping to hold nft leafs that have been verified.
     mapping(bytes32 => bool) nftVerified;
 
+    // mapping to hold block of submited root.
     mapping(bytes32 => uint) nftRootsMap;
 
-    bytes32[] nftRoots;
+    // array of nftRoots;
+    bytes32[] public nftRoots;
 
     //bytes public ipfsBytes = bytes("ipfs://");   
 
     //bytes public uriBytes = bytes("ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ");
 
+
+    // Event emitted when a new nft root is submitted.
     event rootSubmited(bytes32 _root, uint _block);
 
+    // Event emitted when a verification request is submitted.
     event verificationRequest(address _contract, address _distributor, string _baseURI, uint _block, uint _value);
 
+    // Event emitted when an nft has been verifed!
     event verified(nftStruct _nft);
 
     /*
@@ -51,19 +70,12 @@ contract ProtocolNFT is Ownable {
     constructor(uint _minimumRequestValue){
         minimumRequestValue = _minimumRequestValue;
     }
-
-    // Function to submit transaction roots for verified NFTs.
-    function submitRoot(bytes32 _root) public onlyOwner{
-        nftRoots.push(_root);
-        nftRootsMap[_root] = block.number;
-        emit rootSubmited(_root, block.number);
-    }
     
     // Function to requets verificaition of NFT 
     function requestVerification(string  memory _baseURI) public payable{
         require(msg.value >= minimumRequestValue, "Invalid Request .");
 
-        require(uriDistributor[_baseURI] == address(0), "Base URI has already been claimed.");
+        require(baseURIdistributor[_baseURI] == address(0), "Base URI has already been claimed.");
 
         require(bytes(_baseURI).length == 53, "Incorrect _baseURI length");
 
@@ -93,21 +105,52 @@ contract ProtocolNFT is Ownable {
 
         // Verify and Store NFT info.
         nftVerified[_leaf] = true;
-        uriDistributor[_nft._baseURI] = _nft._distributor;
+
+        // Set URIs distributor.
+        baseURIdistributor[_nft._baseURI] = _nft._distributor;
         for(uint i = 0; i < _nft._subURIs.length; i++){
-            uriDistributor[_nft._subURIs[i]] = _nft._distributor;
+            subURIdistributor[_nft._subURIs[i]] = _nft._distributor;
         }
-        nftDistributor[_nft._distributor][_nft._baseURI] = _nft;
+        // Set distributor nft;
+        distributorNFT[_nft._distributor][_nft._baseURI] = _nft;
+
+        // Condition to determine if the baseURI should be added to baseURI array.
+        if(!baseURIadded[_nft._baseURI]){
+            baseURIadded[_nft._baseURI] = true;
+            baseURIs.push(_nft._baseURI);
+        }
         emit verified(_nft);
     }
 
-    
+    // Function to submit transaction roots for verified NFTs.
+    function submitRoot(bytes32 _root) public onlyOwner{
+        nftRoots.push(_root);
+        nftRootsMap[_root] = block.number;
+        emit rootSubmited(_root, block.number);
+    }
+
+    function slashNFTs(address[] memory _distributors, string[] memory _baseURIs) public onlyOwner{
+        for(uint i = 0; i < _distributors.length; i++){
+            delete distributorNFT[_distributors[i]][_baseURIs[i]];
+        }
+    }
+
+    function modifyRequestValue(uint _val) public onlyOwner{
+        minimumRequestValue = _val;
+    }
+
+    function claim() public{
+        payable(owner()).transfer(address(this).balance);
+    }
+
+
+    /*
     function verifyProofTest(bytes32 _root, bytes32 _leaf, bytes32[] memory _proof, nftStruct memory leaf) public {
 
          emit proof(MerkleProof.verify(_proof, _root, _leaf));
 
     }
-    /*
+    
     //
     function structHashTest(bytes32 _leaf, verificationStruct memory leaf) public{
 
@@ -130,8 +173,5 @@ contract ProtocolNFT is Ownable {
         return (keccak256(abi.encodePacked(bytes9( bytes(_baseURI) ) ) )  == keccak256(abi.encodePacked( bytes9("ipfs://Qm") ) ) );
     }
 
-    function claimVerificationValue() public{
-        payable(owner()).transfer(address(this).balance);
-    }
-
+    
 }

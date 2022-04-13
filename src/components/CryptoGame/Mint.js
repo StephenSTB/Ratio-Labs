@@ -54,7 +54,7 @@ class Mint extends Component{
 
         return(
             <div id="MintComponent">
-                <Segment basic inverted id="MintBanner" style={{"margin-top": "auto", height: "25vh"}}>
+                <Segment basic inverted id="MintBanner" style={{"marginTop": "auto", height: "25vh"}}>
                     <Container textAlign="left">
                         <div id="MintText">Mint</div>
                     </Container>

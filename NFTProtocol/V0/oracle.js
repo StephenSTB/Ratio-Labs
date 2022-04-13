@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	max: 25, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
@@ -22,7 +22,10 @@ app.use(limiter);
 app.use(busboy(
     {
         highWaterMark: 2 * 1024 * 1024,
-        
+        limits : {
+            files: 5,
+            fileSize: 100 * 1024 * 1024
+        }
     }
 ));
 
@@ -40,7 +43,7 @@ const fs = require("fs");
 
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 
-const providers = require('../src/data/Providers.json');
+const providers = require('../../src/data/Providers.json');
 
 var providerName = null;
 
@@ -56,7 +59,7 @@ const verify = require('./verify')
 const IPFS = require("ipfs");
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-var drop = false;
+var drop = true;
 
 mongoClient.connect(url, {useUnifiedTopology: true}, async (err, client) =>{
     if (err) throw err;
@@ -108,6 +111,29 @@ mongoClient.connect(url, {useUnifiedTopology: true}, async (err, client) =>{
     await init();
 
     const ipfs = await IPFS.create();
+
+    var pins = await ipfs.pin.ls();
+
+    console.log(`IPFS Pins:`)
+
+    for await (var p of pins){
+        console.log(p)
+    }
+
+    if(drop){
+        try{
+            //var dropedPins = await ipfs.pin.rmAll(pins);
+            console.log(`Dropping pins`)
+            pins = await ipfs.pin.ls();
+            for await(var p of pins){
+                console.log(p)
+                await ipfs.pin.rm(p.cid)
+                //console.log(p)
+            }
+        }catch{
+            console.log("Removing pins failed.");
+        }
+    }
     
     verify(db, provider, providerName, web3, accounts);
 
@@ -120,7 +146,7 @@ mongoClient.connect(url, {useUnifiedTopology: true}, async (err, client) =>{
 
 init = async () =>{
     var args = process.argv.splice(2);
-    console.log(args[0])
+    console.log(`Provider name: ${args[0]}`);
     providerName = args[0];
     try{
         switch(args[0]){

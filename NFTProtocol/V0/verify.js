@@ -8,14 +8,13 @@ const contract = require('@truffle/contract');
 
 const { MerkleTree } = require('merkletreejs')
 
-const deployedContracts = require('../src/data/Deployed_Contracts.json');
+const deployedContracts = require('../../src/data/Deployed_Contracts.json');
 
 const keccak256 = require('keccak256');
 
-const ProtocolNFT = contract(require('../src/contracts/ProtocolNFT.json'));
+const ProtocolNFT = contract(require('../../src/contracts/ProtocolNFT.json'));
 
 var protocolNFT;
-
 
 
 verify = async (db, provider, providerName, web3) =>{
@@ -32,7 +31,7 @@ verify = async (db, provider, providerName, web3) =>{
 
     await ProtocolNFT.defaults({from: account});
 
-    console.log(deployedContracts[providerName].ProtocolNFT.address)
+    console.log(`ProtocolNFT Address: ${deployedContracts[providerName].ProtocolNFT.address}`)
 
     protocolNFT = await ProtocolNFT.at(deployedContracts[providerName].ProtocolNFT.address);
     
@@ -100,7 +99,7 @@ verify = async (db, provider, providerName, web3) =>{
 
         try{
            var receipt = await protocolNFT.submitRoot(root)
-           console.log(receipt.logs[0].args)
+           console.log(`Submitted root: ${receipt.logs[0].args._root}`)
         }
         catch(err){
             console.log(err + "submitError")

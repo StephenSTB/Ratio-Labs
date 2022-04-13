@@ -11,10 +11,6 @@ import Main from "./components/Main/Main";
 
 import {BrowserRouter} from "react-router-dom";
 
-import { Button, Dimmer, Header, Image, Segment } from 'semantic-ui-react'
-
-import * as IPFS from "ipfs";
-
 import networkData from "./data/Network_Data.json";
 
 import mumbai from "./logos/wallet/chains/polygonMumbai.png";
@@ -24,6 +20,21 @@ import polygon from "./logos/wallet/chains/polygon.png";
 import ganache from "./logos/wallet/chains/ganache.png";
 
 import kovan from "./logos/wallet/chains/kovan.png";
+
+import * as ipfs_http from 'ipfs-http-client';
+
+import * as IPFS from 'ipfs-core';
+
+import {CID, multiaddr} from 'ipfs'
+
+import all from "it-all";
+
+import * as uint8arrays from 'uint8arrays'
+
+const WS = require('libp2p-websockets')
+const filters = require('libp2p-websockets/src/filters')
+const transportKey = WS.prototype[Symbol.toStringTag]
+
 
 var images  = {
                   "80001": mumbai,
@@ -48,11 +59,30 @@ class App extends Component{
     console.log(global.ipfs)
 
     if(global.ipfs === undefined){
-      global.ipfs = await IPFS.create();
+      
+      try{
+        
+        global.ipfs = await IPFS.create({
+          repo: 'ipfs-browser', // Math.random()
+          /*
+          config: {
+            Addresses: {
+              Swarm: [
+                '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+                '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+                '/dns4/localhost/tcp/13579/ws/p2p-webrtc-star/',
+              ]
+            },
+            Bootstrap: []
+          },*/
+          start: false
+        });
 
-      var version = await global.ipfs.version();
+        console.log(global.ipfs)
 
-      console.log(version.version)
+      }catch(err){
+        console.log(err)
+      }
      
     }
     
@@ -186,7 +216,7 @@ class App extends Component{
   render(){
     return (
       <div className="App">
-        <BrowserRouter>
+        <BrowserRouter >
           <TopBar {...this.state} updateWeb3 = {this.updateWeb3} setProvider ={this.setProvider} setLoading = {this.setLoading}/>
           <Main {...this.state} setLoading = {this.setLoading}/>
         </BrowserRouter>

@@ -15,11 +15,13 @@ import * as fs from 'fs';
 
 import RatioNFT from '../../contracts/RatioNFT.json';
 
+import ProtocolNFT from '../../contracts/ProtocolNFT.json';
+
 import testnft from "./CryptoMonkeyRatioNFT.json";
 
-import * as nftOracleAPI from "./nftOracleAPI.js";
+import * as nftGatewayAPI from "./nftGatewayAPI.js";
 
-var oracleApi;
+var gatewayApi;
 
 var prod = false;
 
@@ -46,14 +48,14 @@ class Create extends Component{
                         finalContent: null,
                         host: true, nftDeploymentCost: "",
                       }
+
         host = prod ? "https://ratiomaster.site" : "http://localhost:3001";
 
-        //console.log({nftOracleAPI})
+        //console.log({nftGatewayAPI})
 
-        oracleApi = new nftOracleAPI(host);
+        gatewayApi = new nftGatewayAPI(host);
     
-        
-        //this.addContent = this.addContent.bind(this);
+        this.addContent = this.addContent.bind(this);
     }
 
     componentDidMount = async () =>{
@@ -61,6 +63,8 @@ class Create extends Component{
         //var version = await global.ipfs.version(); 
         //console.log("IPFS Mount, Version: " + version.version)
         this.RatioNFT = contract(RatioNFT)
+
+        this.ProtocolNFT = contract(ProtocolNFT)
 
         if(this.props.web3 === undefined){
             return;   
@@ -79,6 +83,7 @@ class Create extends Component{
 
         if(prevProps.web3.currentProvider !== this.props.web3.currentProvider){
             this.RatioNFT.setProvider(this.props.web3.currentProvider);
+            this.ProtocolNFT.setProvider(this.props.web3.currentProvider)
         }
 
     }
@@ -244,21 +249,16 @@ class Create extends Component{
 
     drop = async (ev) =>{
         ev.preventDefault();
-
         if(ev.dataTransfer.files[0] === undefined)
             return
-
         this.addContent(ev.dataTransfer.files[0])          
     }
 
     upload = (ev) =>{
         if(ev.target.files[0] === undefined)
-            return
-
-        console.log(ev.target.files[0]);
-
+            return;
+        //console.log(ev.target.files[0]);
         //var file = Buffer.from(ev.target.files[0], "utf-8")
-        
         this.addContent(ev.target.files[0])
     }
 
@@ -275,7 +275,6 @@ class Create extends Component{
     addProperty = () =>{
         var properties = this.state.properties;
         properties.push({name: "", value: ""})
-        
         this.setState({properties})
     }
 
@@ -286,20 +285,14 @@ class Create extends Component{
     }
 
     nameChange = (e, data) =>{
-
         var index = data.id.replace("propInput", "")
-
         var properties = this.state.properties;
-
         properties[index].name = data.value;
-
     }
 
     valueChange = (e, data) =>{
         var index = data.id.replace("propInput", "")
-
         var properties = this.state.properties;
-
         properties[index].value = data.value;
     }
 
@@ -343,10 +336,10 @@ class Create extends Component{
         var subURIs = [];
         
         for(var i = 0; i < files.length; i++){
-            console.log(files[i])
+            console.log(`adding file '${files[i].name}' to nft`)
             var result = await ipfs.add(files[i]);
             subURIs.push("ipfs://" + result.cid.toString());
-            console.log(result.cid.toString())
+            console.log(`${files[i].name} cid: ${result.cid.toString()}`);
             switch(this.state.contentType[i]){
                 case "image": contentJSON["image"] = "ipfs://" + result.cid.toString(); break;
                 case "video": contentJSON["video"] = "ipfs://" + result.cid.toString(); break;
@@ -422,7 +415,7 @@ class Create extends Component{
 
             var protocolAddress = deployedContracts[networkData[this.props.network].chainName].ProtocolNFT.address;
 
-            console.log("ProtocolNFT Address:" + protocolAddress)
+            //console.log("ProtocolNFT Address:" + protocolAddress)
 
             this.setState({stepText: "Setting NFT Contract URI..."});
 
@@ -439,7 +432,17 @@ class Create extends Component{
 
             this.setState({stepText: "Waiting for Ratio Labs Verification..."})
 
-            var state = await oracleApi.state(nftJSON.content.contract)
+            if(this.ProtocolNFT.currentProvider === undefined ){
+                this.ProtocolNFT.setProvider(this.props.web3.currentProvider);
+            }
+
+            var protocolNFT = this.ProtocolNFT.at(protocolAddress);
+
+            //var roots = protocolNFT.contract.methods.nftRoots.call().call()
+
+            //console.log(roots)
+            
+            var state = await gatewayApi.state(nftJSON.content.contract)
 
             if(state.status !== "success"){
                 if(state.reason === "Invalid contract address format.")
@@ -450,7 +453,7 @@ class Create extends Component{
                 }
                 while(state.status !== "success"){
                     await new Promise(r => setTimeout(r, 2000));
-                    state = await oracleApi.state(nftJSON.content.contract)
+                    state = await gatewayApi.state(nftJSON.content.contract)
                 }
             }
 
@@ -460,7 +463,7 @@ class Create extends Component{
                 return;
             }
 
-            var ver = await oracleApi.verify(nftJSON);
+            var ver = await gatewayApi.verify(nftJSON);
 
             console.log(ver.status)
 
@@ -470,10 +473,35 @@ class Create extends Component{
                 return;
             }
 
-            state = await oracleApi.state(nftJSON.content.contract);
+            state = await gatewayApi.state(nftJSON.content.contract);
+            console.log(`   State: ${JSON.stringify(state)}`);
+            // Send data to Ratio
+
+            const nftString = JSON.stringify(nftJSON);
+
+            const blob = new Blob([nftString], {type: "application/json"})
+
+            const file = new File([blob], baseURI.replace("ipfs://", ""), {type: "application/json"})
+
+            const formdata = new FormData();
+
+            formdata.append(baseURI, file);
+
+            for(var i =0; i < subURIs.length; i++){
+                formdata.append(subURIs[i], files[i]);
+            }
+
+            formdata.append('contract', nftJSON.content.contract)
+
+            var host = await gatewayApi.host(formdata);
+
+            console.log(`host: ${host}`);
+
+            state = await gatewayApi.state(nftJSON.content.contract);
             console.log(`   State: ${JSON.stringify(state)}`);
 
-            // Send data to Ratio
+            
+
         }
         catch(err){
             console.log(err)
@@ -511,16 +539,15 @@ class Create extends Component{
 
     testHost = async () =>{
 
-
-        var nft = {"content":{"name":"Ratio Card","image":"ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ","contract":"0xc6bF5824D849f68c4D39283cEDf23F38b9567AB8","distributor":"0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"},"signature":"0x2d22f5cd608ac78b53be2b8fbc5653777626d1dc8fea4feb0256f696cc311b60745b5a73a6fc1ebe820958eded1bd24f8dcb98e05b8c2ab0478bc33e4f9716fc1b"}
+        var nft = {"content":{"name":"Ratio Card","image":"ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ","contract":"0x9D63017F409C64EEDBad55193A8766F9F20FAE68","distributor":"0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"},"signature":"0x782c5f75959cfae69ec6fd95408074d9e2a1ecd397e54c04d33999d93465a1ee5839c04cf533b69ba455b685dc83e94c582a59d2ad001271ca6c28ea49539e6c1c"}
 
         const nftString = JSON.stringify(nft);
 
-        var baseURI = "ipfs://QmQZrbujeGjZfky7aUKqX81pC6rTqAmaHv27VZcLf2Ye4i";
+        var baseURI = "ipfs://QmdrV5KEK4nSZvDdqK1XNZ6NnmtxvVkCb2GQXKUgjxFJPP";
 
         const blob = new Blob([nftString], {type: "application/json"})
 
-        const file = new File([blob], baseURI.replace("ipfs://", ""))
+        const file = new File([blob], baseURI.replace("ipfs://", ""), {type: "application/json"})
         
         var subURI = "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ";
         const data = new FormData();
@@ -538,14 +565,14 @@ class Create extends Component{
         
         //console.log(data.getAll('file'))
 
-        oracleApi.host(data);
+        gatewayApi.host(data);
     }
 
     testVerify = async() =>{
         var nft = {"content":{"name":"Ratio Card","image":"ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ","contract":"0xa64A895fDCFA0C94E1240BDe002b50B248983dE5","distributor":"0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"},"signature":"0xa355642b6539beb85f4d6ed7952f477d42ef519eae76a48fde14119cf3c3536558f765f41709b3cd905c8cf885bd1eee2f5c982c104dfd17167d5d2ea5130b971c"}
-        //await oracleApi.verify(nft)
+        await gatewayApi.verify(nft)
 
-        await oracleApi.state(nft.content.contract);
+        await gatewayApi.state(nft.content.contract);
     }
 
     render(){
@@ -554,7 +581,7 @@ class Create extends Component{
 
         return(
             <div id="createComponent">
-                <Segment basic inverted id="createBanner" style={{"margin-top": "auto", height: "25vh"}}>
+                <Segment basic inverted id="createBanner" style={{"marginTop": "auto", height: "25vh"}}>
                         <Container textAlign="left">
                             <div id="createText">Create</div>
                         </Container>
@@ -563,11 +590,11 @@ class Create extends Component{
                     <Container textAlign="left">
                         <div id="prompt">Use the form bellow to create NFT's utilizing the Ratio NFT Protocol. (see About)</div>
                         <div id="required">* Indicates Required Fields</div>
-                        <Button onClick={this.testHost}>Test</Button>
+                        <Button onClick={this.testVerify}>verify</Button>
                         <Form id="nftForm" onSubmit={() => this.createNFT}>
-                            <div style={{"margin-top": "3vh", "font-size": "x-large"}}>Content: </div>
+                            <div style={{"marginTop": "3vh", "font-size": "x-large"}}>Content: </div>
                             <div id="nftContent">
-                                <div style={{"margin-top": "3vh", "font-size": "large"}}>&emsp; *Main:</div>
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; *Main:</div>
                                 {this.state.content.map(c =>(
                                     <div className="drop">
                                         {c}
@@ -575,16 +602,16 @@ class Create extends Component{
                                 ))}
                                 {this.state.contentButtons}
                                 <input id="fileDialog" type="file" onChange={this.upload}/>
-                                <div id="supportedFiles">&emsp; Supported file types: JPG, PNG, GIF, SVG, MP4, WEBM, MP3, WAV, OGG, GLB, GLTF. Max size: 1000 MB </div>
+                                <div id="supportedFiles">&emsp; Supported file types: JPG, PNG, GIF, SVG, MP3, WAV, OGG, MP4, WEBM, GLB, GLTF. Max size: 100 MB </div>
                                 <div id="contentError">{this.state.contentError}</div>
 
-                                <div style={{"margin-top": "3vh", "font-size": "large"}}>&emsp; *Name:</div>
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; *Name:</div>
                                 <input  style={{width: "50%", alignSelf: "center"}} onChange={this.setName}/>
 
-                                <div style={{"margin-top": "3vh", "font-size": "large"}}>&emsp; &nbsp; Description:</div>
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; Description:</div>
                                 <textarea style={{width: "50%", height:"100px", alignSelf: "center"}}  onChange={this.setDescription}/>
 
-                                <div style={{"margin-top": "3vh", "font-size": "large"}}>&emsp; &nbsp; Properties:</div>
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; Properties:</div>
                                 <div id="properties">
                                     {this.state.properties.map((p, i) =>(
                                         <div className="prop">
@@ -592,16 +619,16 @@ class Create extends Component{
                                                     <Dropdown simple item placeholder="Type" id={"dropdown" + i} options={this.state.options} onChange={this.propertyDrop}/>
                                                 </Menu>*/}
                                             <div>Name:</div>
-                                            <Form.Input id={"propInput" + i} style={{"marginLeft": "1vh"}} placeholder="Name" size="small" onChange={this.nameChange}/>
+                                            <Form.Input id={"propInput" + i} key={i} style={{"marginLeft": "1vh"}} placeholder="Name" size="small" onChange={this.nameChange}/>
                                             <div id="valuePropLabel">Value:</div>
-                                            <Form.Input id={"propInput" + i} style={{"marginLeft": "1vh"}} placeholder="Value" size="small" onChange={this.valueChange}/>
+                                            <Form.Input id={"propInput" + i} key={i} style={{"marginLeft": "1vh"}} placeholder="Value" size="small" onChange={this.valueChange}/>
                                         </div>
                                     ))}
                                         
                                     <div id="propButtons"><Button icon="minus" onClick={this.removeProperty}/><Button icon="plus" onClick={this.addProperty}/></div>
                                 </div>
                                 <Divider />
-                                <div style={{"margin-top": "3vh", "font-size": "large"}}>&emsp; &nbsp; *Contract:</div>
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; *Contract:</div>
                                 <div className="contractVars">
                                     <div id="contractInput">
                                         <div className="mintLabel">*Max Mint Count:</div>

@@ -2,6 +2,8 @@ const CID = require('multiformats/cid').CID
 const path = require('path');  
 const fs = require("fs-extra");
 
+const mime = require('mime-types')
+
 const uploadPath = path.join(__dirname, 'nft/'); // Register the upload path
 fs.ensureDir(uploadPath); // Make sure that he upload path exits
 
@@ -33,6 +35,66 @@ routes = (app, db, ipfs, web3) =>{
         res.status(200).json({status: "success", state: data.state});
 
     });
+
+    app.get("/hosted", async (req, res) =>{
+
+        console.log("\n Verify Hosted.");
+
+        var contract = req.query.contract;
+
+        if(contract === undefined || contract === null || !web3.utils.isAddress(contract)){
+            res.status(400).json({"status": "failed", "reason": "Invalid contract address format."})
+            return;
+        }
+
+        var data =  await db.collection("nft").findOne({contract: contract});
+
+        if(data === null || data === undefined){
+            res.status(400).json({"status": "failed", "reason": "Invalid nft query."})
+            return
+        }
+
+        console.log(data);
+
+        if(data.state === 'new' || data.state === 'hosted'){
+            res.status(400).json({"status": "failed", "reason": "Invalid nft state."})
+        }
+
+        var baseURI = data.baseURI;
+
+        var uriQuery = await db.collection('uri').findOne({uri: baseURI});
+
+        if(uriQuery === null || uriQuery === undefined){
+            res.status(400).json({"status": "failed", "reason": "Invalid nft uri query."})
+            return;
+        }
+
+        if(uriQuery.hosted !== true){
+            res.status(400).json({"status": "failed", "reason": "NFT already hosted."})
+            return;
+        }
+
+        console.log(uriQuery);
+
+        for(var d of data.content){
+            console.log(d);
+            var subURI = data.content[d];
+
+            uriQuery =  await db.collection('uri').findOne({uri: subURI});
+            if(uriQuery === null || uriQuery === undefined){
+                res.status(400).json({"status": "failed", "reason": "Invalid nft uri query."})
+                return;
+            }
+
+            if(uriQuery.hosted !== true){
+                res.status(400).json({"status": "failed", "reason": "NFT already hosted."})
+                return;
+            }
+
+        }
+
+        var content;
+    })
     
     app.post("/verify", async (req, res) =>{
 
@@ -177,14 +239,14 @@ routes = (app, db, ipfs, web3) =>{
 
             console.log(`   transaction: ${JSON.stringify(transaction)}`);
 
-            await db.collection("uri").insertOne({uri: data.baseURI});
+            await db.collection("uri").insertOne({uri: data.baseURI, hosted: false});
             
             for(var u of subURIs){
                 console.log(`   subURI: ${u}`)
-                await db.collection("uri").insertOne({uri: u});
+                await db.collection("uri").insertOne({uri: u, hosted: false});
             }
 
-            var updated = await db.collection("nft").updateOne({contract: contract}, {$set: {state: "verified"}})
+            var updated = await db.collection("nft").updateOne({contract: contract}, {$set: {state: "verified", content: result.content}})
             //console.log(`   updated: ${JSON.stringify(updated)}`)
 
             updated = await db.collection("nft").findOne({contract: contract})
@@ -202,12 +264,12 @@ routes = (app, db, ipfs, web3) =>{
     validateURIs =  async (content) =>{
 
         var main = [content.image, content.audio, content.video, content.model] 
-        var res = {status: false, main: []}
+        var res = {status: false, main: [], content: {}}
         /*
         console.log(content.image.replace("ipfs://",""))
         var cid = CID.parse(content.image.replace("ipfs://","a"))
         console.log(cid)*/
-
+        var i = 0;
         for(var a of main){
             if(a !== undefined){
                 if(a.length !== 53){
@@ -229,80 +291,158 @@ routes = (app, db, ipfs, web3) =>{
                     return res;
                 }
                 res.main.push(a)
+                
+                switch(i){
+                    case 0: res.content.image = a; break;
+                    case 1: res.content.audio = a; break;
+                    case 2: res.content.video = a; break;
+                    case 0: res.content.model = a; break;
+                }
             }
-            continue;
+            i++;
         }
-        
+    
         res.status = true;
-
         return res;
     }
 
     app.post("/host", async (req, res) =>{
-        console.log("Host")
+        console.log("Attempting Host Request...")
 
         req.pipe(req.busboy);
+
+        var contract;
+
+        var baseURI;
+
+        var subURIs = [];
 
         var files = [];
 
         var success = true;
 
-        var fileData = {}
+        count = 0;
         
         req.busboy.on('file', async (name, file, info) =>{
-            console.log(`name: ${name} file: ${file} info: ${JSON.stringify(info)}`);
+            console.log(`   name: ${name} info: ${info.mimeType}`);
+            count++;
             try{
                 var data = await db.collection("uri").findOne({uri: name});
-                if(data !== null){
-                    //files.push({name: name, file: file})
-                }
-                else{
-                    console.log(data);
+                console.log(`   uri data: ${data}.`);
+                if(data === null){
+                    console.log(`   uri data was null.`)
+                    file.resume();
                     success = false;
+                    return;
                 }
+                console.log(`   uri hosted: ${data.hosted}.`);
+                if(data.hosted){
+                    console.log(`   uri data already hosted.`);
+                    file.resume();
+                    success = false;
+                    return;
+                }
+
+                var cid = (await ipfs.add(file)).cid.toString();
+
+                if(cid !== name.replace("ipfs://", "")){
+                    console.log(`   file cid does not match name.`);
+                    file.resume();
+                    success = false;
+                    return;
+                }
+
+                files.push(name);
+
+                var ext = mime.extension(info.mimeType);
+                console.log(`   ext: ${ext}`)
                 
+                console.log(`   writing file: ${name}`);
+                const fstream = fs.createWriteStream(path.join(uploadPath, name.replace("ipfs://", "") + "." + ext));
+                file.pipe(fstream);
+                fstream.on('close', async () => {
+                    console.log(`   Upload of '${name}' finished, `);
+                    var pin = await ipfs.pin.add(CID.parse(cid))
+                    console.log(`   ${pin} was pinned!`)
+
+                    await db.collection("uri").updateOne({uri: name.replace("ipfs://", "")}, {$set: {hosted: true}})
+
+                    count --;
+
+                    if(count === 0){
+                        console.log(` closing... success: ${success}`);
+
+                        if(!success){
+                            res.status(400).json({status: "failed"})
+                            return;
+                        }
+            
+                        if(!files.includes(baseURI)){
+                            console.log(`   baseURI: ${baseURI} not included.`)
+                            res.status(400).json({status: "failed"})
+                            return;
+                        }
+            
+                        for(var u of subURIs){
+                            if(!files.includes(u)){
+                                console.log(` subURI: ${u} not included.`)
+                                res.status(400).json({status: "failed"})
+                                return;
+                            }
+                        }
+                        await db.collection("nft").updateOne({contract: contract}, {$set: {state: "hosted"}})
+                        
+                        res.status(200).json({status: "success"})
+                        return;
+                    }
+                })
             }
             catch{
-                console.log("uri error.")
+                console.log("   uri error.")
             }
         })
 
+        req.busboy.on('field', async (fieldname, value) =>{
 
-        req.busboy.on('finish', async () =>{
-            console.log("finish")
-
-            console.log(`success: ${success} files.length: ${files.length}`);
-
-            if(!success || files.length === 0){
-                res.status(400).json({status: "failed"})
+            console.log(`   fieldname: ${fieldname} value: ${value}`);
+            if(fieldname !== 'contract'){
+                console.log(`   Invalid field name`);
+                success = false;
                 return;
             }
 
-            var baseURIquery = await db.collection('nft').findOne({baseURI: files[0].name});
-
-            if(baseURIquery === null || baseURIquery.state !== "verified"){
-                res.status(400).json({status: "failed"})
+            if(!web3.utils.isAddress(value)){
+                console.log(` Invalid contract address given.`)
+                success = false;
                 return;
             }
 
-            for(var f of files){
+            var nft = await db.collection('nft').findOne({contract: value});
 
-                console.log(JSON.stringify(f))
-                /*
-                const fstream = fs.createWriteStream(path.join(uploadPath, f.name.replace("ipfs://", "")));
-                f.file.pipe(fstream);
-                fstream.on('close', () => {
-                    console.log(`Upload of '${f.name}' finished`);
-                });*/
+            console.log(nft);
+
+            if(nft === null || nft.state !== 'verified'){
+                console.log(`   Invalid contract query.`);
+                success = false;
+                return;
             }
-            
-            res.status(200).json({status: "success"})
+
+            baseURI = nft.baseURI;
+
+            console.log(`   baseURI: ${baseURI}`);
+
+            for(var c in nft.content){
+                console.log(`   subURI: ${nft.content[c]}`);
+                subURIs.push(nft.content[c]);
+            }
+
+            contract = value;
+
+            console.log(`   contract: ${contract}`)
+
         })
-        
-        
+
     })
-
-    
 
 }
 

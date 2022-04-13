@@ -22,10 +22,10 @@ class Home extends Component{
         return(
             <div>
                 <Segment inverted color="black" id="About"  >
-                    <Container style={{"margin-top": "2vh"}} textAlign="left">
+                    <Container style={{"marginTop": "2vh"}} textAlign="left">
                         <div id="missionHeader">The Mission</div>
                         <p className="pState"> &emsp; The primary goal of the projects featured on this site are to enable innovative interactions with blockchain technologies. To acheive this goal, projects designed for this site have been structured to solve real world use cases including, Seamless smart contract interactions, Digital asset verification and distribution, NFT gamification with virtual reality visualization, Cross chain asset transfer for legacy cryptocurrencies, and multichain DAO governance. Read bellow about the inovative projects that are being worked on. </p>
-                        <List style={{"margin-top": "3vh"}}>
+                        <List style={{"marginTop": "3vh"}}>
                             <List.Item>
                                 <List.Icon name="ethereum"/>
                                 <List.Content className="listItem">Hot wallet enables seamless smart contract interactions via its autonomous signatory transaction system.</List.Content>

@@ -1,5 +1,5 @@
 var host;
-module.exports = class nftOracleAPI{
+module.exports = class nftGatewayAPI{
 
     constructor(h){
         host = h;
@@ -59,7 +59,7 @@ module.exports = class nftOracleAPI{
                 method: 'POST',
                 body: data
             });
-            console.log(await resp.json())
+            //console.log(await resp.json())
             return await resp.json();
         }catch{}
 

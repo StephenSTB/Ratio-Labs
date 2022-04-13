@@ -110,6 +110,7 @@ deploy = async() =>{
 
         deployedContracts[args[0]]["ProtocolNFT"] = {address: protocolNFT.address}
 
+        console.log(` ProtocolNFT deployed to '${protocolNFT.address}' on ${args[0]}`)
     }
 
     // PolyCards
