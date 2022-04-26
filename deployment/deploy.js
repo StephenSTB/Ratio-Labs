@@ -29,7 +29,7 @@ const PolyCard = contract(require('../src/contracts/PolyCard.json'));
 
 const RatioNFT = contract(require('../src/contracts/RatioNFT.json'));
 
-const ProtocolNFT = contract(require('../src/contracts/ProtocolNFT.json'));
+const NFTProtocol = contract(require('../src/contracts/NFTProtocol.json'));
 
 // State Variables
 var provider;
@@ -104,13 +104,13 @@ deploy = async() =>{
     // Ratio NFT Protocol
     if(contractDeploy.includes("all") || contractDeploy.includes("ratioNFT")){
 
-        ProtocolNFT.setProvider(provider);
+        NFTProtocol.setProvider(provider);
 
-        var protocolNFT = await ProtocolNFT.new(utils.toWei(".01", "ether"), {from: accounts[4]});
+        var nftProtocol = await NFTProtocol.new(utils.toWei(".01", "ether"), {from: accounts[4]});
 
-        deployedContracts[args[0]]["ProtocolNFT"] = {address: protocolNFT.address}
+        deployedContracts[args[0]]["NFTProtocol"] = {address: nftProtocol.address}
 
-        console.log(` ProtocolNFT deployed to '${protocolNFT.address}' on ${args[0]}`)
+        console.log(` NFTProtocol deployed to '${nftProtocol.address}' on ${args[0]}`)
     }
 
     // PolyCards
@@ -178,8 +178,13 @@ deploy = async() =>{
         }
     })
 
-    process.exit(1);
+    console.log(`Waiting for Oracle reboot...`)
 
+    await new Promise(p => setTimeout(p, 45000));
+
+    console.log(`Waiting Complete`)
+
+    process.exit(0);
 }
 
 deploy();
