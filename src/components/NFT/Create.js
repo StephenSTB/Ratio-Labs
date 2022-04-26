@@ -13,9 +13,9 @@ import * as contract from "@truffle/contract";
 
 import * as fs from 'fs';
 
-import RatioNFT from '../../contracts/RatioNFT.json';
+import RatioSingleNFT from '../../contracts/RatioSingleNFT.json';
 
-import ProtocolNFT from '../../contracts/ProtocolNFT.json';
+import NFTProtocol from '../../contracts/NFTProtocol.json';
 
 import testnft from "./CryptoMonkeyRatioNFT.json";
 
@@ -62,16 +62,16 @@ class Create extends Component{
         //ipfs = await IPFS.create({start: false, offline: true});
         //var version = await global.ipfs.version(); 
         //console.log("IPFS Mount, Version: " + version.version)
-        this.RatioNFT = contract(RatioNFT)
+        this.RatioSingleNFT = contract(RatioSingleNFT)
 
-        this.ProtocolNFT = contract(ProtocolNFT)
+        this.NFTProtocol = contract(NFTProtocol)
 
         if(this.props.web3 === undefined){
             return;   
         }
         //console.log(this.props.web3.currentProvider);
         
-        this.RatioNFT.setProvider(this.props.web3.currentProvider);
+        this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
     }
 
     componentDidUpdate = async (prevProps) =>{
@@ -82,8 +82,8 @@ class Create extends Component{
             return;
 
         if(prevProps.web3.currentProvider !== this.props.web3.currentProvider){
-            this.RatioNFT.setProvider(this.props.web3.currentProvider);
-            this.ProtocolNFT.setProvider(this.props.web3.currentProvider)
+            this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
+            this.NFTProtocol.setProvider(this.props.web3.currentProvider)
         }
 
     }
@@ -386,13 +386,13 @@ class Create extends Component{
         }
 
         try{
-            if(this.RatioNFT.currentProvider === undefined ){
-                this.RatioNFT.setProvider(this.props.web3.currentProvider);
+            if(this.RatioSingleNFT.currentProvider === undefined ){
+                this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
             }
 
             this.setState({stepText: "Deploying NFT Contract..."});
 
-            var ratioNFT = await this.RatioNFT.new(this.state.name, "RNFT", this.state.maxMintCount, this.state.mintCost, {from: this.props.account});
+            var ratioNFT = await this.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, this.state.mintCost, {from: this.props.account});
             contentJSON["contract"] = ratioNFT.address;
             contentJSON["distributor"] = this.props.account;
 
@@ -413,9 +413,9 @@ class Create extends Component{
 
             console.log(`   BaseURI: ${baseURI}`);
 
-            var protocolAddress = deployedContracts[networkData[this.props.network].chainName].ProtocolNFT.address;
+            var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
 
-            //console.log("ProtocolNFT Address:" + protocolAddress)
+            //console.log("NFT Protocol Address:" + protocolAddress)
 
             this.setState({stepText: "Setting NFT Contract URI..."});
 
@@ -432,13 +432,14 @@ class Create extends Component{
 
             this.setState({stepText: "Waiting for Ratio Labs Verification..."})
 
-            if(this.ProtocolNFT.currentProvider === undefined ){
-                this.ProtocolNFT.setProvider(this.props.web3.currentProvider);
+            if(this.NFTProtocol.currentProvider === undefined ){
+                this.NFTProtocol.setProvider(this.props.web3.currentProvider);
             }
 
-            var protocolNFT = this.ProtocolNFT.at(protocolAddress);
-
-            //var roots = protocolNFT.contract.methods.nftRoots.call().call()
+            var nftProtocol = this.NFTProtocol.at(protocolAddress);
+            
+            // TODO get latestBlock
+            //var roots = nftProtocol.contract.methods.nftRoots.call().call()
 
             //console.log(roots)
             

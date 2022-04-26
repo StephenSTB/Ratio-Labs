@@ -23,7 +23,7 @@ contract BNBCard is ERC721URIStorage, ERC721Enumerable, Mintable, Ownable{
         wBnb = WBNB(_wbnb);
     }
 
-    function mint(address _receiver) external override onlyOwner returns(uint _id){
+    function mint(address _receiver) external override payable onlyOwner returns(uint _id){
         tokenIds.increment();
         _id = tokenIds.current();
         _safeMint(_receiver, _id);

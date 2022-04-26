@@ -1,11 +1,16 @@
 const CID = require('multiformats/cid').CID
 const path = require('path');  
-const fs = require("fs-extra");
+//const fs = require("fs-extra");
 
-const mime = require('mime-types')
+const fs = require('fs')
+
+const mime = require('mime-types');
+const async = require('mime-kind');
 
 const uploadPath = path.join(__dirname, 'gatenft/'); // Register the upload path
-fs.ensureDir(uploadPath); // Make sure that he upload path exits
+//fs.ensureDir(uploadPath); // Make sure that he upload path exits
+
+var uri_ext = ["jpg", "png", "gif", "svg", "mp3", "wav", "ogg", "mp4", "webm","glb", "gltf", "json"];
 
 routes = (app, db, ipfs, web3) =>{
     app.get("/", (req, res) => {
@@ -22,12 +27,14 @@ routes = (app, db, ipfs, web3) =>{
 
         if(contract === undefined || contract === null || !web3.utils.isAddress(contract)){
             res.status(400).json({"status": "failed", "reason": "Invalid contract address format."})
+            return;
         }
 
         var data =  await db.collection("nft").findOne({contract: contract});
 
         if(data === null || data === undefined){
             res.status(400).json({"status": "failed", "reason": "Invalid nft status."})
+            return;
         }
 
         console.log(`   ${contract} state: ${data.state}`)
@@ -40,23 +47,33 @@ routes = (app, db, ipfs, web3) =>{
 
         console.log("\nNFT verificaiton POST.")
         var body = req.body;
+
+        console.log(body)
+        if(body === undefined || body === null){
+            res.status(400).json({"status": "Failed", "reason": "Invalid nft given"})
+            return;
+        }
+
         var content = body.content
+        var signature = body.signature;
+
+        if(content === undefined || content === null || signature === undefined  || signature === null){
+            res.status(400).json({"status": "Failed", "reason": "Invalid nft given"})
+            return;
+        }
         var contract = content.contract;
         var distributor = content.distributor;
-        var signature = body.signature;
         /*
         console.log("body:")
         console.log(body)
         console.log("content: ");
         console.log( content)*/
-        if(req.body === undefined || content === undefined || contract === undefined || distributor === undefined || signature === undefined || content.name === undefined ){
+        if(contract === undefined || distributor === undefined  || content.name === undefined ||
+            contract === null || distributor === null|| content.name === null){
             res.status(400).json({"status": "Failed", "reason": "Invalid nft given"})
             return;
         }
-        if(req.body === null || content === null || contract === null || distributor === null || signature === null || content.name === undefined){
-            res.status(400).json({"status": "Failed", "reason": "Invalid nft given"})
-            return;
-        }
+
         if((content.image === undefined || content.image === null) && (content.audio === undefined || content.audio === null) && 
            (content.video === undefined || content.video === null) && (content.model === undefined || content.model === null)){
             res.status(400).json({"status": "Failed", "reason": "Invalid nft given"})
@@ -150,11 +167,11 @@ routes = (app, db, ipfs, web3) =>{
 
             //console.log(subURIs[0])
 
-            await db.collection("uri").insertOne({uri: data.baseURI, hosted: false});
+            await db.collection("uri").insertOne({uri: data.baseURI, state: "verified", contract: contract});
             
             for(var u of subURIs){
                 console.log(`   subURI: ${u}`)
-                await db.collection("uri").insertOne({uri: u, hosted: false});
+                await db.collection("uri").insertOne({uri: u, state: "verified", contract: contract});
             }
 
             var updated = await db.collection("nft").updateOne({contract: contract}, {$set: {state: "verified", content: result.content}})
@@ -217,6 +234,7 @@ routes = (app, db, ipfs, web3) =>{
         return res;
     }
 
+
     app.post("/host", async (req, res) =>{
         console.log("Attempting Host Request...")
 
@@ -240,24 +258,17 @@ routes = (app, db, ipfs, web3) =>{
             try{
                 var data = await db.collection("uri").findOne({uri: name});
                 console.log(`   uri data: ${data}.`);
+
+                //console.log(file)
                 if(data === null){
                     console.log(`   uri data was null.`)
                     file.resume();
                     success = false;
                     return;
                 }
-                console.log(`   uri hosted: ${data.hosted}.`);
-                if(data.hosted){
-                    console.log(`   uri data already hosted.`);
-                    file.resume();
-                    success = false;
-                    return;
-                }
-
-                var cid = (await ipfs.add(file)).cid.toString();
-
-                if(cid !== name.replace("ipfs://", "")){
-                    console.log(`   file cid does not match name.`);
+                console.log(`   uri state: ${data.state}`);
+                if(data.state !== "verified"){
+                    console.log(`   uri data already analyzed`);
                     file.resume();
                     success = false;
                     return;
@@ -268,15 +279,21 @@ routes = (app, db, ipfs, web3) =>{
                 var ext = mime.extension(info.mimeType);
                 console.log(`   ext: ${ext}`)
                 
+                if(!uri_ext.includes(ext)){
+                    console.log("   Invalid file type");
+                    file.resume();
+                    success = false;
+                    return;
+                }
+                
                 console.log(`   writing file: ${name}`);
                 const fstream = fs.createWriteStream(path.join(uploadPath, name.replace("ipfs://", "") + "." + ext));
                 file.pipe(fstream);
+
                 fstream.on('close', async () => {
                     console.log(`   Upload of '${name}' finished, `);
-                    var pin = await ipfs.pin.add(CID.parse(cid))
-                    console.log(`   ${pin} was pinned!`)
 
-                    await db.collection("uri").updateOne({uri: name.replace("ipfs://", "")}, {$set: {hosted: true}})
+                    await db.collection("uri").updateOne({uri: name}, {$set: {state: "uploaded", ext: ext}})
 
                     count --;
 
@@ -301,7 +318,8 @@ routes = (app, db, ipfs, web3) =>{
                                 return;
                             }
                         }
-                        await db.collection("nft").updateOne({contract: contract}, {$set: {state: "hosted"}})
+
+                        await db.collection("nft").updateOne({contract: contract}, {$set: {state: "uploaded"}})
                         
                         res.status(200).json({status: "success"})
                         return;
@@ -350,6 +368,7 @@ routes = (app, db, ipfs, web3) =>{
 
             console.log(`   contract: ${contract}`)
         })
+
     })
 }
 

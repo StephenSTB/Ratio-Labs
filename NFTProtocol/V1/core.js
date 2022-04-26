@@ -14,9 +14,9 @@ const networkData = require('../../src/data/Network_Data.json');
 
 const keccak256 = require('keccak256');
 
-const ProtocolNFT = contract(require('../../src/contracts/ProtocolNFT.json'));
+const NFTProtocol = contract(require('../../src/contracts/NFTProtocol.json'));
 
-var protocolNFT;
+var nftProtocol;
 
 const path = require('path');  
 const fs = require("fs-extra");
@@ -46,38 +46,29 @@ core = async (db, web3, ipfs) =>{
 
     console.log(await web3.eth.getChainId())
 
-    await ProtocolNFT.setProvider(provider);
+    await NFTProtocol.setProvider(provider);
 
-    await ProtocolNFT.setWallet(web3.eth.accounts.wallet);
+    await NFTProtocol.setWallet(web3.eth.accounts.wallet);
 
-    await ProtocolNFT.defaults({from: account});
+    await NFTProtocol.defaults({from: account});
 
-    console.log(`ProtocolNFT Address: ${deployedContracts[providerName].ProtocolNFT.address}`)
+    console.log(`NFTProtocol Address: ${deployedContracts[providerName].NFTProtocol.address}`)
 
-    protocolNFT = await ProtocolNFT.at(deployedContracts[providerName].ProtocolNFT.address);
+    nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
 
-    
-    //var owner = await protocolNFT.owner();
+    //var owner = await nftProtocol.owner();
 
     // Process requests.
-    protocolNFT.verificationRequest().on('data', async (event) => {
-        //console.log(event.returnValues);
-        console.log(`Verifiaction Request -- contract: ${event.returnValues._contract}, distributor: ${event.returnValues._distributor}, 
-                                             baseURI: ${event.returnValues._baseURI}` );
+    nftProtocol.verificationRequest().on('data', async (event) => {
 
         var contract = event.returnValues._contract;
         var distributor = event.returnValues._distributor;
-        var uri = event.returnValues._baseURI;
+        var baseURI = event.returnValues._baseURI;
+        var block = event.returnValues._block;
+        console.log(`Verifiaction Request -- contract: ${event.returnValues._contract}, distributor: ${event.returnValues._distributor}, 
+                                             baseURI: ${event.returnValues._baseURI}, block: ${block}` );
 
-        var contractExists = await db.collection("nft").findOne({contract: contract})
-
-        if(contractExists !== null){
-            console.log("contract has already requested verification");
-            return;
-        }
-        
-        await db.collection("nft").insertOne({contract: contract, distributor: distributor, 
-                                        baseURI: uri, state: "new", block: event.returnValues._block})  
+        await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, state: "new", block: block})  
 
     });
 
@@ -139,14 +130,21 @@ core = async (db, web3, ipfs) =>{
     }
 
     verifyNFTs = async () =>{
-        //console.log("Evaluating nft requests")
-
+        //console.log("Evaluating nft requests...")
         var nfts = await db.collection("nft").find({state: "new"}).toArray();
+
+        var curBlock =  await web3.eth.getBlockNumber();
+
+        var staleThresh = curBlock - 21600;
+
+        //21600 12hrs of blocks --- stale
+
+        //TODO stale-verify
 
         for(var n of nfts){
             var baseURI = n.baseURI;
             var block = n.block;
-            console.log(`NFT Info, contract: ${n.contract}, distributor: ${n.distributor}, baseURI: ${n.baseURI}, state: ${n.state}, block: ${n.block}`)
+            console.log(`NFT Info, contract: ${n.contract}, distributor: ${n.distributor}, baseURI: ${n.baseURI}, state: ${n.state},\n block: ${n.block}`)
             var cid = n.baseURI.replace("ipfs://" , "");
             console.log(`   cid: ${cid}`);
 
@@ -233,24 +231,6 @@ core = async (db, web3, ipfs) =>{
                     continue;
                 }
 
-                var uriExists = await db.collection("uri").findOne({uri: baseURI})
-
-                console.log("   baseURI Exists: " + uriExists);
-
-                if(uriExists !== null){
-                    if(uriExists.block <= block){
-                        console.log(`   ${baseURI} already validiated.`)
-                        await db.collection('nft').updateOne({contract: contract}, {$set: {state: "rejected"}})
-                        continue;
-                    }
-                    console.log(`       ${distributor} is distributor slash: ${uriExists} and update.`)
-                    await db.collection("slash").insertOne({slash: uriExists})
-                    await db.collection("uri").updateOne({uri: baseURI}, {$set: {contract: contract, distributor: distributor, block: block, baseURI: baseURI}})
-                }
-                else{
-                    await db.collection("uri").insertOne({uri: baseURI, contract: contract, distributor: distributor, block: block, baseURI: baseURI})
-                }
-
                 for(var i of result.insert){
                     console.log(`   uri collection INSERT: ${i},`);
                     await db.collection("uri").insertOne(i)
@@ -266,21 +246,21 @@ core = async (db, web3, ipfs) =>{
                     await db.collection("slash").insertOne({slash: s})
                 }
 
-                // Create verification 
+                // Create verification transaction.
                 var subURIs = result.main;
                 var leaf;
                 switch(subURIs.length){
                     case 1:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0]);
+                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], block);
                         break; 
                     case 2:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1])
+                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], block)
                         break; 
                     case 3:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2])
+                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], block)
                         break; 
                     case 4:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3])
+                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
                         break; 
                 }
                 //console.log(`leaf: ${leaf.toString('hex')}`)
@@ -309,6 +289,8 @@ core = async (db, web3, ipfs) =>{
     hostNFTs = async () =>{
         var nfts = await db.collection("nft").find({state: "verified"}).toArray();
 
+        // TODO stale-host
+
         for(var n of nfts){
 
             console.log(`   Attempting to host: ${n.baseURI}`);
@@ -322,8 +304,6 @@ core = async (db, web3, ipfs) =>{
                 var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(cid), {length: 100000})));
 
                 //console.log(`Base URI data length: ${data.length}`);
-
-                // TODO decode data to .json file
                 var decodedData = new TextDecoder().decode(data).toString();
 
                 //console.log(`file content: ${decodedData}`)
@@ -348,8 +328,8 @@ core = async (db, web3, ipfs) =>{
                     continue;
                 }
                 try{
-                    var cid = u.replace("ipfs://", "")
-                    var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(cid), {length: 100000000})));
+                    var _cid = u.replace("ipfs://", "")
+                    var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(_cid), {length: 100000000})));
 
                     var buf = Buffer.from(data);
                     //console.log(buf)
@@ -361,7 +341,7 @@ core = async (db, web3, ipfs) =>{
                         continue;
                     }
 
-                    subFiles.push({cid: cid, ext: type.ext, buffer: buf})
+                    subFiles.push({cid: _cid, ext: type.ext, buffer: buf})
 
                     //console.log(type)
                 }catch(err){
@@ -396,13 +376,17 @@ core = async (db, web3, ipfs) =>{
 
         await verifyNFTs();
 
-        await hostNFTs()
+        await hostNFTs();
+
+        // TODO: handle stale-verify and stale-host states
+
+        // TODO: handle slashed nfts
 
     }, 5000)
     
     
     // Aggregate transactions.
-    var slot = 100;
+    var slot = 5;
     var targetBlock = await web3.eth.getBlockNumber() + slot;
     console.log(`Target Block: ${targetBlock}`);
     setInterval(async() =>{
@@ -412,6 +396,8 @@ core = async (db, web3, ipfs) =>{
             return;
         }
         console.log("Target Block: " + targetBlock + " Hit.");
+
+        var latestBlock = await nftProtocol.latestBlock();
 
         var leaves = (await db.collection("transactions").find({}).toArray()).map(l => l.leaf);
 
@@ -426,11 +412,16 @@ core = async (db, web3, ipfs) =>{
             return;
         }
         var tree = new MerkleTree(leaves, keccak256, {sort: true});
+
         var root = tree.getHexRoot();
 
+        var prev = web3.utils.soliditySha3(latestBlock._prev, latestBlock._root, latestBlock._block);
+
+        var block = {_prev: prev, _root: root, _leaves: leaves, _block: 0}
+
         try{
-           var receipt = await protocolNFT.submitRoot(root)
-           console.log(`Submitted root: ${receipt.logs[0].args._root}`)
+           var receipt = await nftProtocol.submitBlock(block)
+           console.log(`Submitted Block: ${JSON.stringify(receipt.logs[0].args)}`)
         }
         catch(err){
             console.log(err + "submitError")
@@ -440,7 +431,6 @@ core = async (db, web3, ipfs) =>{
         
         //console.log(blockNumber)
     }, 60000)
-   
 }
 
 module.exports = core

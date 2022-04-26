@@ -56,7 +56,7 @@ contract NFTMinter is Ownable{
 
     // Function to mint an _nft
     function mint(Mintable _nft) public{
-        // Condition to determine if the nft e to be minted exists.
+        // Condition to determine if the nft to be minted exists.
         require(address(nfts[address(_nft)].token) != address(0), "Invalid nft to mint");
 
         // Get the info about the given nft for minting.

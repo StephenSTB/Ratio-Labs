@@ -64,8 +64,8 @@
             "address": "0x7e38918F45fac5bDAF3E8Ec2b7a3B0BAd90D315E",
             "uri": "ipfs://QmUqYcWhyk14Vk738uRErow72sprHcKY85TTE4V8SWF1YH"
         },
-        "ProtocolNFT": {
-            "address": "0x9FA09EA8C7787405C5369A99DcFb3b4875aa7d7b"
+        "NFTProtocol": {
+            "address": "0x47F6e2cb5d0b62965c6bcAAF75ac3F2A29cec42B"
         }
     },
     "developmentCLI": {

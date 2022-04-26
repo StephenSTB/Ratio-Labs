@@ -207,8 +207,6 @@ contract NFTChef is Ownable {
         pool.lastRewardBlock = block.number;
     }
 
-
-
     // Deposit LP tokens to MasterChef for CryptoGame allocation.
     function deposit(address _sender, uint256 _pid, uint256 _tokenId, uint256 _amount) public onlyOwner{
         PoolInfo storage pool = poolInfo[_pid];

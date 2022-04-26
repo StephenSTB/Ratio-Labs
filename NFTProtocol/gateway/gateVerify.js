@@ -1,4 +1,5 @@
 
+const fs = require('fs');
 
 const ganache = require('ganache');
 
@@ -8,11 +9,13 @@ const deployedContracts = require('../../src/data/Deployed_Contracts.json');
 
 const networkData = require('../../src/data/Network_Data.json');
 
-const ProtocolNFT = contract(require('../../src/contracts/ProtocolNFT.json'));
+const { CID } = require('multiformats');
 
-var protocolNFT;
+const NFTProtocol = contract(require('../../src/contracts/NFTProtocol.json'));
 
-gateVerify = async (db, web3) =>{
+var nftProtocol;
+
+gateVerify = async (db, web3, ipfs) =>{
 
     var provider = await web3.eth.currentProvider;
 
@@ -22,13 +25,13 @@ gateVerify = async (db, web3) =>{
 
     console.log(await web3.eth.getChainId())
 
-    await ProtocolNFT.setProvider(provider);
+    await NFTProtocol.setProvider(provider);
 
-    console.log(`ProtocolNFT Address: ${deployedContracts[providerName].ProtocolNFT.address}`)
+    console.log(`NFTProtocol Address: ${deployedContracts[providerName].NFTProtocol.address}`)
 
-    protocolNFT = await ProtocolNFT.at(deployedContracts[providerName].ProtocolNFT.address);
+    nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
 
-    protocolNFT.verificationRequest().on('data', async (event) => {
+    nftProtocol.verificationRequest().on('data', async (event) => {
         console.log(event.returnValues);
         //console.log("event:" + event.returnValues)
         var contract = event.returnValues._contract;
@@ -49,6 +52,99 @@ gateVerify = async (db, web3) =>{
         console.log(insert)
     
     });
+
+    hostURIs = async () =>{
+        var uploadedURIs = await db.collection("uri").find({state: "uploaded"}).toArray();
+
+        console.log(`   Hosting Uploaded URIs...`)
+
+        console.log(`   Uploaded URIs: ${uploadedURIs}`);
+
+        if(uploadedURIs.length > 0){
+            for(var u of uploadedURIs){
+
+                console.log(`   Validating CID for ${u.uri}`);
+                var cid = u.uri.replace("ipfs://", "").toString()
+                console.log(`   URI Parsed CID: ${cid}`)
+                try{
+                    console.log(`   File path: `+ __dirname  + "/gatenft/" + cid + '.' +  u.ext)
+                    
+                    var file = fs.readFileSync(__dirname + "/gatenft/" + cid + '.' +  u.ext, (err) =>{
+                        if(err) console.log(err);
+                    })
+    
+                    //console.log(`   file: \n${file}`);
+    
+                    var add = await ipfs.add(file);
+    
+                    console.log(`   add cid: ${add.cid.toString()}`)
+    
+                    if(add.cid.toString() !== cid){
+                        console.log(`   cids dont match: ${add.cid.toString()} : ${cid}`    )
+                        await db.collection("uri").updateOne({uri: u.uri}, {$set: {state: "rejected"}})
+                        await fs.unlink(__dirname + "/gatenft/" + cid + '.' +  u.ext, (err) =>{
+                            if(err) console.log(err);
+                        });
+                        continue;
+                    }
+                    console.log("   CIDs match.")
+                    await ipfs.pin.add(CID.parse(add.cid.toString()));
+                    await db.collection("uri").updateOne({uri: u.uri}, {$set: {state: "hosted"}})
+                }catch{ console.log("   file error.")}
+            }
+        }
+    }
+
+    hostNFT = async () =>{
+        var uploadedNFTs = await db.collection('nft').find({state: "uploaded"}).toArray();
+
+        console.log(`   Hosting Uploaded NFTs...`)
+
+        console.log(`   Uploaded NFTs: ${uploadedNFTs}`);
+
+        for(var u of uploadedNFTs){
+            var contract = u.contract;
+            var content = u.content;
+
+            var host = true;
+
+            // evaluate baseURI
+
+            for(var c in content){
+                console.log(`   subURI: ${content[c]}`)
+                var data = db.collection("uri").findOne({uri:content[c]});
+
+                if(data.state == "uploaded"){
+                    host = false;
+                    break;
+                }
+                if(data.state === "hosted"){
+                    continue;
+                }
+                if(data.state === "rejected"){
+                    await db.collection("nft").updateOne({contract: contract}, {$set: {state: "rejected"}})
+                    host = false;
+                    break;
+                }
+            }
+            // TODO create stale nft
+            if(host){
+                await db.collection("nft").updateOne({contract: contract}, {$set: {state: "hosted"}});
+                console.log(`   ${contract} <-> ${u.baseURI} HOSTED!`);
+            }
+        }
+    }
+
+    // Handle nft hosting post upload;
+    setInterval(async() =>{
+
+        await hostURIs();
+
+        await hostNFT();
+        
+    }, 30000)
+
+
    
 }
 

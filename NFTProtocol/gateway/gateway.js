@@ -73,7 +73,7 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
 
     await ipfsinit()
     
-    gateVerify(db, web3);
+    gateVerify(db, web3, ipfs);
 
     routes(app, db, ipfs, web3)
     
@@ -99,8 +99,7 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
     }
 
     try{
-        var create = await db.createCollection("nft");
-        
+        await db.createCollection("nft");
     }
     catch{
         console.log("couldn't CREATE nft collection");
