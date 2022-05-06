@@ -12,6 +12,8 @@ const fs = require("fs");
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
+const ipfs_http = require('ipfs-http-client');
+
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 const providers = require('../../src/data/Providers.json');
@@ -34,6 +36,14 @@ var ipfs;
 // Drop collections and pins
 var drop = true;
 
+
+// Variable to hold command arguments.
+var args;
+
+// Variable to determine if ipfs should connect via http client or be created
+
+var create;
+
 mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, async (err, client) =>{
     if (err) throw err;
     //console.log("Database created!");
@@ -45,9 +55,9 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
 
     await ipfsinit();
     
-    core(db, web3, ipfs);
+    await core(db, web3, ipfs);
     
-  });
+});
 
   dbinit= async () =>{
     if(drop){
@@ -99,12 +109,12 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
         await db.createCollection("slash");
      }
      catch{
-         console.log("couldn't CREATE slash collection");
+        console.log("couldn't CREATE slash collection");
      }
 }
 
 web3init = async () =>{
-    var args = process.argv.splice(2);
+    args = process.argv.splice(2);
     console.log(`Provider name: ${args[0]}`);
     providerName = args[0];
     try{
@@ -151,7 +161,12 @@ web3init = async () =>{
 
 ipfsinit = async () =>{
 
-    ipfs = await IPFS.create();
+    if(args.includes("HTTP")){
+        ipfs = await ipfs_http.create('/ip4/127.0.0.1/tcp/5002/http');
+    }
+    else{
+        ipfs = await IPFS.create();
+    }
 
     var pins = await ipfs.pin.ls();
 

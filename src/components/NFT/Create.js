@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-import {Container, Segment, Form, Icon, Button, Dropdown, Divider, Menu, Input, Radio, Popup} from 'semantic-ui-react';
+import {Container, Segment, Form, Icon, Button, Dropdown, Divider, Menu, Input, Radio, Popup, TextArea} from 'semantic-ui-react';
 
 import  "@google/model-viewer";
 
@@ -20,6 +20,10 @@ import NFTProtocol from '../../contracts/NFTProtocol.json';
 import testnft from "./CryptoMonkeyRatioNFT.json";
 
 import * as nftGatewayAPI from "./nftGatewayAPI.js";
+
+import { MerkleTree } from 'merkletreejs';
+
+import * as keccak256 from 'keccak256';
 
 var gatewayApi;
 
@@ -45,7 +49,8 @@ class Create extends Component{
                         createLoading: false,
                         maxMintCount: null, mintCost: null,
                         createError: "",
-                        finalContent: null,
+                        displayFinalContent: null,  
+                        displayFinalInfo: null,
                         host: true, nftDeploymentCost: "",
                       }
 
@@ -56,22 +61,26 @@ class Create extends Component{
         gatewayApi = new nftGatewayAPI(host);
     
         this.addContent = this.addContent.bind(this);
+
+        this.RatioSingleNFT = contract(RatioSingleNFT)
+
+        this.NFTProtocol = contract(NFTProtocol)
     }
 
     componentDidMount = async () =>{
         //ipfs = await IPFS.create({start: false, offline: true});
         //var version = await global.ipfs.version(); 
         //console.log("IPFS Mount, Version: " + version.version)
-        this.RatioSingleNFT = contract(RatioSingleNFT)
-
-        this.NFTProtocol = contract(NFTProtocol)
-
+    
         if(this.props.web3 === undefined){
             return;   
         }
         //console.log(this.props.web3.currentProvider);
         
         this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
+        this.NFTProtocol.setProvider(this.props.web3.currentProvider)
+
+        console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
     }
 
     componentDidUpdate = async (prevProps) =>{
@@ -333,12 +342,10 @@ class Create extends Component{
             contentJSON["description"] = this.state.description;
         }
 
-        var subURIs = [];
-        
+        // Place files uri content into contentJSON
         for(var i = 0; i < files.length; i++){
             console.log(`adding file '${files[i].name}' to nft`)
             var result = await ipfs.add(files[i]);
-            subURIs.push("ipfs://" + result.cid.toString());
             console.log(`${files[i].name} cid: ${result.cid.toString()}`);
             switch(this.state.contentType[i]){
                 case "image": contentJSON["image"] = "ipfs://" + result.cid.toString(); break;
@@ -349,7 +356,22 @@ class Create extends Component{
                     break;
             }
         }
+        
+        // Insert subURIs in correct placement for hashing.
+        var main = [contentJSON["image"], contentJSON["audio"],  contentJSON["video"], contentJSON["model"]]
 
+        var subURIs = [];
+
+        for(var i = 0; i < main.length; i++ ){
+            if(main[i] !== undefined){
+                subURIs.push(main[i])
+                continue;
+            }
+            main[i] = "";
+        }
+        console.log(`SubURIs: ${subURIs}`)
+
+        // insert properties into nft content
         if(this.state.properties.length > 0){
             contentJSON["properties"] = [];
             for(var i = 0; i < this.state.properties; i++){
@@ -370,6 +392,7 @@ class Create extends Component{
 
         //console.log(contentJSON);
 
+        // Condition to evaluate correct contract variables.
         if(!Number.isInteger(Number(this.state.maxMintCount)) || !Number.isInteger(Number(this.state.mintCost)) ){
             var createError = "An invalid mint count or cost was given. Enter a full number to create your NFT."
             this.setState({createError, stepText: ""});
@@ -385,6 +408,7 @@ class Create extends Component{
             return;
         }
 
+        // Encapsulate async calls with try/catch
         try{
             if(this.RatioSingleNFT.currentProvider === undefined ){
                 this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
@@ -392,7 +416,7 @@ class Create extends Component{
 
             this.setState({stepText: "Deploying NFT Contract..."});
 
-            var ratioNFT = await this.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, this.state.mintCost, {from: this.props.account});
+            var ratioNFT = await this.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, web3.utils.toWei(this.state.mintCost.toString(), "ether"), {from: this.props.account});
             contentJSON["contract"] = ratioNFT.address;
             contentJSON["distributor"] = this.props.account;
 
@@ -415,9 +439,9 @@ class Create extends Component{
 
             var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
 
-            //console.log("NFT Protocol Address:" + protocolAddress)
+            console.log("NFT Protocol Address:" + protocolAddress)
 
-            this.setState({stepText: "Setting NFT Contract URI..."});
+            this.setState({stepText: "Setting NFT Contract BaseURI..."});
 
             if(!this.state.host){
                 await ratioNFT.setBaseURI(baseURI, false, protocolAddress, {from: this.props.account});
@@ -426,22 +450,23 @@ class Create extends Component{
                 return;
             }
 
-            await ratioNFT.setBaseURI(baseURI, true, protocolAddress, {from: this.props.account, value: web3.utils.toWei(".01", "ether")});
+            var block = (await ratioNFT.setBaseURI(baseURI, true, protocolAddress, {from: this.props.account, value: web3.utils.toWei(".01", "ether")})).receipt.blockNumber;
+
+            console.log(`NFT Verificaiton Request Block Number: ${block}`);
 
             console.log(` ${nftJSON.content.contract}`);
 
-            this.setState({stepText: "Waiting for Ratio Labs Verification..."})
+            this.setState({stepText: "Sending Ratio Labs NFT For Verification..."})
 
             if(this.NFTProtocol.currentProvider === undefined ){
                 this.NFTProtocol.setProvider(this.props.web3.currentProvider);
             }
 
-            var nftProtocol = this.NFTProtocol.at(protocolAddress);
-            
-            // TODO get latestBlock
-            //var roots = nftProtocol.contract.methods.nftRoots.call().call()
+            var nftProtocol = await this.NFTProtocol.at(protocolAddress);
 
-            //console.log(roots)
+            var latestBlock = await nftProtocol.latestBlock();
+
+            console.log(`latestBlock: ${latestBlock}`);
             
             var state = await gatewayApi.state(nftJSON.content.contract)
 
@@ -486,22 +511,84 @@ class Create extends Component{
 
             const formdata = new FormData();
 
+            formdata.append('contract', nftJSON.content.contract)
+
             formdata.append(baseURI, file);
 
             for(var i =0; i < subURIs.length; i++){
                 formdata.append(subURIs[i], files[i]);
             }
 
-            formdata.append('contract', nftJSON.content.contract)
-
             var host = await gatewayApi.host(formdata);
+
+            if(host.status !== "success"){
+                this.setState({createError: host.reason})
+                this.props.setLoading(false);
+                return;
+            }
 
             console.log(`host: ${host}`);
 
             state = await gatewayApi.state(nftJSON.content.contract);
             console.log(`   State: ${JSON.stringify(state)}`);
 
-            
+            this.setState({stepText: "Waiting for Ratio Labs Verification..."})
+
+            var leaf;
+            switch(subURIs.length){
+                case 1:
+                    leaf = web3.utils.soliditySha3(ratioNFT.address, this.props.account, baseURI, subURIs[0], block);
+                    break; 
+                case 2:
+                    leaf = web3.utils.soliditySha3(ratioNFT.address, this.props.account, baseURI, subURIs[0], subURIs[1], block)
+                    break; 
+                case 3:
+                    leaf = web3.utils.soliditySha3(ratioNFT.address, this.props.account, baseURI, subURIs[0], subURIs[1], subURIs[2], block)
+                    break; 
+                case 4:
+                    leaf = web3.utils.soliditySha3(ratioNFT.address, this.props.account, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
+                    break; 
+            }
+
+            var currentBlock = await nftProtocol.latestBlock();
+
+            while(currentBlock._block === latestBlock._block){
+                console.log("Waiting for new block...")
+                await new Promise(p => setTimeout(p, 2000));
+                currentBlock = await nftProtocol.latestBlock();
+            }
+
+            while(!currentBlock._leaves.includes(leaf)){
+                console.log("Waiting for block to include leaf...")
+                await new Promise(p => setTimeout(p, 2000));
+                currentBlock = await nftProtocol.latestBlock();
+            }
+
+            var tree = new MerkleTree(currentBlock._leaves, keccak256, {sort: true})
+
+            var proof = tree.getHexProof(leaf)
+
+            var nftStruct = {_contract: ratioNFT.address, _distributor: this.props.account, _baseURI: baseURI, _subURIs: subURIs, _block: block}
+
+            this.setState({stepText: "Confirming Ratio Labs Verification..."})
+
+            var receipt = await nftProtocol.verifyNFT(proof, currentBlock._root, leaf, nftStruct, {from: this.props.account});
+
+            console.log(`verifyNFT receipt: ${receipt.logs[0].args[0]}`);
+
+            this.setState({stepText: "Setting NFT Contract SubURIs..."})
+
+            console.log(`subRUIs: ${main}`);
+
+            await ratioNFT.setSubURIs(main[0], main[1], main[2], main[3], {from: this.props.account})
+
+            this.setState({stepText: "NFT Created!"})
+
+            var displayFinalInfo = <Container id="finalContent" textAlign="left" style={{width: "750px"}}><p>Your NFT has been deployed to: {ratioNFT.address}</p><p>You can find the NFT content below or at: <a href={baseURI}>{baseURI}</a></p></Container>
+
+            var displayFinalContent = <TextArea id="finalContent" style={{width: "750px", height: "25vh"}}>{JSON.stringify(nftJSON, null, 4)}</TextArea>
+
+            this.setState({displayFinalInfo, displayFinalContent})
 
         }
         catch(err){
@@ -581,17 +668,17 @@ class Create extends Component{
         var createButton = this.props.loading ?  <Button id="createButton" color="black" loading size="huge">Loading</Button> : <Button id="createButton" color="black" onClick={this.createNFT} size="huge">Create NFT</Button> 
 
         return(
-            <div id="createComponent">
-                <Segment basic inverted id="createBanner" style={{"marginTop": "auto", height: "25vh"}}>
+            <div id="mainComponent">
+                <Segment basic inverted id="banner" style={{"marginTop": "auto", height: "25vh"}}>
                         <Container textAlign="left">
-                            <div id="createText">Create</div>
+                            <div id="bannerText">Create</div>
                         </Container>
                 </Segment>
                 <div id="createForm" style={{"padding-top": "6vh", color:"black", }}>
                     <Container textAlign="left">
                         <div id="prompt">Use the form bellow to create NFT's utilizing the Ratio NFT Protocol. (see About)</div>
                         <div id="required">* Indicates Required Fields</div>
-                        <Button onClick={this.testVerify}>verify</Button>
+                        {/*<Button onClick={this.testVerify}>verify</Button>*/}
                         <Form id="nftForm" onSubmit={() => this.createNFT}>
                             <div style={{"marginTop": "3vh", "font-size": "x-large"}}>Content: </div>
                             <div id="nftContent">
@@ -655,17 +742,15 @@ class Create extends Component{
                                     </div>
                                 </div>
                                 <div id="submitError">{this.state.createError}</div>
-                                
-                                <div id="nftMain"></div>
-                                <div id="nftContract"></div>
-                                <div id="nftVerified"></div>
-                                <div id="nftHosted"></div>
+                                {this.state.displayFinalInfo}
+                                <br/>
+                                {this.state.displayFinalContent}
                             </div>
                         </Form>
                     </Container>
                 </div>
-                
             </div>
+            
         )  
     }
 }

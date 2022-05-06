@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "../Interfaces/Mintable.sol";
 
-import "../../ProtocolNFT/RatioSingleNFT.sol";
+import "../../NFTProtocol/RatioSingleNFT.sol";
 
 contract PolyCard is RatioSingleNFT, Mintable, Ownable{
 

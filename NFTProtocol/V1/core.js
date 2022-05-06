@@ -2,7 +2,7 @@ const contract = require('@truffle/contract');
 
 const { MerkleTree } = require('merkletreejs')
 
-const {CID, multiaddr} = require('ipfs');
+const {CID} = require('ipfs');
 
 const all = require("it-all");
 
@@ -20,8 +20,6 @@ var nftProtocol;
 
 const path = require('path');  
 const fs = require("fs-extra");
-
-const mime = require('mime-types')
 
 const {sync: mime_kind} = require('mime-kind')
 
@@ -58,22 +56,8 @@ core = async (db, web3, ipfs) =>{
 
     //var owner = await nftProtocol.owner();
 
-    // Process requests.
-    nftProtocol.verificationRequest().on('data', async (event) => {
-
-        var contract = event.returnValues._contract;
-        var distributor = event.returnValues._distributor;
-        var baseURI = event.returnValues._baseURI;
-        var block = event.returnValues._block;
-        console.log(`Verifiaction Request -- contract: ${event.returnValues._contract}, distributor: ${event.returnValues._distributor}, 
-                                             baseURI: ${event.returnValues._baseURI}, block: ${block}` );
-
-        await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, state: "new", block: block})  
-
-    });
-
     // Function utilized to verify subURIs in an nft.
-    validateURIs =  async (content, block, baseURI) =>{
+    validateURIs = async (content, block, baseURI) =>{
 
         var main = [content.image, content.audio, content.video, content.model] 
         var res = {status: false, main: [], content: {}, slash: [], update: [], insert: []}
@@ -86,10 +70,7 @@ core = async (db, web3, ipfs) =>{
         var i = 0;
         for(var a of main){
             if(a !== undefined){
-                if(a.length !== 53){
-                    return res;
-                }
-                if(a.substring(0,7) !== "ipfs://"){
+                if(a.length !== 53 || a.substring(0,7) !== "ipfs://"){
                     return res;
                 }
                 try{
@@ -106,8 +87,8 @@ core = async (db, web3, ipfs) =>{
                         await db.collection('nft').updateOne({contract: contract}, {$set: {state: "rejected"}})
                         return res;
                     }
-                    console.log(`       ${distributor} is distributor slash: ${data} and update.`)
-                    res.slash.push(data);
+                    console.log(`       ${distributor} is distributor slash: ${data.contract} and update.`)
+                    res.slash.push(data.contract);
                     res.update.push({uri: a, contract: contract, distributor: distributor, block: block, baseURI: baseURI});
                 }
                 else{
@@ -130,28 +111,30 @@ core = async (db, web3, ipfs) =>{
     }
 
     verifyNFTs = async () =>{
-        //console.log("Evaluating nft requests...")
+        console.log("Verifying NFTs:")
         var nfts = await db.collection("nft").find({state: "new"}).toArray();
 
-        var curBlock =  await web3.eth.getBlockNumber();
+        var currentBlock =  await web3.eth.getBlockNumber();
 
-        var staleThresh = curBlock - 21600;
+        var staleBlock = currentBlock - (4 * slot);// 7200 blocks // Original 21600;
 
-        //21600 12hrs of blocks --- stale
+        var rejectBlock = currentBlock - (48 * slot);
 
         //TODO stale-verify
 
         for(var n of nfts){
             var baseURI = n.baseURI;
             var block = n.block;
-            console.log(`NFT Info, contract: ${n.contract}, distributor: ${n.distributor}, baseURI: ${n.baseURI}, state: ${n.state},\n block: ${n.block}`)
+            console.log(`   NEW NFT Info: contract: ${n.contract}, distributor: ${n.distributor}, \n                baseURI: ${n.baseURI}, state: ${n.state}, block: ${n.block}`)
             var cid = n.baseURI.replace("ipfs://" , "");
-            console.log(`   cid: ${cid}`);
+            console.log(`   CID: ${cid}`);
 
             var nft;
             
             try{
-                var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(cid), {length: 100000})));
+                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + cid, {length: 100000, timeout: 2000})));
+
+                //console.log(data)
 
                 //console.log(`   Base URI data length: ${data.length}`);
 
@@ -167,7 +150,15 @@ core = async (db, web3, ipfs) =>{
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
                 }
             }catch(err){
-                console.log("   BaseURI Read Error:" + err)
+                console.log("   BaseURI Read Error: " + err + "\n")
+                if(Number(n.block) <= rejectBlock){
+                    await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
+                    console.log(`   ${n.contract} : ${n.baseURI} is rejected.`)
+                }
+                if(Number(n.block) <= staleBlock){
+                    await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "stale"}})
+                    console.log(`   ${n.contract} : ${n.baseURI} is stale.`)
+                }
                 continue;
             }
 
@@ -232,12 +223,12 @@ core = async (db, web3, ipfs) =>{
                 }
 
                 for(var i of result.insert){
-                    console.log(`   uri collection INSERT: ${i},`);
+                    console.log(`   uri collection INSERT: ${i.uri},`);
                     await db.collection("uri").insertOne(i)
                 }
 
                 for(var u of result.update){
-                    console.log(`   uri collection UPDATE: ${u},`)
+                    console.log(`   uri collection UPDATE: ${u.contract},`)
                     await db.collection("uri").updateOne({uri: u.uri}, {$set: {contract: u.contract, distributor: u.distributor, block: u.block, baseURI: u.baseURI}})
                 }
 
@@ -266,10 +257,11 @@ core = async (db, web3, ipfs) =>{
                 //console.log(`leaf: ${leaf.toString('hex')}`)
 
                 //console.log(await db.listCollections({ name: "transactions" }).hasNext())
+                /*
                 while(!db.listCollections({ name: "transactions" }).hasNext()){
                     console.log("transactions collection doesn't exists");
                     await new Promise(r => setTimeout(r, 2000));
-                }
+                }*/
 
                 //console.log(`Submitting Transaction: 0x${leaf.toString('hex')}`)
 
@@ -280,16 +272,20 @@ core = async (db, web3, ipfs) =>{
                 await db.collection("nft").updateOne({contract: contract}, {$set: {state: "verified", content: result.content}})
 
             }catch(err){
-                console.log(err);
+                console.log("err" + err);
             }
         }
-    } 
-
+        console.log()
+        return;
+    }
 
     hostNFTs = async () =>{
+        console.log("Hosting NFTs:")
         var nfts = await db.collection("nft").find({state: "verified"}).toArray();
 
-        // TODO stale-host
+        var currentBlock = await web3.eth.getBlockNumber();
+
+        var rejectBlock = currentBlock - (48 * slot); // 21600
 
         for(var n of nfts){
 
@@ -301,7 +297,8 @@ core = async (db, web3, ipfs) =>{
             
             try{
                 cid = n.baseURI.replace("ipfs://", "");
-                var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(cid), {length: 100000})));
+
+                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + cid, {length: 100000, timeout: 2000})));
 
                 //console.log(`Base URI data length: ${data.length}`);
                 var decodedData = new TextDecoder().decode(data).toString();
@@ -310,12 +307,15 @@ core = async (db, web3, ipfs) =>{
                 
                 baseFile = JSON.parse(decodedData);
 
-                console.log(`   nft is json`)
+                //console.log(`   nft is json`)
 
                 //console.log(baseFile)
                 
             }catch(err){
                 console.log("BaseURI Read Error:" + err)
+                if(n.block <= rejectBlock){
+                    await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
+                }
                 continue;
             }
 
@@ -323,13 +323,15 @@ core = async (db, web3, ipfs) =>{
 
             var subFiles = [];
 
+            var host = true;
+
             for(var u of subURIs){
                 if(u === undefined){
                     continue;
                 }
                 try{
                     var _cid = u.replace("ipfs://", "")
-                    var data = uint8arrays.concat(await all(ipfs.files.read(CID.parse(_cid), {length: 100000000})));
+                    var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + _cid, {length: 100000000, timeout:2000})));
 
                     var buf = Buffer.from(data);
                     //console.log(buf)
@@ -338,99 +340,197 @@ core = async (db, web3, ipfs) =>{
 
                     if(!uri_ext.includes(type.ext)){
                         console.log("   Invalid file type");
-                        continue;
+                        await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
+                        host = false;
+                        break;
                     }
 
                     subFiles.push({cid: _cid, ext: type.ext, buffer: buf})
 
                     //console.log(type)
                 }catch(err){
+                    console.log("SubURI Read Error:" + err)
+                    host = false;
+                    if(n.block <= rejectBlock){
+                        host = false
+                        await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
+                    }
+                    break;
                 }
             }
+            if(host){
+                console.log(`   writing files for : ${cid}.json`)
 
-            console.log("   writing files...")
-
-            fs.writeFile(`${uploadPath}${cid}.json`, JSON.stringify(baseFile, null, 4), (err) =>{
-                if(err) console.log(err);
-
-                console.log(`   writting baseURI file: ${cid}.json`);
-            })
-
-            await ipfs.pin.add(CID.parse(cid))
-            
-            for(var f of subFiles){
-                fs.writeFile(`${uploadPath}${f.cid}.${f.ext}`, f.buffer, (err) =>{
+                fs.writeFile(`${uploadPath}${cid}.json`, JSON.stringify(baseFile, null, 4), (err) =>{
                     if(err) console.log(err);
 
-                    console.log(`   writting subURI file: ${f.cid}.${f.ext}`);
+                    //console.log(`   writing baseURI file: ${cid}.json`);
                 })
-                await ipfs.pin.add(CID.parse(f.cid))
+
+                await ipfs.pin.add(CID.parse(cid))
+                
+                for(var f of subFiles){
+                    fs.writeFile(`${uploadPath}${f.cid}.${f.ext}`, f.buffer, (err) =>{
+                        if(err) console.log(err);
+
+                        //console.log(`   writing subURI file: ${f.cid}.${f.ext}`);
+                    })
+                    await ipfs.pin.add(CID.parse(f.cid))
+                }
+                
+                await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "hosted"} })
             }
-            
-            await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "hosted"} })
         }
+        console.log()
+        return;
     }
 
-    // Verify/Host IPFS nft data
-    setInterval(async() =>{
+    slashNFTs = async() =>{
+        console.log("Slashing NFTs:")
+
+        var slash = (await db.collection("slash").find({}).toArray()).map(s => s.slash);
+
+        if(slash.length > 0){
+            console.log(`   Slash: `+ slash);
+            try{
+                await nftProtocol.slashNFTs(slash);
+                await db.collection("slash").drop();
+            }
+            catch(err){
+                console.log("   Slash error: " + err)
+            }
+        }
+        console.log()
+        return;
+    }
+
+    staleNFTs = async () =>{
+        console.log(`Stale NFTs: ${stale}`)
+
+        if(stale % 10 === 0){
+            console.log(`   Reinstating stale nfts`)
+            db.collection("nft").updateMany({state: "stale"}, {$set:{state: "new"}})
+        }
+        stale++;
+        console.log()
+        return;
+    }
+
+    submitBlock = async() =>{
+        // Aggregate transactions.
+        try{
+            var blockNumber = await web3.eth.getBlockNumber();
+
+            if(blockNumber < targetBlock){
+                return;
+            }
+            console.log("Submitting Target Block: " + targetBlock + " Hit.");
+
+            var latestBlock = await nftProtocol.latestBlock();
+
+            var leaves = (await db.collection("transactions").find({}).toArray()).map(l => l.leaf);
+
+            if(leaves.length == 0){
+                targetBlock += slot;
+                console.log()
+                return;
+            }
+
+            console.log("   Current transactions:" + leaves)
+
+            var tree = new MerkleTree(leaves, keccak256, {sort: true});
+
+            var root = tree.getHexRoot();
+
+            var prev = web3.utils.soliditySha3(latestBlock._prev, latestBlock._root, latestBlock._block);
+
+            var block = {_prev: prev, _root: root, _leaves: leaves, _block: 0}
+
+            try{
+                var receipt = await nftProtocol.submitBlock(block);
+                console.log(`   Submitted Block: ${receipt.logs[0].args[0]._root}`);
+            }
+            catch(err){
+                console.log(err + "submitError" + "\n")
+                return;
+            }
+
+            await db.collection("transactions").drop();
+
+            await db.createCollection("transactions"); 
+            
+            targetBlock += slot;
+            
+            //console.log(blockNumber)
+        }
+        catch(err){
+            console.log(err);
+        }
+        console.log()
+        return;
+    }
+
+    // Process requests.
+    await nftProtocol.verificationRequest().on('data', async (event) => {
+
+        var contract = event.returnValues._contract;
+        var distributor = event.returnValues._distributor;
+        var baseURI = event.returnValues._baseURI;
+        var block = event.returnValues._block;
+        console.log(`Verifiaction Request -- contract: ${event.returnValues._contract}, distributor: ${event.returnValues._distributor}, 
+                                             baseURI: ${event.returnValues._baseURI}, block: ${block}` );
+
+        await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, state: "new", block: block})  
+
+    });
+
+    var connected = await web3.eth.net.isListening();
+
+    if(!connected){
+        console.log(`Web3 didn't connect!`);
+    }
+
+    var latest = await nftProtocol.latestBlock();
+    var block = await web3.eth.getBlockNumber();
+    var slot = 5;
+    var interval = 5;
+    var targetBlock = block + slot;
+    var stale = 1;
+    console.log(`Target Block: ${targetBlock}`);
+
+    // TODO: process requests from last block to current (block);
+
+    console.log(`Latest block: ${latest}`);
+
+    var events = await nftProtocol.getPastEvents('verificationRequest', {fromBlock: latest._block, toBlock: block.toString()})
+
+    for(var event of events){
+        var contract = event.returnValues._contract;
+        var distributor = event.returnValues._distributor;
+        var baseURI = event.returnValues._baseURI;
+        var block = event.returnValues._block;
+        console.log(`Verifiaction Request -- contract: ${contract}, distributor: ${distributor}, 
+                                             baseURI: ${baseURI}, block: ${block}` );
+
+        await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, state: "new", block: block})  
+    }
+
+    // Core Interval loop.
+    while(true){
 
         await verifyNFTs();
 
+        await submitBlock();
+
+        await slashNFTs();
+
         await hostNFTs();
 
-        // TODO: handle stale-verify and stale-host states
+        await staleNFTs()
 
-        // TODO: handle slashed nfts
-
-    }, 5000)
+        await new Promise(p => setTimeout(p, interval * 1000))
+    }
     
-    
-    // Aggregate transactions.
-    var slot = 5;
-    var targetBlock = await web3.eth.getBlockNumber() + slot;
-    console.log(`Target Block: ${targetBlock}`);
-    setInterval(async() =>{
-        var blockNumber = await web3.eth.getBlockNumber();
-
-        if(blockNumber < targetBlock){
-            return;
-        }
-        console.log("Target Block: " + targetBlock + " Hit.");
-
-        var latestBlock = await nftProtocol.latestBlock();
-
-        var leaves = (await db.collection("transactions").find({}).toArray()).map(l => l.leaf);
-
-        console.log("transactions:" + leaves)
-
-        await db.collection("transactions").drop();
-
-        await db.createCollection("transactions");
-
-        if(leaves.length == 0){
-            targetBlock += slot;
-            return;
-        }
-        var tree = new MerkleTree(leaves, keccak256, {sort: true});
-
-        var root = tree.getHexRoot();
-
-        var prev = web3.utils.soliditySha3(latestBlock._prev, latestBlock._root, latestBlock._block);
-
-        var block = {_prev: prev, _root: root, _leaves: leaves, _block: 0}
-
-        try{
-           var receipt = await nftProtocol.submitBlock(block)
-           console.log(`Submitted Block: ${JSON.stringify(receipt.logs[0].args)}`)
-        }
-        catch(err){
-            console.log(err + "submitError")
-        }       
-        
-        targetBlock += slot;
-        
-        //console.log(blockNumber)
-    }, 60000)
 }
 
 module.exports = core

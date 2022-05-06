@@ -5,7 +5,7 @@
     src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
 
 #TopMenu{
-    background-image: url("../../logos/content/RatioColors.png"); 
+    background-image: url("../../logos/content/RatioColors.png") !important; 
 }
 
 #link, #connect{
@@ -37,7 +37,7 @@
 }
 
 .networkImg{
-    height: 1.3em;
+    height: 18px;
 }
 
 .cardStyle{

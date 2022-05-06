@@ -16,6 +16,11 @@ contract RatioSingleNFT is ERC721Enumerable{
     // Distributor.
     address public immutable distributor;
 
+    // NFT creation variables.
+    uint public immutable maxSupply;
+
+    uint public immutable mintValue;
+
     // URI Variables.
     string public baseURI;
 
@@ -31,11 +36,6 @@ contract RatioSingleNFT is ERC721Enumerable{
     bool baseURIset = false;
 
     bool subURIset = false;
-
-    // NFT creation variables.
-    uint public maxSupply;
-
-    uint public mintValue;
 
     Counters.Counter private tokenIds;
 
@@ -71,6 +71,10 @@ contract RatioSingleNFT is ERC721Enumerable{
         video = _video;
         model = _model;
         subURIset = true;
+    }
+
+    function info() public view returns(string memory _name, uint _maxSupply, uint _mintValue, uint _minted, string memory _image, string memory _audio, string memory _video, string memory _model){
+        return (name(), maxSupply, mintValue, tokenIds.current(), image, audio, video, model);
     }
 
     function mint(address _receiver) external virtual payable returns(uint _id){

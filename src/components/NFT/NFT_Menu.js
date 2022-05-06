@@ -11,6 +11,7 @@ import "./NFT.css";
 
 import Create from "./Create";
 
+import Display from "./Display";
 
 const { MediaContextProvider, Media } = createMedia({
     breakpoints: {
@@ -19,7 +20,6 @@ const { MediaContextProvider, Media } = createMedia({
       computer: 1024,
     },
   })
-
 
 class NFT_Menu extends Component{
     constructor(props){
@@ -36,6 +36,9 @@ class NFT_Menu extends Component{
                                 <Menu.Item>
                                     <Link to="Create"><div id="link">Create</div></Link>
                                 </Menu.Item>
+                                <Menu.Item>
+                                    <Link to="Display"><div id="link">Display</div></Link>
+                                </Menu.Item>
                             </Menu.Menu>
                             <Menu.Menu position="right">
                                 <Menu.Item>
@@ -45,6 +48,7 @@ class NFT_Menu extends Component{
                         </Menu>
                         <Routes>
                             <Route path="Create" element = {<Create {...this.props} setLoading = {this.props.setLoading}/>}/>
+                            <Route path="Display" element = {<Display {...this.props} setLoading = {this.props.setLoading}/>}/>
                         </Routes>
                     </Media>
                 </MediaContextProvider>

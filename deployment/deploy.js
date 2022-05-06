@@ -23,13 +23,21 @@ const fs = require("fs");
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 // Contracts
+const NFTProtocol = contract(require('../src/contracts/NFTProtocol.json'));
+
+const CryptoGame = contract(require('../src/contracts/CryptoGame.json'));
+
+const NFTChef = contract(require('../src/contracts/NFTChef.json'));
+
+const NFTMinter = contract(require('../src/contracts/NFTMinter.json'));
+
 const WMatic = contract(require("../src/contracts/WMatic.json"));
 
 const PolyCard = contract(require('../src/contracts/PolyCard.json'));
 
 const RatioNFT = contract(require('../src/contracts/RatioNFT.json'));
 
-const NFTProtocol = contract(require('../src/contracts/NFTProtocol.json'));
+
 
 // State Variables
 var provider;
@@ -113,6 +121,27 @@ deploy = async() =>{
         console.log(` NFTProtocol deployed to '${nftProtocol.address}' on ${args[0]}`)
     }
 
+    // NFT Minter
+    if(contractDeploy.includes("all") || contractDeploy.includes("nftMinter")){
+        var cryptoGame = await CryptoGame.new({from: accounts[4]});
+
+        var block = await web3.eth.getBlockNumber();
+        
+        var nftChef = await NFTChef.new(cryptoGame.address, accounts[4], utils.toWei('10', "ether"), block, (block + 201600), {from: accounts[0]})
+        
+        await cryptoGame.transferOwnership(nftChef.address, {from: accounts[4]});
+        
+        var nftMinter = await NFTMinter.new(nftChef.address, {from: accounts[4]});
+
+        await nftChef.transferOwnership(nftMinter.address, {from: accounts[4]});
+
+        deployedContracts[args[0]]["CryptoGame"] = {address: cryptoGame.address};
+
+        deployedContracts[args[0]]["NFTChef"] = {address: nftChef.address};
+
+        deployedContracts[args[0]]["NFTMinter"] = {address: nftMinter.address};
+    }
+
     // PolyCards
     if(contractDeploy.includes("all") || contractDeploy.includes("polyCards")){
 
@@ -147,7 +176,11 @@ deploy = async() =>{
 
             var sym = nft.replace(/[a-z]/g, "")
 
-            var polyCard = await PolyCard.new(wMatic.address, uri, nft, sym, {from: accounts[4]});
+            sym = sym.replace(" ", "")
+
+            console.log(sym);
+
+            var polyCard = await PolyCard.new(nft, sym, {from: accounts[4]});
 
             receipt = await web3.eth.getTransaction(polyCard.transactionHash)
 
@@ -159,7 +192,7 @@ deploy = async() =>{
 
             console.log(nft + " cost: " + utils.fromWei(new BN(price.toString()), "ether"));
 
-            deployedContracts[args[0]][nft] = {address: polyCard.address, uri: uri};
+            deployedContracts[args[0]]["PolyCards"][nft] = {address: polyCard.address, baseURI: uri};
         }
 
     }
@@ -180,7 +213,7 @@ deploy = async() =>{
 
     console.log(`Waiting for Oracle reboot...`)
 
-    await new Promise(p => setTimeout(p, 45000));
+    await new Promise(p => setTimeout(p, 10000));
 
     console.log(`Waiting Complete`)
 

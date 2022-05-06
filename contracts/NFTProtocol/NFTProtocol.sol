@@ -71,6 +71,9 @@ contract NFTProtocol is Ownable {
     // Event emitted when an nft has been verifed!
     event verified(nftStruct _nft);
 
+    // Event emitted when nfts have been slashed.
+    event slashed(address[] _contracts);
+
     // Constructor
     constructor(uint _minimumRequestValue){
         minimumRequestValue = _minimumRequestValue;
@@ -166,6 +169,7 @@ contract NFTProtocol is Ownable {
         for(uint i = 0; i < _contracts.length; i++){
             delete contractNFT[_contracts[i]];
         }
+        emit slashed(_contracts);
     }
 
     // Function to slashNFT via public
@@ -187,7 +191,7 @@ contract NFTProtocol is Ownable {
         return nftBlocks[nftBlocks.length - 1];
     }
 
-    function getContractNFT(address _contract) public view returns( nftStruct memory _nft){
+    function getContractNFT(address _contract) public view returns(nftStruct memory _nft){
         return contractNFT[_contract];
     }
 

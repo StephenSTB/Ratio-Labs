@@ -32,24 +32,21 @@ gateVerify = async (db, web3, ipfs) =>{
     nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
 
     nftProtocol.verificationRequest().on('data', async (event) => {
-        console.log(event.returnValues);
+        
         //console.log("event:" + event.returnValues)
         var contract = event.returnValues._contract;
         var distributor = event.returnValues._distributor;
-        var uri = event.returnValues._baseURI;
+        var baseURI = event.returnValues._baseURI;
+        var block = event.returnValues._block
 
-        var contractExists = await db.collection("nft").findOne({contract: contract})
-
-        if(contractExists !== null){
-            console.log("contract has already requested verification");
-            return;
-        }
+        console.log(`Verifiaction Request -- contract: ${contract}, distributor: ${distributor}, 
+                                             baseURI: ${baseURI}, block: ${block}` );
         
-        var insert = await db.collection("nft").insertOne({contract: contract, distributor: distributor, 
-            baseURI: uri, state: "new", block: event.returnValues._block, 
+        await db.collection("nft").insertOne({contract: contract, distributor: distributor, 
+            baseURI: baseURI, state: "new", block: block
         })  
 
-        console.log(insert)
+        //console.log(insert)
     
     });
 
@@ -82,7 +79,7 @@ gateVerify = async (db, web3, ipfs) =>{
                     if(add.cid.toString() !== cid){
                         console.log(`   cids dont match: ${add.cid.toString()} : ${cid}`    )
                         await db.collection("uri").updateOne({uri: u.uri}, {$set: {state: "rejected"}})
-                        await fs.unlink(__dirname + "/gatenft/" + cid + '.' +  u.ext, (err) =>{
+                        await fs.unlink(__dirname + "/gatenft/" + cid + '.' +  u.ext, (err) =>{ 
                             if(err) console.log(err);
                         });
                         continue;
@@ -93,6 +90,7 @@ gateVerify = async (db, web3, ipfs) =>{
                 }catch{ console.log("   file error.")}
             }
         }
+        return;
     }
 
     hostNFT = async () =>{
@@ -127,24 +125,22 @@ gateVerify = async (db, web3, ipfs) =>{
                     break;
                 }
             }
-            // TODO create stale nft
             if(host){
                 await db.collection("nft").updateOne({contract: contract}, {$set: {state: "hosted"}});
                 console.log(`   ${contract} <-> ${u.baseURI} HOSTED!`);
             }
         }
+        return;
     }
 
     // Handle nft hosting post upload;
-    setInterval(async() =>{
-
+    while(true){
         await hostURIs();
 
         await hostNFT();
-        
-    }, 30000)
 
-
+        await new Promise(p => setTimeout(p, 10000));
+    }
    
 }
 

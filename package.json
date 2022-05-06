@@ -27,6 +27,7 @@
     "ganache": "^7.0.3",
     "hdkey": "^2.0.1",
     "ipfs": "^0.62.2",
+    "ipfs-http-client": "^56.0.3",
     "it-all": "^1.0.6",
     "it-to-buffer": "^2.0.2",
     "keccak256": "^1.0.6",
@@ -57,14 +58,15 @@
   "scripts": {
     "dev": "run-p start webrtc",
     "start": "CHOKIDAR_USEPOLLING=true BROWSER=chrome react-scripts start",
-    "build": "BROWSER=chrome react-scripts build",
+    "build": "BROWSER=chrome react-scripts -max-old-space-size=4096 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "gate-ipfs": "ipfs daemon",
     "gate-db": "sudo mongod --dbpath ./data/gatedb --port 27018",
     "gate": "nodemon --ignore ./NFTProtocol/gateway/gatenft --ignore ./src --ignore ./NFTProtocol/V1 ./NFTProtocol/gateway/gateway.js Ganache",
+    "oracle-ipfs": "jsipfs daemon",
     "oracle-db": "sudo mongod --dbpath ./data/db",
-    "oracle": "nodemon --ignore ./NFTProtocol/V1/nft --ignore ./src --ignore ./NFTProtocol/gateway ./NFTProtocol/V1/oracle.js Ganache",
+    "oracle": "nodemon --ignore ./NFTProtocol/V1/nft --ignore ./src --ignore ./NFTProtocol/gateway ./NFTProtocol/V1/oracle.js Ganache HTTP",
     "contractsTest": "truffle test ./test/MockGovernor.js --compile-none",
     "cryptoGameTest": "truffle test ./test/CryptoGame.js --compile-none",
     "ratioProtocol": "truffle test ./test/NFTProtocol.js",
@@ -76,7 +78,8 @@
     "webrtc": "webrtc-star --port 13579",
     "ipfs-testing": "nodemon --ignore ./src --ignore package.json ./IPFS/ipfs-testing.js",
     "nftTesting": " node ./NFTProtocol/test/nftProtocolTests.js",
-    "nftTest": "run-s deployTest nftTesting"
+    "nftTest": "run-s deployTest nftTesting",
+    "init": "node ./init/init.js"
   },
   "eslintConfig": {
     "extends": [

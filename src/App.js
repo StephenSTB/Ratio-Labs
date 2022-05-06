@@ -13,6 +13,14 @@ import {BrowserRouter} from "react-router-dom";
 
 import networkData from "./data/Network_Data.json";
 
+import deployedContracts from "./data/Deployed_Contracts.json"
+
+import * as contract from "@truffle/contract";
+
+import RatioSingleNFT from './contracts/RatioSingleNFT.json';
+
+import NFTProtocol from './contracts/NFTProtocol.json';
+
 import mumbai from "./logos/wallet/chains/polygonMumbai.png";
 
 import polygon from "./logos/wallet/chains/polygon.png";
@@ -21,20 +29,7 @@ import ganache from "./logos/wallet/chains/ganache.png";
 
 import kovan from "./logos/wallet/chains/kovan.png";
 
-import * as ipfs_http from 'ipfs-http-client';
-
 import * as IPFS from 'ipfs-core';
-
-import {CID, multiaddr} from 'ipfs'
-
-import all from "it-all";
-
-import * as uint8arrays from 'uint8arrays'
-
-const WS = require('libp2p-websockets')
-const filters = require('libp2p-websockets/src/filters')
-const transportKey = WS.prototype[Symbol.toStringTag]
-
 
 var images  = {
                   "80001": mumbai,
@@ -47,11 +42,18 @@ class App extends Component{
 
   constructor(){
     super();
-    this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false}
+    this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false,
+                    NFTProtocol: null, RatioSingleNFT: null,
+                    networkError: ""
+                    
+                  }
     this.updateWeb3 = this.updateWeb3.bind(this);
     this.setProvider = this.setProvider.bind(this);
     this.setLoading = this.setLoading.bind(this);
     this.test = true;
+
+    this.RatioSingleNFT = contract(RatioSingleNFT)
+    this.NFTProtocol = contract(NFTProtocol) 
   }
 
   componentDidMount = async () =>{
@@ -87,10 +89,12 @@ class App extends Component{
     }
     
     if (window.ethereum) {
-      const web3  = new Web3(window.ethereum);
-      const network = await web3.eth.getChainId();
-      await this.setProvider(network.toString())
+      this.updateWeb3(null);
     }
+  }
+
+  componentDidUpdate = async (prevProps, prevState) =>{
+  
   }
 
   setLoading = (loading) =>{
@@ -113,17 +117,27 @@ class App extends Component{
     }
   }
 
-  setProvider = async (network) =>{
+  setProvider = async (web3, network) =>{
 
       if(networkData[network] !== undefined){
+        console.log("App Setting Provider")
         
         var networkHex = networkData[network].chainId;
         var selectedProviderImage = images[network]
 
         console.log(networkHex)
-  
-        this.setState({network, networkHex, selectedProviderImage});
+
+        this.RatioSingleNFT.setProvider(web3.currentProvider)
+
+        this.NFTProtocol.setProvider(web3.currentProvider);
+
+        this.setState({network, networkHex, selectedProviderImage, RatioSingleNFT: this.RatioSingleNFT, NFTProtocol: this.NFTProtocol, networkError: ""});
+        return;
       }
+
+      this.setState({networkError: "The current network is Unsupported."})
+      console.log("App current network is Unsupported.")
+
   }
 
   updateWeb3 = async (web3, account) =>{
@@ -137,13 +151,15 @@ class App extends Component{
       
       const network = await web3.eth.getChainId();
 
-      await this.setProvider(network.toString())
+      const utils = web3.utils;
+
+      await this.setProvider(web3, network.toString())
 
       var unlocked = true
 
       //this.getProvider(network);
 
-      this.setState({web3, accounts, account, network, selectedAccount, unlocked});
+      this.setState({web3, utils, accounts, account, network, selectedAccount, unlocked});
       return;
     }
 
@@ -157,6 +173,8 @@ class App extends Component{
         return;
       }
       const web3  = new Web3(window.ethereum);
+
+      const utils = web3.utils;
 
       //console.log(web3.eth.accounts)
 
@@ -191,8 +209,10 @@ class App extends Component{
       }
 
       //var provider = this.getProvider(network);
+
+      this.setProvider(web3, network,toString());
       
-      this.setState({web3, accounts, account, network, selectedAccount});
+      this.setState({web3, utils, accounts, account, network, selectedAccount});
 
       //console.log("state" + this.state.network)
 
@@ -208,6 +228,7 @@ class App extends Component{
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
         //window.location.reload();
+        this.updateWeb3();
       });
       
     }

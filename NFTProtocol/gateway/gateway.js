@@ -1,3 +1,7 @@
+const https = require("https");
+
+const http = require('http')
+
 // Express Declarations / Initialization
 const express = require('express');
 
@@ -16,7 +20,20 @@ const busboy = require('connect-busboy');
 
 const app = express();
 
-app.use(cors());
+/*
+var whitelist = ['http://localhost/3000', 'http://example2.com']
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}*/
+
+//app.use(cors(corsOptions));
+app.use(cors())
 app.use(express.json());
 app.use(limiter);
 app.use(busboy(
@@ -77,7 +94,17 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
 
     routes(app, db, ipfs, web3)
     
-    app.listen(3001);
+    https.createServer({
+        key: fs.readFileSync("./sslcert/key.pem"),
+        cert: fs.readFileSync("./sslcert/cert.pem"),
+      },
+      app).listen(3001, () =>{
+        console.log('server is runing at port 3001')
+    })
+
+    http.createServer(app).listen(3002, ()=>{
+        console.log('server is runing at port 3002')
+    })
     
   });
 

@@ -13,9 +13,10 @@ const uploadPath = path.join(__dirname, 'gatenft/'); // Register the upload path
 var uri_ext = ["jpg", "png", "gif", "svg", "mp3", "wav", "ogg", "mp4", "webm","glb", "gltf", "json"];
 
 routes = (app, db, ipfs, web3) =>{
+
     app.get("/", (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        res.send({greet: "Welcome to oracle. 3001"})
+        res.send({greet: "Welcome to Ratio Gateway. 3001"})
         console.log("Pinged")
     })
 
@@ -30,7 +31,7 @@ routes = (app, db, ipfs, web3) =>{
             return;
         }
 
-        var data =  await db.collection("nft").findOne({contract: contract});
+        var data = await db.collection("nft").findOne({contract: contract});
 
         if(data === null || data === undefined){
             res.status(400).json({"status": "failed", "reason": "Invalid nft status."})
@@ -253,8 +254,8 @@ routes = (app, db, ipfs, web3) =>{
         count = 0;
         
         req.busboy.on('file', async (name, file, info) =>{
-            console.log(`   name: ${name} info: ${info.mimeType}`);
             count++;
+            console.log(`   name: ${name} info: ${info.mimeType}`);
             try{
                 var data = await db.collection("uri").findOne({uri: name});
                 console.log(`   uri data: ${data}.`);
@@ -295,26 +296,26 @@ routes = (app, db, ipfs, web3) =>{
 
                     await db.collection("uri").updateOne({uri: name}, {$set: {state: "uploaded", ext: ext}})
 
-                    count --;
+                    count--;
 
                     if(count === 0){
                         console.log(` closing... success: ${success}`);
 
                         if(!success){
-                            res.status(400).json({status: "failed"})
+                            res.status(400).json({status: "failed", reason: "data error"})
                             return;
                         }
             
                         if(!files.includes(baseURI)){
                             console.log(`   baseURI: ${baseURI} not included.`)
-                            res.status(400).json({status: "failed"})
+                            res.status(400).json({status: "failed", reason: `baseURI: ${baseURI} not included.`})
                             return;
                         }
             
                         for(var u of subURIs){
                             if(!files.includes(u)){
                                 console.log(` subURI: ${u} not included.`)
-                                res.status(400).json({status: "failed"})
+                                res.status(400).json({status: "failed", reason: ` subURI: ${u} not included.`})
                                 return;
                             }
                         }

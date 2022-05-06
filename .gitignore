@@ -42,3 +42,6 @@ mongod.sh
 
 #killProcess
 killProcess
+
+#ssl cert
+/sslcert

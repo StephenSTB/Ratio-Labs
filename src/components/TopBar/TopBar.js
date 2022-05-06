@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import {Button, Menu, Image, Dimmer, Card, Header, CardContent, Grid} from 'semantic-ui-react';
+import {Button, Menu, Image, Dimmer, Card, Header, Grid} from 'semantic-ui-react';
 
 import { createMedia } from '@artsy/fresnel'
 
@@ -129,17 +129,17 @@ class TopBar extends Component{
                                 <Card.Content>
                                     <Grid columns={2}>
                                         <Grid.Column textAlign="right">
-                                            <Button color="black"><div style={{"marginRight": "2em"}} onClick={() => this.changeProvider("137") }><img className="networkImg" src={Polygon} style={{marginRight: "1em"}}/>Polygon </div></Button>
+                                            <Button color="black"><div style={{marginRight: "2em"}} onClick={() => this.changeProvider("137") }><img className="networkImg" src={Polygon} style={{marginRight: "1em"}}/>Polygon </div></Button>
                                         </Grid.Column>
                                         <Grid.Column textAlign="left">
-                                            <Button color="black"><div style={{"marginRight": "2em"}} onClick={() => this.changeProvider("80001")}><img className="networkImg" src={Mumbai} style={{marginRight: "1em"}}/>Mumbai</div></Button>
+                                            <Button color="black"><div style={{marginRight: "2em"}} onClick={() => this.changeProvider("80001")}><img className="networkImg" src={Mumbai} style={{marginRight: "1em"}}/>Mumbai</div></Button>
                                         </Grid.Column> 
                                     </Grid>
                                 </Card.Content>
                                 <Card.Content>
                                     <Grid columns={2} >
                                         <Grid.Column textAlign="right">
-                                            <Button color="black" ><div style={{"marginRight": "2em"}} onClick={() =>this.changeProvider("1337")}><img className="networkImg" src={Ganache} style={{"marginRight": "1em"}}/>Ganache </div></Button>
+                                            <Button color="black" ><div style={{marginRight: "2em"}} onClick={() =>this.changeProvider("1337")}><img className="networkImg" src={Ganache} style={{marginRight: "1em"}}/>Ganache </div></Button>
                                         </Grid.Column>
                                         <Grid.Column textAlign="left">
                                         </Grid.Column> 
