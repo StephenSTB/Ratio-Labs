@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.5;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
@@ -23,6 +23,8 @@ contract RatioSingleNFT is ERC721Enumerable{
 
     // URI Variables.
     string public baseURI;
+
+    string public cid;
 
     string public image;
 
@@ -73,8 +75,8 @@ contract RatioSingleNFT is ERC721Enumerable{
         subURIset = true;
     }
 
-    function info() public view returns(string memory _name, uint _maxSupply, uint _mintValue, uint _minted, string memory _image, string memory _audio, string memory _video, string memory _model){
-        return (name(), maxSupply, mintValue, tokenIds.current(), image, audio, video, model);
+    function info() public view returns( string memory _name, string memory _image, string memory _audio, string memory _video, string memory _model, uint _maxSupply, uint _mintValue, uint _minted){
+        return (name(), image, audio, video, model, maxSupply, mintValue, tokenIds.current());
     }
 
     function mint(address _receiver) external virtual payable returns(uint _id){

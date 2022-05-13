@@ -35,7 +35,7 @@ const WMatic = contract(require("../src/contracts/WMatic.json"));
 
 const PolyCard = contract(require('../src/contracts/PolyCard.json'));
 
-const RatioNFT = contract(require('../src/contracts/RatioNFT.json'));
+const RatioNFT = contract(require('../src/contracts/RatioSingleNFT.json'));
 
 
 

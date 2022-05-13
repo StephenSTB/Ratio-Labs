@@ -180,6 +180,7 @@ contract NFTProtocol is Ownable {
         if(rNFT.distributor() != nStruct._distributor || !compareStrings(rNFT.baseURI(), nStruct._baseURI)){
             delete contractNFT[_contract];
         }
+        //TODO slash contract if subURIs don't match NFT Protocol
     }
 
     /**  

@@ -11,8 +11,6 @@ import networkData from "../../data/Network_Data.json"
 
 import * as contract from "@truffle/contract";
 
-import * as fs from 'fs';
-
 import RatioSingleNFT from '../../contracts/RatioSingleNFT.json';
 
 import NFTProtocol from '../../contracts/NFTProtocol.json';
@@ -422,7 +420,7 @@ class Create extends Component{
 
             this.setState({stepText: "Signing NFT..."});
 
-            var contentHash = web3.utils.sha3(JSON.stringify(contentJSON))
+            var contentHash = web3.utils.soliditySha3(JSON.stringify(contentJSON))
             var signedContent = await web3.eth.personal.sign(contentHash, this.props.account)
             //console.log(signedContent)
             var nftJSON = {}
