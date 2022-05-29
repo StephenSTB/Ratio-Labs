@@ -212,7 +212,7 @@ contract NFTChef is Ownable {
         PoolInfo storage pool = poolInfo[_pid];
         NFTInfo storage nft = nftInfo[_pid][_tokenId];
         updatePool(_pid);
-        pool.colToken.safeTransferFrom(
+        pool.colToken.transferFrom(
             address(_sender),
             address(this),
             _amount
@@ -235,7 +235,7 @@ contract NFTChef is Ownable {
         safeCryptoGameTransfer(_sender, pending);
         nft.amount = nft.amount.sub(_amount);
         nft.rewardDebt = nft.amount.mul(pool.accCryptoGamePerShare).div(1e12);
-        pool.colToken.safeTransfer(address(_sender), _amount);
+        pool.colToken.transfer(address(_sender), _amount); // chan
         emit Withdraw(_sender, _pid, _amount);
     }
 
@@ -243,7 +243,7 @@ contract NFTChef is Ownable {
     function emergencyWithdraw(address _sender, uint256 _pid, uint256 _tokenId) public onlyOwner {
         PoolInfo storage pool = poolInfo[_pid];
         NFTInfo storage nft = nftInfo[_pid][_tokenId];
-        pool.colToken.safeTransfer(_sender, nft.amount);
+        pool.colToken.transfer(_sender, nft.amount);
         emit EmergencyWithdraw(_sender, _pid, nft.amount);
         nft.amount = 0;
         nft.rewardDebt = 0;

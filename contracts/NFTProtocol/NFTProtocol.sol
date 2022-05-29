@@ -39,6 +39,9 @@ contract NFTProtocol is Ownable {
     // Mapping to hold nft leafs that have been verified.
     mapping(bytes32 => bool) nftVerified;
 
+    // Mapping to hold contracts that have been slashed.
+    mapping(address => bool) public nftSlashed;
+
     // Structure to hold NFT data.
     struct nftStruct{
         address _contract;
@@ -71,8 +74,11 @@ contract NFTProtocol is Ownable {
     // Event emitted when an nft has been verifed!
     event verified(nftStruct _nft);
 
-    // Event emitted when nfts have been slashed.
+    // Event emitted when nfts have been slashed via slashNFTs.
     event slashed(address[] _contracts);
+
+    // Event emitted when an nft has been slashed via slashNFT.
+    event slash(address _contract, bool _slashed);
 
     // Constructor
     constructor(uint _minimumRequestValue){
@@ -110,6 +116,9 @@ contract NFTProtocol is Ownable {
     function verifyNFT(bytes32[] memory _proof, bytes32 _root, bytes32 _leaf, nftStruct memory _nft) public{
         // require the _root to exist.
         require(blockMap[_root]._block != 0, "Invalid nft root given.");
+
+        // require nft contract not to be slashed.
+        require(!nftSlashed[_nft._contract], "NFT contract has already been slashed.");
 
         // calculate sub URI encoding.
         bytes memory encoded;
@@ -168,6 +177,7 @@ contract NFTProtocol is Ownable {
     function slashNFTs(address[] memory _contracts) public onlyOwner{
         for(uint i = 0; i < _contracts.length; i++){
             delete contractNFT[_contracts[i]];
+            nftSlashed[_contracts[i]] = true;
         }
         emit slashed(_contracts);
     }
@@ -179,8 +189,20 @@ contract NFTProtocol is Ownable {
         nftStruct memory nStruct = contractNFT[_contract];
         if(rNFT.distributor() != nStruct._distributor || !compareStrings(rNFT.baseURI(), nStruct._baseURI)){
             delete contractNFT[_contract];
+            nftSlashed[_contract] = true;
+            emit slash(_contract, true);
+            return;
         }
-        //TODO slash contract if subURIs don't match NFT Protocol
+        string[4] memory subURIs = [rNFT.image(), rNFT.audio(), rNFT.video(), rNFT.model()];
+        for(uint i = 0 ; i < subURIs.length; i++){
+            if(!compareStrings(subURIs[i], nStruct._subURIs[i])){
+                delete contractNFT[_contract];
+                nftSlashed[_contract] = true;
+                emit slash(_contract, true);
+                return;
+            }
+        }
+        emit slash(_contract, false);
     }
 
     /**  

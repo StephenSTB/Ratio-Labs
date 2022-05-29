@@ -30,7 +30,7 @@ module.exports = class nftGatewayAPI{
     
         return null;
     }
-    
+    /*
     verify = async(nft) =>{
         try{
             const resp = await fetch(host + "/verify", {
@@ -50,12 +50,12 @@ module.exports = class nftGatewayAPI{
         catch{}
         
         return null;
-    }
+    }*/
 
 
-    host = async(data) =>{
+    verify = async(data) =>{
         try{
-            const resp = await fetch(host + "/host", {
+            const resp = await fetch(host + "/verify", {
                 method: 'POST',
                 body: data
             });

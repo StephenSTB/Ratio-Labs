@@ -9,12 +9,6 @@ import deployedContracts from "../../data/Deployed_Contracts.json"
 
 import networkData from "../../data/Network_Data.json"
 
-import * as contract from "@truffle/contract";
-
-import RatioSingleNFT from '../../contracts/RatioSingleNFT.json';
-
-import NFTProtocol from '../../contracts/NFTProtocol.json';
-
 import testnft from "./CryptoMonkeyRatioNFT.json";
 
 import * as nftGatewayAPI from "./nftGatewayAPI.js";
@@ -23,11 +17,16 @@ import { MerkleTree } from 'merkletreejs';
 
 import * as keccak256 from 'keccak256';
 
+import * as mime from 'mime-types';
+import { concat } from "uint8arrays/concat";
+
 var gatewayApi;
 
 var prod = false;
 
 var host;
+
+var uri_ext = ["jpg", "jpeg", "png", "gif", "svg", "mp3", "mpga", "wav", "ogg", "oga", "mp4", "webm", "glb", "gltf"];
 
 class Create extends Component{
 
@@ -45,14 +44,14 @@ class Create extends Component{
                         properties:[],
                         options:[{key: "number", text:"Number", value:"number"}, {key:"string", text:"Word", value:"string"}, ],
                         createLoading: false,
-                        maxMintCount: null, mintCost: null,
+                        burnable: false,
                         createError: "",
                         displayFinalContent: null,  
                         displayFinalInfo: null,
                         host: true, nftDeploymentCost: "",
                       }
 
-        host = prod ? "https://ratiomaster.site" : "http://localhost:3001";
+        host = prod ? "https://ratiomaster.site" : "http://localhost:3002";
 
         //console.log({nftGatewayAPI})
 
@@ -60,37 +59,36 @@ class Create extends Component{
     
         this.addContent = this.addContent.bind(this);
 
-        this.RatioSingleNFT = contract(RatioSingleNFT)
-
-        this.NFTProtocol = contract(NFTProtocol)
+        this.RatioSingleNFT = this.props.RatioSingleNFT;
     }
 
     componentDidMount = async () =>{
-        //ipfs = await IPFS.create({start: false, offline: true});
-        //var version = await global.ipfs.version(); 
-        //console.log("IPFS Mount, Version: " + version.version)
+        console.log(this.props.networkError)
     
-        if(this.props.web3 === undefined){
+        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== ""){
             return;   
         }
-        //console.log(this.props.web3.currentProvider);
+        
         
         this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
-        this.NFTProtocol.setProvider(this.props.web3.currentProvider)
+        /*this.NFTProtocol.setProvider(this.props.web3.currentProvider)*/
 
-        console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
+        //console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
     }
 
     componentDidUpdate = async (prevProps) =>{
 
         //console.log("update")
-
-        if(this.props.web3 === undefined || prevProps.web3 === undefined)
+        
+        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "")
+        {
             return;
+        }
 
-        if(prevProps.web3.currentProvider !== this.props.web3.currentProvider){
+        //console.log(this.props.web3.currentProvider)
+        
+        if(this.props.web3.currentProvider !== prevProps.web3.currentProvider){
             this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
-            this.NFTProtocol.setProvider(this.props.web3.currentProvider)
         }
 
     }
@@ -99,54 +97,31 @@ class Create extends Component{
         
         const reader = new FileReader();
 
-        //console.log(file);
+        console.log(file.name)
 
-        var type = null;
+        var type;
 
-        var fileName = file.name.split(".");
+        var ext = mime.extension(file.type);
 
-        switch(fileName[fileName.length-1]){
-            case "jpg":
-                type = "image";
-                break;
-            case "png" :
-                type = "image";
-                break;
-            case "gif" :
-                type = "image";
-                break;
-            case "svg" :
-                type = "image";
-                break;
-            case "mp4" :
-                type = "video";
-                break;
-            case "webm" :
-                type = "video";
-                break;
-            case "ogg":
-                type = "audio";
-                break;
-            case "mp3":
-                type = "audio";
-                break;
-            case "wav":
-                type = "audio";
-                break;
-            case "glb" : 
-                type = "model";
-                break
-            case "gltf": 
-                type = "model"
-                break;
-            default:
-                break;
+        console.log(ext);
+
+        if(ext === false){
+            var filenameParse = file.name.split(".");
+            ext = filenameParse[filenameParse.length - 1];
+            type = ext === "gltf" ? "model" : ext === "glb" ? "model" : null;
+        }else if(!uri_ext.includes(ext)){
+            this.setState({contentError: `Invalid file ext: ${ext}`});
+            return
         }
 
-        //console.log(type)
+        if(type === undefined){
+            type = (file.type.split("/"))[0];
+        }
+
+        console.log(type)
         
         if(type === null){
-            console.log("unsupported file type")
+            this.setState({contentError: "Unsupported file type."})
             return
         }
 
@@ -169,13 +144,13 @@ class Create extends Component{
                 contentType.push(type);
                 files.push(file);
             }
-            if(type === "video"){
-                content.push(<div id="contentSize"><video id="uploadedContent" autoPlay muted> <source src={event.target.result} /></video></div>)
+            if(type === "audio"){
+                content.push(<div id="contentSize"><audio id="uploadedContent" controls="Pause, Play"> <source src={event.target.result} /></audio></div>)
                 contentType.push(type);
                 files.push(file);
             }
-            if(type === "audio"){
-                content.push(<div id="contentSize"><audio id="uploadedContent" controls="Pause, Play"> <source src={event.target.result} /></audio></div>)
+            if(type === "video"){
+                content.push(<div id="contentSize"><video id="uploadedContent" autoPlay muted> <source src={event.target.result} /></video></div>)
                 contentType.push(type);
                 files.push(file);
             }
@@ -197,8 +172,6 @@ class Create extends Component{
             }
         })
         reader.readAsDataURL(file)
-
-        
     }
 
     addContentSection = () =>{
@@ -303,16 +276,41 @@ class Create extends Component{
         properties[index].value = data.value;
     }
 
-    createNFT = async () =>{
-        //console.log(this.state.properties)
+    maxMintCountChange = (e, data) =>{
+        var maxMintCount = data.value;
+        this.setState({maxMintCount})
+    }
 
-        console.log("CreateNFT")
+    mintCostChange = (e, data) =>{
+        var mintCost = data.value;
+        this.setState({mintCost})
+    }
 
-        var files = this.state.files;
+    claimValueChange = (e, data) =>{
+        var claimValue = data.value;
+        this.setState({claimValue})
+    }
 
-        var ipfs = global.ipfs;
+    toggleBurn = () =>{
+        var burnable = this.state.burnable
+        this.setState({burnable: !burnable})
+    }
 
-        var web3 = this.props.web3;
+    toggleHost = () =>{
+        var host = this.state.host;
+
+        this.setState({host: !host});
+
+        console.log()
+
+        this.calculateFee();
+    }
+
+    
+
+    createContent = async(files, ipfs) =>{
+
+        var result = {success: false}
 
         this.props.setLoading(true);
 
@@ -322,14 +320,14 @@ class Create extends Component{
             var createError = "Add a file to *Main to create an NFT."
             this.setState({createError, stepText: ""});
             this.props.setLoading(false)
-            return;
+            return result;
         }
 
         if(this.state.name.length < 5){
             var createError = "*Name must be at least 5 characters."
             this.setState({createError, stepText: ""});
             this.props.setLoading(false)
-            return
+            return result;
         }
 
         var contentJSON = {};
@@ -346,10 +344,10 @@ class Create extends Component{
             var result = await ipfs.add(files[i]);
             console.log(`${files[i].name} cid: ${result.cid.toString()}`);
             switch(this.state.contentType[i]){
-                case "image": contentJSON["image"] = "ipfs://" + result.cid.toString(); break;
-                case "video": contentJSON["video"] = "ipfs://" + result.cid.toString(); break;
-                case "audio": contentJSON["audio"] = "ipfs://" + result.cid.toString(); break;
-                case "model": contentJSON["model"] = "ipfs://" + result.cid.toString(); break;
+                case "image": contentJSON["image"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
+                case "video": contentJSON["video"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
+                case "audio": contentJSON["audio"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
+                case "model": contentJSON["model"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
                 default:
                     break;
             }
@@ -388,13 +386,55 @@ class Create extends Component{
             }
         }
 
-        //console.log(contentJSON);
+        return {success: true, contentJSON, subURIs, main};
+    }
 
+    evaluateContractVars = () =>{
+
+        var result = {success: false}
         // Condition to evaluate correct contract variables.
-        if(!Number.isInteger(Number(this.state.maxMintCount)) || !Number.isInteger(Number(this.state.mintCost)) ){
-            var createError = "An invalid mint count or cost was given. Enter a full number to create your NFT."
+        
+        if(!Number.isInteger(Number(this.state.maxMintCount)) || !Number.isInteger(Number(this.state.mintCost))){
+            var createError = "An invalid Max Mint Count or Mint Cost paramaters were given. Enter valid network token amounts to create your NFT."
             this.setState({createError, stepText: ""});
             this.props.setLoading(false)
+            return result;
+        }
+
+        if(this.state.claimValue === undefined){
+            console.log("claim value undefined.")
+            result.claimValue = this.state.mintCost;
+        }
+        else if(isNaN(this.state.claimValue)){
+            return result;
+        }
+        else if(Number(this.state.claimValue) > Number(this.state.mintCost)){
+            return result;
+        }
+        else{
+            result.claimValue = this.state.claimValue;
+        }
+
+        result.success = true;
+        return result;
+    }
+
+    createNFT = async () =>{
+        //console.log(this.state.properties)
+
+        console.log("CreateNFT")
+
+        //TODO: parse process to functions.
+
+        var files = this.state.files;
+
+        var ipfs = global.ipfs;
+
+        var web3 = this.props.web3;
+
+        if(this.props.networkError !== ""){
+            var createError = this.props.networkError
+            this.setState({createError, stepText: ""});
             return;
         }
 
@@ -402,19 +442,45 @@ class Create extends Component{
         if(this.props.account === undefined){
             var createError = "Connect Wallet to Create your NFT."
             this.setState({createError, stepText: ""});
-            this.props.setLoading(false)
             return;
         }
 
+        var contentObj = await this.createContent(files, ipfs);
+
+        if(contentObj.success === false){
+            return;
+        }
+
+        var contentJSON = contentObj.contentJSON;
+
+        var subURIs = contentObj.subURIs;
+
+        var main = contentObj.main;
+
+        //console.log(contentJSON);
+
+        var evalContract = this.evaluateContractVars()
+
+        console.log(evalContract)
+
+        if(evalContract.success === false){
+            return;
+        }
+
+        var claimValue = evalContract.claimValue;
+
+        console.log(claimValue)
+
         // Encapsulate async calls with try/catch
         try{
-            if(this.RatioSingleNFT.currentProvider === undefined ){
-                this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
-            }
-
+           
             this.setState({stepText: "Deploying NFT Contract..."});
 
-            var ratioNFT = await this.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, web3.utils.toWei(this.state.mintCost.toString(), "ether"), {from: this.props.account});
+            console.log(`NFT Vars: { name: ${this.state.name}, mintCount: ${this.state.maxMintCount}, mintCost: ${web3.utils.toWei(this.state.mintCost.toString(), "ether")}, claimValue: ${ web3.utils.toWei(claimValue.toString(),"ether")}, burnable: ${this.state.burnable} from: ${this.props.account}}}`);
+
+            console.log(this.RatioSingleNFT.currentProvider)
+
+            var ratioNFT = await this.props.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, web3.utils.toWei(this.state.mintCost.toString(), "ether"), web3.utils.toWei(claimValue.toString(), "ether"), this.state.burnable, {from: this.props.account});
             contentJSON["contract"] = ratioNFT.address;
             contentJSON["distributor"] = this.props.account;
 
@@ -456,17 +522,17 @@ class Create extends Component{
 
             this.setState({stepText: "Sending Ratio Labs NFT For Verification..."})
 
-            if(this.NFTProtocol.currentProvider === undefined ){
-                this.NFTProtocol.setProvider(this.props.web3.currentProvider);
-            }
-
-            var nftProtocol = await this.NFTProtocol.at(protocolAddress);
+            var nftProtocol = await this.props.NFTProtocol.at(protocolAddress);
 
             var latestBlock = await nftProtocol.latestBlock();
 
             console.log(`latestBlock: ${latestBlock}`);
+
+            //TODO: update verification process.
             
-            var state = await gatewayApi.state(nftJSON.content.contract)
+            var state = await gatewayApi.state(nftJSON.content.contract);
+
+            console.log(state)
 
             if(state.status !== "success"){
                 if(state.reason === "Invalid contract address format.")
@@ -487,45 +553,26 @@ class Create extends Component{
                 return;
             }
 
-            var ver = await gatewayApi.verify(nftJSON);
-
-            console.log(ver.status)
-
-            if(ver.status !== "success"){
-                this.setState({createError: ver.reason})
-                this.props.setLoading(false);
-                return;
-            }
-
-            state = await gatewayApi.state(nftJSON.content.contract);
-            console.log(`   State: ${JSON.stringify(state)}`);
             // Send data to Ratio
+
+            const form = new FormData();
 
             const nftString = JSON.stringify(nftJSON);
 
-            const blob = new Blob([nftString], {type: "application/json"})
+            form.append(ratioNFT.address, nftString);
 
-            const file = new File([blob], baseURI.replace("ipfs://", ""), {type: "application/json"})
-
-            const formdata = new FormData();
-
-            formdata.append('contract', nftJSON.content.contract)
-
-            formdata.append(baseURI, file);
-
-            for(var i =0; i < subURIs.length; i++){
-                formdata.append(subURIs[i], files[i]);
+            for(var i = 0; i < subURIs.length; i++){
+                form.append(subURIs[i], files[i]);
             }
+            var verify = await gatewayApi.verify(form);
 
-            var host = await gatewayApi.host(formdata);
-
-            if(host.status !== "success"){
-                this.setState({createError: host.reason})
+            if(verify.status !== "success"){
+                this.setState({createError: verify.reason})
                 this.props.setLoading(false);
                 return;
             }
 
-            console.log(`host: ${host}`);
+            console.log(`verify: ${verify}`);
 
             state = await gatewayApi.state(nftJSON.content.contract);
             console.log(`   State: ${JSON.stringify(state)}`);
@@ -599,66 +646,10 @@ class Create extends Component{
         
     }
 
-    host = () =>{
-        var host = this.state.host;
-
-        this.setState({host: !host});
-
-        console.log()
-
-        this.calculateFee();
-    }
+    
 
     calculateFee = () =>{
 
-    }
-
-    maxMintCountChange = (e, data) =>{
-        var maxMintCount = data.value;
-        this.setState({maxMintCount})
-    }
-
-    mintCostChange = (e, data) =>{
-        var mintCost = data.value;
-        this.setState({mintCost})
-    }
-
-    testHost = async () =>{
-
-        var nft = {"content":{"name":"Ratio Card","image":"ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ","contract":"0x9D63017F409C64EEDBad55193A8766F9F20FAE68","distributor":"0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"},"signature":"0x782c5f75959cfae69ec6fd95408074d9e2a1ecd397e54c04d33999d93465a1ee5839c04cf533b69ba455b685dc83e94c582a59d2ad001271ca6c28ea49539e6c1c"}
-
-        const nftString = JSON.stringify(nft);
-
-        var baseURI = "ipfs://QmdrV5KEK4nSZvDdqK1XNZ6NnmtxvVkCb2GQXKUgjxFJPP";
-
-        const blob = new Blob([nftString], {type: "application/json"})
-
-        const file = new File([blob], baseURI.replace("ipfs://", ""), {type: "application/json"})
-        
-        var subURI = "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ";
-        const data = new FormData();
-        
-        if(this.state.files.length === 0){
-            console.log("no files.")
-            return
-        }
-
-        data.append(baseURI, file)
-
-        for(var f of this.state.files){
-            data.append(subURI, f);
-        }
-        
-        //console.log(data.getAll('file'))
-
-        gatewayApi.host(data);
-    }
-
-    testVerify = async() =>{
-        var nft = {"content":{"name":"Ratio Card","image":"ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ","contract":"0xa64A895fDCFA0C94E1240BDe002b50B248983dE5","distributor":"0xCA76A94C54b461d7230a59f4f78C1Dd3a0eACd63"},"signature":"0xa355642b6539beb85f4d6ed7952f477d42ef519eae76a48fde14119cf3c3536558f765f41709b3cd905c8cf885bd1eee2f5c982c104dfd17167d5d2ea5130b971c"}
-        await gatewayApi.verify(nft)
-
-        await gatewayApi.state(nft.content.contract);
     }
 
     render(){
@@ -672,9 +663,10 @@ class Create extends Component{
                             <div id="bannerText">Create</div>
                         </Container>
                 </Segment>
+                <div id="networkError">{this.props.networkError}</div>
                 <div id="createForm" style={{"padding-top": "6vh", color:"black", }}>
                     <Container textAlign="left">
-                        <div id="prompt">Use the form bellow to create NFT's utilizing the Ratio NFT Protocol. (see About)</div>
+                        <div id="prompt">Use the form below to create NFT's utilizing the Ratio NFT Protocol. (see About)</div>
                         <div id="required">* Indicates Required Fields</div>
                         {/*<Button onClick={this.testVerify}>verify</Button>*/}
                         <Form id="nftForm" onSubmit={() => this.createNFT}>
@@ -722,10 +714,20 @@ class Create extends Component{
                                     </div>
                                     <br/>
                                     <div id="contractInput">
-                                        <div className="mintLabel">*MintCost:</div>
+                                        <div className="mintLabel">*Mint Cost:</div>
                                         <Form.Input size="small" placeholder="Mint Cost e.g., (1 Matic)"  onChange={this.mintCostChange}/>
                                     </div>
-                                    
+                                    <br/>
+                                    <div id="contractInput">
+                                        <div className="mintLabel"><Popup content="This field sets how much the distributor (creator address) will receive from the Mint Cost. " trigger={<Icon name="question circle"/>  } />Claim Value:</div>
+                                        <Form.Input size="small" placeholder="Default will be Mint Cost"  onChange={this.claimValueChange}/>
+                                    </div>
+                                    <br/>
+                                    <div id="contractInput">
+                                        <div id="burnable">
+                                            <Radio toggle onChange={this.toggleBurn}/>  &emsp; Enable Burning &nbsp; <Popup content={<div><p>When Burnable, Minted NFTs may be removed from circulation allowing owners to recieve part or all of the Mint Cost</p><p>(Mint Cost - Claim Value)</p></div>} trigger={<Icon name="question circle"/>  } />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <Divider id="subDivide"></Divider>
@@ -736,7 +738,7 @@ class Create extends Component{
                                 <div id="submission">
                                    {createButton}
                                     <div id="verify">
-                                        <Radio toggle defaultChecked onChange={this.host}/> &emsp; Host With Ratio Labs <Popup content="Ensure your NFT is verified and distributed on IPFS via Ratio Labs." trigger={<Icon name="question circle"/>  } />
+                                        <Radio toggle defaultChecked onChange={this.toggleHost}/> &emsp; Host With Ratio Labs &nbsp; <Popup content="Ensure your NFT is verified and distributed on IPFS via Ratio Labs." trigger={<Icon name="question circle"/>  } />
                                     </div>
                                 </div>
                                 <div id="submitError">{this.state.createError}</div>

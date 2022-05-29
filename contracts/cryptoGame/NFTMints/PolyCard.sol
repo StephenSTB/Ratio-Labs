@@ -14,7 +14,7 @@ contract PolyCard is RatioSingleNFT, Mintable, Ownable{
 
     uint256 MAX_INT = 2**256 - 1;
 
-    constructor(string memory _name, string memory _symbol )RatioSingleNFT(_name, _symbol, MAX_INT, 0){
+    constructor(string memory _name, string memory _symbol )RatioSingleNFT(_name, _symbol, MAX_INT, 0, 0, true){
         
     }
 
@@ -24,7 +24,7 @@ contract PolyCard is RatioSingleNFT, Mintable, Ownable{
         _safeMint(_receiver, _id);
     }
 
-    function burn(uint _tokenId) external override onlyOwner{
+    function burn(uint _tokenId) external override(RatioSingleNFT, Mintable) onlyOwner{
         _burn(_tokenId);
     }
 }

@@ -54,6 +54,10 @@ contract NFTMinter is Ownable{
         nftChef.set(_pid, _allocPoint, _withUpdate);
     }
 
+    //Function to insert nft into NFTChef,
+
+    //Funtion to remove nft from NFTChef,
+
     // Function to mint an _nft
     function mint(Mintable _nft) public{
         // Condition to determine if the nft to be minted exists.

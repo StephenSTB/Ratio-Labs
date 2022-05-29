@@ -3,7 +3,7 @@ import 'semantic-ui-css/semantic.min.css';
 
 import {Menu, Segment,} from 'semantic-ui-react';
 
-import {Link,Routes, Route} from 'react-router-dom';
+import {Link, Routes, Route, useParams} from 'react-router-dom';
 
 import { createMedia } from '@artsy/fresnel';
 
@@ -27,6 +27,11 @@ class NFT_Menu extends Component{
         this.props = props;
     }
     render(){
+        const DisplayW = () =>{
+            const params = useParams();
+            return <Display {...{...this.props, match: {params}}} setLoading = {this.props.setLoading}/>
+        }
+
         return(
             <div id="NFT">
                 <MediaContextProvider>
@@ -37,7 +42,7 @@ class NFT_Menu extends Component{
                                     <Link to="Create"><div id="link">Create</div></Link>
                                 </Menu.Item>
                                 <Menu.Item>
-                                    <Link to="Display"><div id="link">Display</div></Link>
+                                    <Link to="Display/0x"><div id="link">Display</div></Link>
                                 </Menu.Item>
                             </Menu.Menu>
                             <Menu.Menu position="right">
@@ -48,7 +53,7 @@ class NFT_Menu extends Component{
                         </Menu>
                         <Routes>
                             <Route path="Create" element = {<Create {...this.props} setLoading = {this.props.setLoading}/>}/>
-                            <Route path="Display" element = {<Display {...this.props} setLoading = {this.props.setLoading}/>}/>
+                            <Route path="Display/:searchContract" element = {<DisplayW/>}/>
                         </Routes>
                     </Media>
                 </MediaContextProvider>

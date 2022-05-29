@@ -61,8 +61,8 @@ class TopBar extends Component{
         if(!this.props.unlocked){
             await this.props.updateWeb3(null)
         }
+        this.setState({dimP:false})
     }
-
 
     render(){
         //var ethAccount = this.props.accounts ?  this.props.accounts[0] : "Connect Wallet";

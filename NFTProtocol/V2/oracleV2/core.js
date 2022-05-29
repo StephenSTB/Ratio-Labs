@@ -21,13 +21,13 @@ var nftProtocol;
 const path = require('path');  
 const fs = require("fs-extra");
 
-const {sync: mime_kind} = require('mime-kind');
+const {sync: mime_kind, async} = require('mime-kind');
+const { writeFileSync } = require('fs');
 
 const uploadPath = path.join(__dirname, 'nft/'); // Register the upload path
 fs.ensureDir(uploadPath); // Make sure that he upload path exits
 
-var uri_ext = ["jpg", "png", "gif", "svg", "mp3", "wav", "ogg", "mp4", "webm","glb", "gltf"];
-
+var uri_ext = ["jpg", "jpeg", "png", "gif", "svg", "mp3", "mpga", "wav", "ogg", "oga", "mp4", "webm", "glb", "gltf"];
 
 core = async (db, web3, ipfs) =>{
 
@@ -55,6 +55,15 @@ core = async (db, web3, ipfs) =>{
 
     nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
 
+    //var connected = await web3.eth.net.isListening();
+
+    //console.log(`connected: ${connected}`)
+
+    /*
+    if(!connected){
+        console.log(`Web3 didn't connect!`);
+    }*/
+
     //var owner = await nftProtocol.owner();
 
     // Function utilized to verify subURIs in an nft.
@@ -64,6 +73,10 @@ core = async (db, web3, ipfs) =>{
        
         for(var u of subURIs){
             if(u !== undefined){
+                if(typeof u !== 'string'){
+                    res.error = `Invalid subURI type ${typeof u}.`;
+                    return res;
+                }
                 var cid;
                 var filename;
                 if(u.substring(0,7) !== "ipfs://" || (cid = u.replace("ipfs://", "").split("?filename=")).length != 2){
@@ -77,14 +90,14 @@ core = async (db, web3, ipfs) =>{
                 catch{ 
                     return res;
                 }
-                console.log(`   CID: ${cid}`)
+                //console.log(`   CID: ${cid}`)
                 if(res.subCIDs.includes(cid)){
                     res.error = `nft already includes cid : ${cid}`;
                     return res;
                 }
-                var mime = mime_kind(filename);
-                console.log(`       ${filename} : ${JSON.stringify(mime)}`);
-                if(mime === null || !uri_ext.includes(mime.ext)){
+                var filemime = mime_kind(filename);
+                //console.log(`       ${filename} : ${JSON.stringify(filemime)}`);
+                if(filemime === null || !uri_ext.includes(filemime.ext)){
                     res.error = `Invalid subURI ext.`
                     return res;
                 }
@@ -95,7 +108,7 @@ core = async (db, web3, ipfs) =>{
                         res.error = `cid already validiated.`;
                         return res;
                     }
-                    console.log(`slash: ${cidExists.contract} and update.`)
+                    console.log(`slash: ${cidExists.contract} and update,`)
 
                     res.slash.push(cidExists.contract)
                 }
@@ -108,25 +121,25 @@ core = async (db, web3, ipfs) =>{
         return res;
     }
 
-
     validateNFT = async (dbNFT, nft) =>{
-
         var result = {success: false, error: "", subURIs: [], subCIDs: []};
-        console.log("   Parsing Content Format.");
+        //console.log("   Parsing Content Format.");
 
         var content = nft.content;
         var signature = nft.signature;
 
-        if(content === undefined || signature === undefined){
-            result.error = `undefined NFT content or signature.`
+        if(content === undefined || content === null || Array.isArray(content)){
+            result.error = `NFT content was undefined, null or an array. Must be JSON.`
             return result;
         }
 
-        var contract = content.contract;
-        var distributor = content.distributor; 
-        
-        if(contract === undefined || distributor === undefined || content.name === undefined){
-            result.error = `NFT had undefined contract, distributor or name.`
+        if(typeof signature !== 'string'){
+            result.error = 'Invalid signature data type.'
+            return result;
+        }
+
+        if(typeof content.name !== 'string'){
+            result.error = `Invalid name data type.`;
             return result;
         }
 
@@ -136,11 +149,18 @@ core = async (db, web3, ipfs) =>{
             result.error = `NFT had no content, (image, audio, video, model).`
             return result;
         }
+
+        var contract = content.contract;
+        var distributor = content.distributor; 
         
         if(dbNFT.contract !== contract || dbNFT.distributor !== distributor){
             result.error = `Invalid contract or distributor in NFT for given baseURI.`
             return result
         }
+
+        //console.log("   Content Format Parsed.");
+
+        //console.log("   Performing signature verification.")
 
         // Verify sig
         try{
@@ -148,7 +168,7 @@ core = async (db, web3, ipfs) =>{
 
             verifySigner = web3.eth.accounts.recover(hash, signature)
 
-            console.log(`   Signer: ${verifySigner}`)
+            //console.log(`   Signer: ${verifySigner}`)
 
             if(verifySigner.toString() !== distributor){
                 result.error = `Invalid signer: ${verifySigner.toString()} expected: ${distributor}`
@@ -170,6 +190,15 @@ core = async (db, web3, ipfs) =>{
         }
 
         for(var s of res.slash){
+            var slashTransaction = await db.collection("transactions").findOne({contract: s});
+            if(slashTransaction !== null){
+                //console.log("slashed contract in transactions. (transaction slash)")
+                await db.collection('logs').insertOne({contract: s, error: "Removed slashed nft from transactions."})
+                await db.collection("transactions").deleteOne({contract: s})
+                await db.collection('nft').updateOne({contract: s}, {$set: {state: "rejected"}});
+                continue;
+            }
+            //console.log("slashed contract already validated (normal slash)")
             await db.collection('nft').updateOne({contract: s}, {$set: {state: "slash"}});
         }
 
@@ -179,9 +208,110 @@ core = async (db, web3, ipfs) =>{
         return result;
     }
 
+    validateFiles = async (subURIs, subCIDs, dbNFT, rejectBlock) =>{
+        var result = {success: false, error: "", subFiles: []}
+
+        for(var i = 0; i < subURIs.length; i++){
+            try{
+                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + subCIDs[i], {length: 100000000, timeout:2000})));
+
+                var buf = Buffer.from(data);
+
+                var filetype = mime_kind(buf);
+
+                var filename = (subURIs[i].replace("ipfs://", "").split("?filename="))[1];
+
+                //console.log(`   subURI filename: ${filename}`);
+
+                var nametype = mime_kind(filename);
+
+                //console.log(`   filetype: ${JSON.stringify(filetype)}, nametype: ${JSON.stringify(nametype)}`);
+
+                if(filetype === null){
+                    if(nametype.ext !== "gltf"){
+                        result.error = "   Invalid file type (filetype null and not gltf)";
+                        return result;
+                    }
+                    //console.log("   gltf special case, use nametype ext.")
+                    result.subFiles.push({cid: subCIDs[i], buffer: buf, ext: nametype.ext})
+                }
+                else if ((filetype.ext === "xml" && nametype.ext === "svg") || (filetype.ext === "jpg" && nametype.ext === "jpeg") || 
+                         (filetype.ext === "oga" && nametype.ext === "ogg") || (filetype.ext === "mp3" && nametype.ext === "mpga")){
+                    //console.log("   filetype/nametype mismatch use nametype ext.")
+                    result.subFiles.push({cid: subCIDs[i], buffer: buf, ext: nametype.ext})
+                }
+                else if(!uri_ext.includes(filetype.ext)){
+                    result.error = `   Invalid file type (URI extension not valid ${filetype.ext})`;
+                    return result;
+                }
+                else{
+                    if(filetype.ext !== nametype.ext){
+                        result.error = `   Invalid file type (filetype: ${filetype.ext} doesn't match nametype: ${nametype.ext})`;
+                        return result;
+                    }
+                    result.subFiles.push({cid: subCIDs[i],  buffer: buf, ext: filetype.ext})
+                }
+            }catch(err){
+                //console.log("SubURI Read Error:" + err)
+                
+                if(dbNFT.block <= rejectBlock){
+                    result.error = "    NFT block <= Reject Block";
+                    return result;
+                }
+                return result;
+            }
+        }
+
+        result.success = true;
+        return result;
+    }
+
+    writeFiles = async (baseCID, baseFile, subFiles) =>{
+        fs.writeFile(`${uploadPath}${baseCID}.json`, JSON.stringify(baseFile, null, 4), (err) =>{
+            if(err) console.log(err);
+
+            //console.log(`   writing baseURI file: ${baseCID}.json`);
+        })
+
+        await ipfs.pin.add(CID.parse(baseCID))
+        
+        for(var f of subFiles){
+            fs.writeFile(`${uploadPath}${f.cid}.${f.ext}`, f.buffer, (err) =>{
+                if(err) console.log(err);
+
+                //console.log(`   writing subURI file: ${f.cid}.${f.ext}`);
+            })
+            await ipfs.pin.add(CID.parse(f.cid))
+        }
+    }
+
+    createTransaction = async (contract, distributor, baseURI, subURIs, block) => {
+        var leaf;
+        //console.log(`   transaction: contract: ${contract}, distributor: ${distributor}, baseURI: ${baseURI}, subURIs: ${subURIs}, block: ${block}`)
+        switch(subURIs.length){
+            case 1:
+                leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], block);
+                break; 
+            case 2:
+                leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], block)
+                break; 
+            case 3:
+                leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], block)
+                break; 
+            case 4:
+                leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
+        }
+
+        //console.log(`   leaf: ${leaf}`);
+
+        await db.collection("transactions").insertOne({contract: contract, leaf: leaf})
+
+        return leaf;
+
+    }
 
     verifyNFTs = async () =>{
-        console.log("Verifying NFTs:")
+        console.log('\x1b[35m%s\x1b[0m', "Verifying NFTs: {")
         var nfts = await db.collection("nft").find({state: "new"}).toArray();
 
         var currentBlock =  await web3.eth.getBlockNumber();
@@ -192,8 +322,8 @@ core = async (db, web3, ipfs) =>{
 
         for(var n of nfts){
             var baseCID = n.baseCID;
-            console.log(`   NEW NFT Info: contract: ${n.contract}, distributor: ${n.distributor}, \n                baseCID: ${n.baseCID}, state: ${n.state}, block: ${n.block}`)
-            console.log(`   CID: ${baseCID}`);
+            //console.log(`   NEW NFT Info: contract: ${n.contract}, distributor: ${n.distributor}, \n                baseCID: ${n.baseCID}, state: ${n.state}, block: ${n.block}`)
+            //console.log(`   CID: ${baseCID}`);
 
             var nft;
             
@@ -206,11 +336,12 @@ core = async (db, web3, ipfs) =>{
                     nft = JSON.parse(decodedData);
                 }
                 catch{
-                    console.log("   Invalid nft json format.")
+                    await db.collection(`logs`).insertOne({contract: n.contract, error: "   Invalid nft json format."});
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
+                    continue;
                 }
             }catch(err){
-                console.log("   BaseCID Read Error: " + err + "\n")
+                //console.log("   BaseCID Read Error: " + err + "\n")
                 if(Number(n.block) <= rejectBlock){
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
                     console.log(`   ${n.contract} : ${n.baseCID} is rejected.`)
@@ -224,210 +355,81 @@ core = async (db, web3, ipfs) =>{
             try{
                 var result = await validateNFT(n, nft);
                 if(!result.success){
-                    console.log(result.err)
+                    console.log('\x1b[31m%s\x1b[0m',`Rejected: { contract: ${n.contract}, error: ${result.error} },`);
+                    await db.collection('logs').insertOne({contract: n.contract, error: result.error})
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
                     continue;
                 }
 
-                console.log("   validateNFT success!");
+                //console.log(`   Parsed ${n.contract}!`);
 
-                // Create verification transaction.
-                var contract = n.contract;
-                var distributor = n.distributor;
-                var baseURI = n.baseURI;
-                var subURIs = result.subURIs;
-                var leaf;
-                console.log(`transaction: contract: ${contract}, distributor: ${distributor}, baseURI: ${baseURI}, subURIs: ${subURIs}, block: ${block}`)
-                switch(subURIs.length){
-                    case 1:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], block);
-                        break; 
-                    case 2:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], block)
-                        break; 
-                    case 3:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], block)
-                        break; 
-                    case 4:
-                        leaf = web3.utils.soliditySha3(contract, distributor, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
-                }
-
-                var transaction = await db.collection("transactions").insertOne({leaf: leaf})
-
-                console.log(`   transaction: ${JSON.stringify(transaction)}`);
-
-                await db.collection("nft").updateOne({contract: contract}, {$set: {state: "verified", subURIs: result.subURIs, subCIDs: result.subCIDs}})
-            }
-            catch(err){
-                console.log("Validation ERROR: " + err)
-            }
-        }
-        console.log()
-        return;
-    }
-
-    hostNFTs = async () =>{
-        console.log("Hosting NFTs:")
-        var nfts = await db.collection("nft").find({state: "verified"}).toArray();
-
-        var currentBlock = await web3.eth.getBlockNumber();
-
-        var rejectBlock = currentBlock - (48 * slot); // 21600
-
-        for(var n of nfts){
-
-            console.log(`   Attempting to host: ${n.baseURI}`);
-
-            var baseFile;
-
-            var cid = n.baseCID;
-            
-            try{
-
-                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + cid, {length: 100000, timeout: 2000})));
-
-                var decodedData = new TextDecoder().decode(data).toString();
-
-                baseFile = JSON.parse(decodedData);
-                
-            }catch(err){
-                console.log("BaseURI Read Error:" + err)
-                if(n.block <= rejectBlock){
-                    await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                }
-                continue;
-            }
-
-            var subCIDs = n.subCIDs;
-
-            var subURIs = n.subURIs;
-
-            var subFiles = [];
-
-            var host = true;
-
-            console.log(`   Host subURIs: ${subURIs}`)
-
-            for(var i = 0; i < subURIs.length; i++){
-                try{
-                    var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + subCIDs[i], {length: 100000000, timeout:2000})));
-
-                    var buf = Buffer.from(data);
-                    //console.log(buf)
-
-                    var filetype = mime_kind(buf);
-
-                    var filename = (subURIs[i].replace("ipfs://", "").split("?filename="))[1];
-
-                    console.log(`   subURI filename: ${filename}`);
-
-                    var nametype = mime_kind(filename);
-
-                    console.log(`   filetype: ${JSON.stringify(filetype)}, nametype: ${JSON.stringify(nametype)}`);
-
-                    if(nametype === null || !uri_ext.includes(nametype.ext)){
-                        console.log("   Invalid file type");
-                        await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                        host = false;
-                        break;
-                    }
-                    if(filetype === null){
-                        if(nametype.ext !== "gltf"){
-                            console.log("   Invalid file type (filetype null and not gltf)");
-                            await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                            host = false;
-                            break;
-                        }
-                        console.log("   gltf special case, use nametype ext.")
-                        subFiles.push({cid: subCIDs[i], buffer: buf, ext: nametype.ext})
-                    }
-                    else if (filetype.ext === "xml" && nametype.ext === "svg"){
-                        console.log("   svg type mismatch use nametype ext.")
-                        subFiles.push({cid: subCIDs[i], buffer: buf, ext: nametype.ext})
-                    }
-                    else if(!uri_ext.includes(filetype.ext)){
-                        console.log(`   Invalid file type (URI extension not valid ${filetype.ext})`);
-                        await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                        host = false;
-                        break;
+                // Validate NFT files.
+                var res = await validateFiles(result.subURIs, result.subCIDs, n, rejectBlock);
+                if(!res.success){
+                    console.log(res.error);
+                    if(res.error !== ""){
+                        console.log('\x1b[31m%s\x1b[0m',`Rejected: { contract: ${n.contract}, error: ${res.error} },`);
+                        await db.collection('logs').insertOne({contract: n.contract, error: res.error})
+                        await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
+                        continue;
                     }
                     else{
-                        if(filetype.ext !== nametype.ext){
-                            console.log(`   Invalid file type (filetype: ${filetype.ext} doesn't match nametype: ${nametype.ext})`);
-                            await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                            host = false;
-                            break;
-                        }
-                        
-                        subFiles.push({cid: subCIDs[i],  buffer: buf, ext: filetype.ext})
+                        await db.collection('logs').insertOne({contract: n.contract, error: "subURI Read Error."})
+                        continue;
                     }
-
-                    //console.log(type)
-                }catch(err){
-                    console.log("SubURI Read Error:" + err)
-                    host = false;
-                    if(n.block <= rejectBlock){
-                        host = false
-                        await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "rejected"} })
-                    }
-                    break;
                 }
+
+                //console.log(`   writing files for : ${baseCID}.json`)
+
+                // write nft files.
+                await writeFiles(baseCID, nft, res.subFiles)
+
+                // Create verification transaction.
+                var transaction = await createTransaction(n.contract, n.distributor, n.baseURI, result.subURIs, n.block);
+                
+                await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "verified", subURIs: result.subURIs, subCIDs: result.subCIDs}})
+
+                console.log('\x1b[32m%s\x1b[0m', `  Verified: { contract: ${n.contract}, transaction: ${transaction} },`)
             }
-            if(host){
-                console.log(`   writing files for : ${cid}.json`)
-
-                fs.writeFile(`${uploadPath}${cid}.json`, JSON.stringify(baseFile, null, 4), (err) =>{
-                    if(err) console.log(err);
-
-                    //console.log(`   writing baseURI file: ${cid}.json`);
-                })
-
-                await ipfs.pin.add(CID.parse(cid))
-                
-                for(var f of subFiles){
-                    fs.writeFile(`${uploadPath}${f.cid}.${f.ext}`, f.buffer, (err) =>{
-                        if(err) console.log(err);
-
-                        //console.log(`   writing subURI file: ${f.cid}.${f.ext}`);
-                    })
-                    await ipfs.pin.add(CID.parse(f.cid))
-                }
-                
-                await db.collection("nft").updateOne({contract: n.contract}, {$set: {state: "hosted"} })
+            catch(err){
+                console.log(`Validation ERROR: ${err},`)
             }
         }
-        console.log()
+        console.log('\x1b[35m%s\x1b[0m',"}\n")
         return;
     }
 
+ 
     slashNFTs = async() =>{
-        console.log("Slashing NFTs:")
+        //console.log("Slashing NFTs: {")
 
         var slash = (await db.collection("nft").find({state: "slash"}).toArray()).map(s => s.contract);
 
+        //TODO remove slashed nft files.
+
         if(slash.length > 0){
-            console.log(`   Slash: `+ slash);
+            console.log('\x1b[31m%s\x1b[0m',`Slash: `+ slash);
             try{
                 await nftProtocol.slashNFTs(slash);
                 await db.collection("nft").updateMany({state: "slash"}, {$set: {state: "rejected"}});
+                await db.collection("logs").insertOne({slashed: slash});
             }
             catch(err){
                 console.log("   Slash error: " + err)
             }
         }
-        console.log()
+        //console.log()
         return;
     }
 
     staleNFTs = async () =>{
-        console.log(`Stale NFTs: ${stale}`)
 
         if(stale % 10 === 0){
-            console.log(`   Reinstating stale nfts`)
+            console.log('\x1b[33m%s\x1b[0m', `Stale NFTs: ${stale}\n`)
             db.collection("nft").updateMany({state: "stale"}, {$set:{state: "new"}})
         }
         stale++;
-        console.log()
+        //console.log()
         return;
     }
 
@@ -439,7 +441,7 @@ core = async (db, web3, ipfs) =>{
             if(blockNumber < targetBlock){
                 return;
             }
-            console.log("Submitting Target Block: " + targetBlock + " Hit.");
+            console.log('\x1b[32m%s\x1b[0m',`Submitting Target Block: {\n   Block: ${targetBlock}`);
 
             var latestBlock = await nftProtocol.latestBlock();
 
@@ -447,11 +449,11 @@ core = async (db, web3, ipfs) =>{
 
             if(leaves.length == 0){
                 targetBlock += slot;
-                console.log()
+                console.log('\x1b[32m%s\x1b[0m', "}\n")
                 return;
             }
 
-            console.log("   Current transactions:" + leaves)
+            //console.log("   Current transactions:" + leaves)
 
             var tree = new MerkleTree(leaves, keccak256, {sort: true});
 
@@ -463,7 +465,7 @@ core = async (db, web3, ipfs) =>{
 
             try{
                 var receipt = await nftProtocol.submitBlock(block);
-                console.log(`   Submitted Block: ${receipt.logs[0].args[0]._root}`);
+                console.log('\x1b[32m%s\x1b[0m',`   Submitted Root: ${receipt.logs[0].args[0]._root} \n}\n`);
             }
             catch(err){
                 console.log(err + "submitError" + "\n")
@@ -481,7 +483,7 @@ core = async (db, web3, ipfs) =>{
         catch(err){
             console.log(err);
         }
-        console.log()
+        //console.log()
         return;
     }
 
@@ -503,23 +505,20 @@ core = async (db, web3, ipfs) =>{
             return;
         }
 
-        console.log(`Verifiaction Request -- contract: ${event.returnValues._contract}, distributor: ${event.returnValues._distributor}, 
-                                             baseURI: ${event.returnValues._baseURI}, block: ${block}` );
+        console.log('\x1b[36m%s\x1b[0m',`Verification Request: { contract: ${contract}, distributor: ${distributor},baseCID: ${baseCID}, block: ${block} }\n` );
 
         await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, baseCID: baseCID, state: "new", block: block})  
 
     });
 
-    var connected = await web3.eth.net.isListening();
+    await web3.eth
 
-    if(!connected){
-        console.log(`Web3 didn't connect!`);
-    }
+    
 
     var latest = await nftProtocol.latestBlock();
     var block = await web3.eth.getBlockNumber();
-    var slot = 5;
-    var interval = 5;
+    var slot = 20;
+    var interval = 20;
     var targetBlock = block + slot;
     var stale = 1;
     console.log(`Target Block: ${targetBlock}`);
@@ -543,8 +542,7 @@ core = async (db, web3, ipfs) =>{
             return;
         }
 
-        console.log(`Verifiaction Request -- contract: ${contract}, distributor: ${distributor}, 
-                                             baseURI: ${baseURI}, block: ${block}` );
+        console.log('\x1b[36m%s\x1b[0m',`Verification Request: { contract: ${contract}, distributor: ${distributor},baseCID: ${baseCID}, block: ${block} }\n` );
 
         await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, baseCID: baseCID, state: "new", block: block})  
     }
@@ -557,8 +555,6 @@ core = async (db, web3, ipfs) =>{
             await submitBlock();
 
             await slashNFTs();
-
-            await hostNFTs();
 
             await staleNFTs()
 

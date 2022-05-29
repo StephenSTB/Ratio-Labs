@@ -38,7 +38,6 @@ const PolyCard = contract(require('../src/contracts/PolyCard.json'));
 const RatioNFT = contract(require('../src/contracts/RatioSingleNFT.json'));
 
 
-
 // State Variables
 var provider;
 
@@ -66,7 +65,8 @@ deploy = async() =>{
             provider = new HDWalletProvider({mnemonic: mnemonic, providerOrUrl: providers[args[0]].url})
             break;
         case 'Mumbai':
-            provider = new Web3.providers.WebsocketProvider(providers[args[0]].url);
+            //provider = new Web3.providers.WebsocketProvider(providers[args[0]].url);
+            provider = new HDWalletProvider({mnemonic: mnemonic, providerOrUrl: providers[args[0]].url})
             break;
         default:
             console.log("Invalid deployment network given,");
@@ -87,7 +87,13 @@ deploy = async() =>{
         return
     }
 
+    console.log(`Connected : ${connected}`)
+
     accounts = await web3.eth.getAccounts();
+
+    var balance = await web3.eth.getBalance(accounts[4])
+
+    console.log(`${accounts[4]}: ${balance}`);
 
     for(var i = 1; i < args.length; i++){
         switch(args[i]){
@@ -97,8 +103,8 @@ deploy = async() =>{
             case "polyCards":
                 contractDeploy.push("polyCards");
                 break;
-            case "ratioNFT":
-                contractDeploy.push("ratioNFT");
+            case "NFTProtocol":
+                contractDeploy.push("NFTProtocol");
                 break;
             default:
                 break
@@ -110,11 +116,21 @@ deploy = async() =>{
     }
 
     // Ratio NFT Protocol
-    if(contractDeploy.includes("all") || contractDeploy.includes("ratioNFT")){
+    if(contractDeploy.includes("all") || contractDeploy.includes("NFTProtocol")){
+
+        console.log("Attempting to create NFTProtocol contract:")
 
         NFTProtocol.setProvider(provider);
 
         var nftProtocol = await NFTProtocol.new(utils.toWei(".01", "ether"), {from: accounts[4]});
+
+        console.log(nftProtocol.transactionHash)
+
+        var transaction = await web3.eth.getTransaction(nftProtocol.transactionHash)
+
+        var gas = utils.fromWei((Number(transaction.gas) * Number(transaction.gasPrice)).toString(), "ether");
+
+        console.log(`   gas cost: ${gas}`);
 
         deployedContracts[args[0]]["NFTProtocol"] = {address: nftProtocol.address}
 

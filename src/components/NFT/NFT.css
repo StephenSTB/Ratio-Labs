@@ -18,6 +18,8 @@
 #mainComponent{
     background-color: #cbedca;
     min-height: 88vh;
+    display: flex;
+    flex-direction: column;
 }
 
 #bannerText{
@@ -25,6 +27,11 @@
     font-size: 6em;
     color: #cbedca;
     font-family: Milkshake !important;
+}
+
+#networkError{
+    color: red;
+    font-size: 14pt;
 }
 
 #prompt,#required{
@@ -103,8 +110,8 @@
 }
 
 #uploadedContent{
-    max-height: 295px;
-    max-width: 295px;
+    max-height: 299px;
+    max-width: 299px;
     /*border: 1px solid salmon;*/
     align-self: center;
 }
@@ -226,7 +233,7 @@
     margin-top: 2vh;
 }
 
-#verify{
+#verify, #burnable{
     display: flex;
     flex-direction: row;
     margin-top: 1vh;
@@ -236,32 +243,51 @@
 
 /* Display specific*/
 
+#searchContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+#searchDiv{
+    width: 750px;
+    align-self: center;
+}
+
+#searchError{
+    color: red;
+}
+
 #nftContainer{
     width: 100%;
     display: flex;
-    
-    flex-direction: column;
-    
+    border: solid 1px black;
+    align-self: center;
+    background-color: #cbedca;
 }
 
 #nftBox {
     display: flex;
     width: 500px;
-    height: 750px;
+    min-height: 820px;
     border: 1px solid black;
-    border-radius: 40px;
+    border-radius: 25px;
     align-self: center;
     opacity: 100%;
     margin-bottom: 2vh;
     background-color: #cbedca;
 }
 
-#nftContent{
-    min-width: 301px;
-    min-height: 301px;
-    
-    border-radius: 40px !important;
-    padding-bottom: 10px;
+#nftContentDisp{
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px !important;
+    border: none;
+    background: none;
+    max-width: 350px;
+    max-height: 350px;
+    min-height: 300px;
+    justify-content: center;
 }
 
 #nftMenu{
@@ -269,9 +295,42 @@
     align-self: center;
 }
 
-#nftInfo{
+#nftHeader{
+    font-size: xx-large;
+    font-family: Milkshake;
+}
+
+.nftInfo{
+   font-family: OpenSans;
+   width: 400px;
+   display: flex;
+   flex-direction: column;
+   margin-left: 20px;
    
 }
+
+.infoElement{
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    
+}
+
+.infoName{
+    text-align: right;
+    width: 100px;
+    
+}
+
+.infoName{
+    margin-right: 20px;
+    
+}
+
+#initMint{
+
+}
+
 
 
 

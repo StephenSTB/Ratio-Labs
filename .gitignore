@@ -12,6 +12,8 @@
 # production
 /build
 
+/cache
+
 # misc
 .DS_Store
 .env
@@ -45,3 +47,21 @@ killProcess
 
 #ssl cert
 /sslcert
+
+#IPFS testing
+/IPFS
+
+# images repo
+/images
+
+# nft protocol nft stores
+
+/NFTProtocol/V2/gatewayV2/gatenft
+
+/NFTProtocol/V2/oracleV2/nft
+
+#contracts
+
+/contracts/core
+
+/contracts/old_contracts

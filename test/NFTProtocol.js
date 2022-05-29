@@ -34,7 +34,7 @@ describe("NFTProtocol", function(){
 
     before(async function () {
         accounts = await web3.eth.getAccounts();
-        //console.log(accounts);
+        console.log(accounts);
         utils = await web3.utils;
 
         nftProtocol = await NFTProtocol.new(utils.toWei("1", "ether"), {from: accounts[4]})
@@ -46,6 +46,68 @@ describe("NFTProtocol", function(){
         //console.log(web3);
     });
 
+    it("Normal NFT Functionality: ", async() =>{
+        
+        var nftObj = await createNFT(0, polyCard, null, true);
+
+        var contract = nftObj.contract;
+        
+        await contract.setBaseURI(nftObj.baseURI, true, nftProtocol.address, {from: accounts[0], value: utils.toWei("1", "ether")});
+        
+        await contract.setSubURIs(polyCard + "?filename=Ratio_Card_Base.png", "", "", "", {from: accounts[0]});
+
+        var tokenId = await contract.mint(accounts[1], {from: accounts[1], value: utils.toWei("1", "ether")});
+
+        console.log(`       tokenId: ${tokenId.logs[0].args.tokenId}`);
+
+        var balance = await web3.eth.getBalance(accounts[1]);
+
+        console.log(`       ${accounts[1]} balance: ${utils.fromWei(balance.toString(), "ether")}`);
+
+        var unclaimed = await contract.contract.methods.unclaimed().call();
+
+        console.log(`       unclaimed: ${unclaimed}`)
+
+        var burnValue = await contract.contract.methods.burnValue().call();
+
+        console.log(`       burnValue: ${burnValue}`);
+
+        balance = await web3.eth.getBalance(accounts[0])
+
+        console.log(`       ${accounts[0]} balance: ${utils.fromWei(balance.toString(), "ether")}`);
+
+        await contract.claim({from: accounts[0]})
+
+        balance = await web3.eth.getBalance(accounts[0])
+
+        console.log(`       ${accounts[0]} balance: ${utils.fromWei(balance.toString(), "ether")}`);
+
+        var tokenURI = await contract.tokenURI(1);
+
+        console.log(`       tokenURI : ${tokenURI}`)
+
+        var burnable = await contract.contract.methods.burnable().call()
+
+        console.log(`       ${contract.address} is burnable: ${burnable}`)
+
+        await contract.burn(1, {from: accounts[1]});
+
+        balance = await web3.eth.getBalance(accounts[1])
+
+        console.log(`       ${accounts[1]} balance: ${utils.fromWei(balance.toString(), "ether")}`);
+
+        console.log(`   Creating non burnable nft`)
+        var createdNFT2 = await createNFT(1, cardURI, null, false)
+
+        contract = createdNFT2.contract;
+
+        var burnable = await contract.contract.methods.burnable().call()
+
+        console.log(`       ${contract.address} is burnable: ${burnable}`)
+
+
+    })
+    
     it("Normal NFT verification process:", async() =>{
         // create nft contract.
         var nftContract = await createNFT(0, cardURI)
@@ -343,11 +405,12 @@ describe("NFTProtocol", function(){
     })
     
     //Helper methods.
-    createNFT = async (account, image, type) =>{
+    createNFT = async (account, image, type, burn) =>{
 
         var contract;
         if(type === null){
-            contract = await RatioSingleNFT.new("RatioNFT", "RC", 1000000000, utils.toWei("1", "ether"), {from: accounts[account]});
+            var burnable = burn === null ? false : burn === false ? false : true;
+            contract = await RatioSingleNFT.new("RatioNFT", "RC", 1000000000, utils.toWei("1", "ether"), utils.toWei(".15", "ether"), burnable, {from: accounts[account]});
         }
         else{
             contract = await BadSingleNFT.new("RatioNFT", "RC", 1000000000, utils.toWei("1", "ether"), {from: accounts[account]});

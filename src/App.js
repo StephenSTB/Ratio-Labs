@@ -43,7 +43,7 @@ class App extends Component{
   constructor(){
     super();
     this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false,
-                    NFTProtocol: null, RatioSingleNFT: null,
+                    NFTProtocol: null, RatioSingleNFT: null, nftProtocol: null,
                     networkError: ""
                     
                   }
@@ -53,7 +53,8 @@ class App extends Component{
     this.test = true;
 
     this.RatioSingleNFT = contract(RatioSingleNFT)
-    this.NFTProtocol = contract(NFTProtocol) 
+    this.NFTProtocol = contract(NFTProtocol);
+
   }
 
   componentDidMount = async () =>{
@@ -104,18 +105,6 @@ class App extends Component{
     this.setState({loading})
 
   }
- 
-  getProvider = (network) =>{
-
-    console.log(network)
-
-    switch(network){
-        case network === "1337":
-          return "development"
-        default :
-          return"development"
-    }
-  }
 
   setProvider = async (web3, network) =>{
 
@@ -135,7 +124,7 @@ class App extends Component{
         return;
       }
 
-      this.setState({networkError: "The current network is Unsupported."})
+      this.setState({networkError: "The current network is unsupported. Switch to a supported network."})
       console.log("App current network is Unsupported.")
 
   }
@@ -157,8 +146,6 @@ class App extends Component{
 
       var unlocked = true
 
-      //this.getProvider(network);
-
       this.setState({web3, utils, accounts, account, network, selectedAccount, unlocked});
       return;
     }
@@ -176,8 +163,6 @@ class App extends Component{
 
       const utils = web3.utils;
 
-      //console.log(web3.eth.accounts)
-
       const accounts = await web3.eth.getAccounts();
 
       const account = accounts[0];
@@ -187,7 +172,7 @@ class App extends Component{
       const network = await web3.eth.getChainId();
 
       console.log(network)
-      
+
       try{
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
@@ -207,8 +192,6 @@ class App extends Component{
           }
         }
       }
-
-      //var provider = this.getProvider(network);
 
       this.setProvider(web3, network,toString());
       

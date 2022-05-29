@@ -18,13 +18,9 @@ const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 const providers = require('../../../src/data/Providers.json');
 
-var providerName = null;
-
 var provider = null;
 
 var web3 = null;
-
-var accounts = []
 
 const core = require('./core.js');
 
@@ -36,13 +32,8 @@ var ipfs;
 // Drop collections and pins
 var drop = true;
 
-
 // Variable to hold command arguments.
 var args;
-
-// Variable to determine if ipfs should connect via http client or be created
-
-var create;
 
 mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, async (err, client) =>{
     if (err) throw err;
@@ -73,6 +64,12 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
         catch{
             console.log("couldn't DROP transactions collection");
         }
+        try{
+            await db.collection("logs").drop();
+
+        }catch{
+            console.log("couldn't DROP logs collection");
+        }
     }
 
     try{
@@ -89,10 +86,16 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
     }
     try{
         await db.createCollection("slash");
-     }
-     catch{
+    }
+    catch{
         console.log("couldn't CREATE slash collection");
-     }
+    }
+    try{
+        await db.createCollection("logs");
+    }
+    catch{
+        console.log("couldn't CREATE logs collection");
+    }
 }
 
 web3init = async () =>{
@@ -101,9 +104,6 @@ web3init = async () =>{
     providerName = args[0];
     try{
         switch(args[0]){
-            case 'developmentCLI':
-                provider = ganache.provider({mnemonic: mnemonic, quiet: true}) //
-                break;
             case 'Ganache':
                 provider = new Web3.providers.WebsocketProvider(providers[args[0]].url)
                 break;
