@@ -51,6 +51,10 @@ killProcess
 #IPFS testing
 /IPFS
 
+/ipfs-testing
+
+/nft-test
+
 # images repo
 /images
 
@@ -65,3 +69,19 @@ killProcess
 /contracts/core
 
 /contracts/old_contracts
+
+/contracts/interfaces
+
+/migrations
+
+#contract testing
+
+/test/MockGovernor.js
+
+/test/Ratio.js
+
+#test files
+/sounds
+
+/testfiles
+
