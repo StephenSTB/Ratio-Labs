@@ -1,4 +1,7 @@
-import React, { Component, version } from "react";
+import React, { Component} from "react";
+
+import { createMedia } from '@artsy/fresnel';
+
 import 'semantic-ui-css/semantic.min.css';
 
 import Web3 from "web3";
@@ -31,6 +34,15 @@ import kovan from "./logos/wallet/chains/kovan.png";
 
 import * as IPFS from 'ipfs-core';
 
+const { MediaContextProvider, Media } = createMedia({
+  breakpoints: {
+    mobile: 0,
+    tablet: 768,
+    computer: 1024,
+  },
+})
+
+
 var images  = {
                   "80001": mumbai,
                   "137": polygon,
@@ -43,7 +55,7 @@ class App extends Component{
   constructor(){
     super();
     this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false,
-                    NFTProtocol: null, RatioSingleNFT: null, nftProtocol: null,
+                    NFTProtocol: null, RatioSingleNFT: null,
                     networkError: ""
                     
                   }
@@ -211,7 +223,7 @@ class App extends Component{
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
         //window.location.reload();
-        this.updateWeb3();
+        this.updateWeb3(null);
       });
       
     }
@@ -219,10 +231,10 @@ class App extends Component{
 
   render(){
     return (
-      <div className="App">
+      <div >
         <BrowserRouter >
-          <TopBar {...this.state} updateWeb3 = {this.updateWeb3} setProvider ={this.setProvider} setLoading = {this.setLoading}/>
-          <Main {...this.state} setLoading = {this.setLoading}/>
+            <TopBar {...this.state} updateWeb3 = {this.updateWeb3} setProvider ={this.setProvider} setLoading = {this.setLoading}/>
+            <Main {...this.state} setLoading = {this.setLoading}/>
         </BrowserRouter>
       </div>
     );

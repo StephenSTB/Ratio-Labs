@@ -4,42 +4,125 @@
 @font-face { font-family: Milkshake; 
     src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
 
-#NFT{
-    background-color: black;
-    color: white;
-    border: none;
+:root{
+    --green: #54c18a;
+    --purple:  #41227f;
+    --teal: #44abc6;
+    --red: #70181e;
+    --black : #1a1a1a;
 }
+/* Desktop */
+@media screen and (min-width: 900px) {
+
+    #banner{
+        height: 25vh;
+    }
+
+    #bannerText{
+        margin-top: 10vh;
+        font-size: 6em;
+        color: #54c18a;
+        font-family: Milkshake !important;
+    }
+
+    #prompt,#required{
+        font-size: medium;
+    }
+    
+    #required{
+        margin-top: 1vh;
+    }
+
+    #nftContent{
+        width: 75%;;
+    }
+
+    .contractInput{
+        margin-left: 3vw;
+    }
+
+    #searchDiv{
+        width: 750px;
+        align-self: center;
+    }
+}
+/*Mobile*/
+@media screen and (max-width: 600px) {
+
+    #bannerText{
+        margin-top: 5vh;
+        font-size: 6em;
+        color: #54c18a;
+        font-family: Milkshake !important;
+    }
+    
+    #required{
+        margin-top: 1vh;
+    }
+
+    #nftContent{
+        width: 100%;
+    }
+
+    #nameInput{
+        margin-top: 5px;
+    }
+
+    #supportedFiles{
+        text-align: center;
+    }
+
+    .contractInput{
+        margin-left: 6vw;
+    }
+    #createAbout{
+        text-align: center;
+    }
+} 
+
+#NFT{
+    background-color: var(--green);
+    color: black;
+    border: none;
+    margin-top: 60px;
+    height: 100vh;
+}
+
 #NFT_Menu{
     background-image: url("../../logos/content/RatioColors.png") !important; 
     border: none;
     margin: auto;
+    height: 60px;
+    border-radius: 0px !important;
 }
 
 #mainComponent{
-    background-color: #cbedca;
+    background-color: var(--green);
     min-height: 88vh;
     display: flex;
     flex-direction: column;
 }
 
-#bannerText{
-    margin-top: 10vh;
-    font-size: 6em;
-    color: #cbedca;
+#bannerSub{
+    margin-top: 40px;
+    font-size: 2em;
+    color: #54c18a;
     font-family: Milkshake !important;
+    padding-left: 100px;
 }
 
 #networkError{
-    color: red;
+    color: var(--red);
     font-size: 14pt;
+    align-self: center;
+    padding: 10px;
 }
 
-#prompt,#required{
-    font-size: medium;
-}
-
-#required{
-    margin-top: 1vh;
+#nftContent{
+    /*border: dashed 1px black;*/
+    align-self: center;
+    display: flex;
+    flex-direction: column;
 }
 
 #nftForm{
@@ -49,16 +132,8 @@
     flex-direction: column;
 }
 
-#nftContent{
-    /*border: dashed 1px black;*/
-    width: 75%;
-    align-self: center;
-    display: flex;
-    flex-direction: column;
-}
-
 .drop{
-    border: 2px solid black;
+    border: 2px dashed black;
     width: 300px;
     height: 300px;
     border-radius: 25px;
@@ -71,7 +146,7 @@
 }
 
 .drop:hover{
-    border: 3px solid gray;
+    border: 3px solid var(--black);
 }
 
 #dropLabel{
@@ -86,26 +161,24 @@
 
 #addIcon, #supportedFiles{
     align-self: center;
-    color: grey;
+    color: black !important;
 }
 
 #fileDialog{
     display: none;
     position: absolute;
     position: 0;
-
     width: 100%;
     height: 100%;
 }
 
 #supportedFiles{
     margin-top: 2vh;
-    color : grey;
 }
 
 #contentError{
     align-self: center;
-    color: red;
+    color: var(--red);
     margin-top: 1vh;
 }
 
@@ -132,7 +205,20 @@
     align-self: center;
 }
 
-#properties, #submission{
+#nameInput, #descriptionArea{
+    align-self: center;
+    background-color: var(--black);
+    color: var(--green);
+    width: clamp(320px, 50% ,750px);    
+    margin-top: 5px;
+}
+
+#descriptionArea{
+    height: 100px;
+    size: fixed;
+}
+
+#attributes{
     /*border: 1px dashed seashell;*/
     display: flex;
     flex-direction: column;
@@ -140,22 +226,27 @@
     align-items: center;
 }
 
-#propButtons{
-    align-self: center;
-    margin-top: 1vh;
-}
-
 .prop{
     /*border: 1px solid black;*/
-    width: 525px;
+    margin-top: 5px;
+    width: clamp(320px, 50% ,750px);  
     align-self: center;
     display: flex;
     flex-direction: row;
     align-items: baseline;
 }
 
-#propInput{
-    margin-left: 1vh;
+#propButtons{
+    align-self: center;
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: row;
+}
+
+.propInput{
+    width: clamp(150px, 49%, 750px);
+    background-color: var(--black) !important;
+    color: var(--green) !important;
 }
 
 #valuePropLabel{
@@ -166,46 +257,46 @@
     margin-top: 3vh;
 }
 
-#submitSection{
-    /*border: 1px dashed seashell;*/
-    margin-top: 2vh;
-    margin-bottom: 10vh;
+.contractVars{
+    margin-top: 5px;
+    width: clamp(320px, 50% ,750px);
+    align-self: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
-#finalContent {
-    align-self: center;
-    background-color: #cbedca;
-  }
-
-#submission{
-    align-self: center;
-    width: 525px;
-    margin-top: 3vh;
+.contractInput{
+    width: 75%;
+    /*border: 1px solid var(--purple);*/
     display: flex;
     flex-direction: row;
-    
+    align-items: center;
 }
 
-.contractVars{
-    width: 525px;
-    align-self: center;
-    display: flex;
-    flex-direction: column;
+.cInput{
+    height: 35px;
+    width: 90% !important;
+    background-color: var(--black) !important;
+    color: var(--green) !important;
 }
 
-#contractInput{
-    width: 325px;
+#burnable{
+    height: 35px;
+    width: 90% !important;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
 }
 
 .mintLabel{
+    display: flex;
+    flex-direction: row;
     margin-right: 1vw;
+    width: 30%;
+    justify-content: flex-end;
 }
 
 #createLabel{
@@ -223,23 +314,48 @@
     font-size: medium;
 }
 
-#createStep{
-    font-size: large;
-}
-
 #submitError{
-    color:red;
+    color:var(--red);
     align-self: center;
     margin-top: 2vh;
 }
 
-#verify, #burnable{
+
+#submitSection{
+    /*border: 1px dashed seashell;*/
+    margin-top: 2vh;
+    margin-bottom: 10vh;
     display: flex;
-    flex-direction: row;
-    margin-top: 1vh;
-    margin-left: 2vw;
+    flex-direction: column;
+    justify-content: center;
 }
 
+#submission{
+    align-self: center;
+    width: clamp(300px, 50%, 750px);
+    margin-top: 3vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.createSettings {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 2vh;
+    margin-left: 1.5vw;
+    width: 55%;
+    align-self: center;
+}
+
+#createButton{
+    width: clamp(200px, 50%, 300px);
+    align-self: center;
+}
+
+#finalContent {
+    align-self: center;
+    background-color: var(--green);
+}
 
 /* Display specific*/
 
@@ -248,33 +364,41 @@
     flex-direction: column;
 }
 
-#searchDiv{
-    width: 750px;
-    align-self: center;
+#searchBar{
+    background-color: var(--black) !important;
+    color: var(--green) !important
 }
 
 #searchError{
-    color: red;
+    color: var(--red);
 }
 
 #nftContainer{
     width: 100%;
     display: flex;
-    border: solid 1px black;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /*border: solid 1px black;*/
     align-self: center;
-    background-color: #cbedca;
+    background-color: var(--green);
+    text-align: center;
+    padding-top: 3vh;
+    color: var(--black);
+    justify-content: center;
 }
 
 #nftBox {
     display: flex;
-    width: 500px;
-    min-height: 820px;
-    border: 1px solid black;
+    flex-direction: column;
+    width: 400px !important;
+    margin: 30px;
+    border: 1px solid black !important;
     border-radius: 25px;
     align-self: center;
     opacity: 100%;
     margin-bottom: 2vh;
-    background-color: #cbedca;
+    background-color: var(--green);
+    align-items: center;
 }
 
 #nftContentDisp{
@@ -282,38 +406,46 @@
     display: flex;
     flex-direction: column;
     border-radius: 25px !important;
+    margin-top: 20px;
     border: none;
     background: none;
-    max-width: 350px;
-    max-height: 350px;
-    min-height: 300px;
+    width: 300px;
+    height: 300px;
     justify-content: center;
+    /*border: solid 1px var(--black);*/
 }
 
 #nftMenu{
     width: 300px;
     align-self: center;
+    margin-top: 20px;
 }
 
 #nftHeader{
     font-size: xx-large;
     font-family: Milkshake;
+    
+}
+
+.nftInfoMenu{
+    background-color: var(--green) !important;
 }
 
 .nftInfo{
    font-family: OpenSans;
-   width: 400px;
+   width: 400px !important;
    display: flex;
    flex-direction: column;
    margin-left: 20px;
-   
+   background-color: var(--green) !important;
+   border: 1px solid var(--black) !important;
+   border-radius: 20px !important;
 }
 
 .infoElement{
     display: flex;
     flex-direction: row;
     height: 30px;
-    
 }
 
 .infoName{
@@ -326,10 +458,103 @@
     margin-right: 20px;
     
 }
-
-#initMint{
-
+.initMint{
+    margin-bottom: 1vh !important;
+    
 }
+
+.detailButtons{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/* NFT Protocol About */
+
+.aboutP{
+    font-family: OpenSans;
+    line-height: 1.5;
+    padding: 1.5vh;
+}
+
+#nftDilemma{
+    display: flex;
+    flex-direction: row;
+}
+
+#dilemmaP{
+    width: 55%;
+}
+
+#nftModels{
+    display: flex;
+    flex-direction: column;
+}
+#basicNFTmodel{
+    align-self: center;
+    margin-top: 1.5vh;
+}
+
+#basicRatioNFTmodel{
+    margin-top: 3vh;
+}
+
+#nftStandard{
+    display: flex;
+    flex-direction: column;
+}
+
+#badNFT{
+    width: 750px;
+    height: 40vh;
+    border: none;
+    resize: none;
+    background: none;
+    font-family: OpenSans;
+    padding-left: 1.5vh;
+}
+
+#typicalNFTcreation{
+    align-self: center;
+}
+
+#worstCaseHeader{
+    padding-left: 1.5vh;
+}
+
+
+#cryptoMonkeyRatioNFT{
+    width: 1200px;
+    height: 50vh;
+    border: none;
+    resize: none;
+    background: none;
+    font-family: OpenSans;
+    
+}
+
+#nftProtocol{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#nftExample{
+    align-self: flex-start;
+    padding: 1.5vh;
+}
+
+#popNote{
+    display: inline;
+    float: right;
+}
+
+#nftProtocolDiagram{
+   margin-top: 10px;
+   margin-bottom: 30px;
+}
+
+
 
 
 

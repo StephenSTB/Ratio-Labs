@@ -28,6 +28,8 @@ var host;
 
 var uri_ext = ["jpg", "jpeg", "png", "gif", "svg", "mp3", "mpga", "wav", "ogg", "oga", "mp4", "webm", "glb", "gltf"];
 
+var max_size = 100_000_000;
+
 class Create extends Component{
 
     constructor(props){
@@ -35,20 +37,19 @@ class Create extends Component{
         this.props = props;
         this.state = {content: [<label for="fileDialog" id="dropLabel" onDrop={this.drop} onDragOver={this.allowDrop}>
                                     <div id="addIcon">
-                                    <Icon name="plus square outline" size="huge" color="grey"></Icon>
+                                        <Icon name="plus square outline" size="huge"></Icon>
                                     </div>
                                     <div id="addIcon" >(Image, Video, Audio, or Model)</div>
                                 </label>], contentType: [], files: [],
                         contentButtons: null, addSection: true, contentError: null,
                         name: "", description: "",
-                        properties:[],
+                        attributes:[],
                         options:[{key: "number", text:"Number", value:"number"}, {key:"string", text:"Word", value:"string"}, ],
                         createLoading: false,
                         burnable: false,
                         createError: "",
                         displayFinalContent: null,  
                         displayFinalInfo: null,
-                        host: true, nftDeploymentCost: "",
                       }
 
         host = prod ? "https://ratiomaster.site" : "http://localhost:3002";
@@ -59,7 +60,7 @@ class Create extends Component{
     
         this.addContent = this.addContent.bind(this);
 
-        this.RatioSingleNFT = this.props.RatioSingleNFT;
+        
     }
 
     componentDidMount = async () =>{
@@ -69,8 +70,7 @@ class Create extends Component{
             return;   
         }
         
-        
-        this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
+       
         /*this.NFTProtocol.setProvider(this.props.web3.currentProvider)*/
 
         //console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
@@ -80,20 +80,24 @@ class Create extends Component{
 
         //console.log("update")
         
-        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "")
+        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "" || prevProps === undefined)
         {
             return;
-        }
-
-        //console.log(this.props.web3.currentProvider)
-        
-        if(this.props.web3.currentProvider !== prevProps.web3.currentProvider){
-            this.RatioSingleNFT.setProvider(this.props.web3.currentProvider);
         }
 
     }
 
     addContent = (file) =>{
+
+        var curSize = 0;
+        for(var f of this.state.files){
+            curSize += f.size;
+        }
+
+        if(curSize + file.size > max_size){
+            this.setState({contentError: `Could not add file: ${file.name} because content size would exceed 100MB.`});
+            return;
+        }
         
         const reader = new FileReader();
 
@@ -163,13 +167,14 @@ class Create extends Component{
 
             if(content.length < 4){
                 //console.log("add")
-                var contentButtons = <div id="contentButtons"><Button icon="minus" onClick={this.removeContentSection}/><Button icon="plus" onClick={this.addContentSection}/></div>
+                var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection}/><Button icon="plus" color="black" onClick={this.addContentSection}/></div>
                 this.setState({contentButtons})
             }
             else{
-                var contentButtons = <div id="contentButtons"><Button icon="minus" onClick={this.removeContentSection} /><Button icon="plus" disabled/></div>
+                var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection} /><Button icon="plus" color="black" disabled/></div>
                 this.setState({contentButtons})
             }
+            
         })
         reader.readAsDataURL(file)
     }
@@ -212,7 +217,7 @@ class Create extends Component{
         }
 
         if(content.length === 4){
-            var contentButtons = <div id="contentButtons"><Button icon="minus" onClick={this.removeContentSection}/><Button icon="plus" onClick={this.addContentSection}/></div>
+            var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection}/><Button icon="plus" color="black" onClick={this.addContentSection}/></div>
             this.setState({contentButtons})
         }
 
@@ -252,42 +257,45 @@ class Create extends Component{
         this.setState({description})
     }
 
-    addProperty = () =>{
-        var properties = this.state.properties;
-        properties.push({name: "", value: ""})
-        this.setState({properties})
+    addAttribute = () =>{
+        var attributes = this.state.attributes;
+        attributes.push({trait_type: "", value: ""})
+        this.setState({attributes})
     }
 
-    removeProperty = () =>{
-        var properties = this.state.properties;
-        properties.pop()
-        this.setState({properties})
+    removeAttribute = () =>{
+        var attributes = this.state.attributes;
+        attributes.pop()
+        this.setState({attributes})
     }
 
-    nameChange = (e, data) =>{
-        var index = data.id.replace("propInput", "")
-        var properties = this.state.properties;
-        properties[index].name = data.value;
+    traitChange = (e) =>{
+        var index = e.target.id;
+        var attributes = this.state.attributes;
+        attributes[index].trait_type = e.target.value;
+        this.setState({attributes})
     }
 
-    valueChange = (e, data) =>{
-        var index = data.id.replace("propInput", "")
-        var properties = this.state.properties;
-        properties[index].value = data.value;
+    valueChange = (e) =>{
+        var index = e.target.id
+        var attributes = this.state.attributes;
+        attributes[index].value = e.target.value;
+        this.setState({attributes})
     }
 
-    maxMintCountChange = (e, data) =>{
-        var maxMintCount = data.value;
+    maxMintCountChange = (e) =>{
+        var maxMintCount = e.target.value;
         this.setState({maxMintCount})
     }
 
-    mintCostChange = (e, data) =>{
-        var mintCost = data.value;
+    mintCostChange = (e) =>{
+        var mintCost = e.target.value;
         this.setState({mintCost})
     }
 
-    claimValueChange = (e, data) =>{
-        var claimValue = data.value;
+    claimValueChange = (e) =>{
+        var claimValue = e.target.value;
+        
         this.setState({claimValue})
     }
 
@@ -295,18 +303,6 @@ class Create extends Component{
         var burnable = this.state.burnable
         this.setState({burnable: !burnable})
     }
-
-    toggleHost = () =>{
-        var host = this.state.host;
-
-        this.setState({host: !host});
-
-        console.log()
-
-        this.calculateFee();
-    }
-
-    
 
     createContent = async(files, ipfs) =>{
 
@@ -367,22 +363,22 @@ class Create extends Component{
         }
         console.log(`SubURIs: ${subURIs}`)
 
-        // insert properties into nft content
-        if(this.state.properties.length > 0){
-            contentJSON["properties"] = [];
-            for(var i = 0; i < this.state.properties; i++){
-                var property = {}
-                var propertyName = this.state.properties[i]["name"];
-                if(propertyName === ""){
+        // insert attributes into nft content
+        if(this.state.attributes.length > 0){
+            contentJSON["attributes"] = [];
+            for(var i = 0; i < this.state.attributes; i++){
+                var attribute = {}
+                var attributeName = this.state.attributes[i]["trait_type"];
+                if(attributeName === ""){
                     continue;
                 }
-                var propertyValue = this.state.properties[i]["value"];
-                if(propertyValue === ""){
+                var attributeValue = this.state.attributes[i]["value"];
+                if(attributeValue === ""){
                     continue
                 }
-                property[propertyName] = propertyValue;
-                console.log(property)
-                contentJSON["properties"].push(property);
+                attribute[attributeName] = attributeValue;
+                console.log(attribute)
+                contentJSON["attributes"].push(attribute);
             }
         }
 
@@ -420,7 +416,7 @@ class Create extends Component{
     }
 
     createNFT = async () =>{
-        //console.log(this.state.properties)
+        //console.log(this.state.attributes)
 
         console.log("CreateNFT")
 
@@ -509,7 +505,9 @@ class Create extends Component{
 
             if(!this.state.host){
                 await ratioNFT.setBaseURI(baseURI, false, protocolAddress, {from: this.props.account});
-                this.setState({stepText: "NFT Created!"})
+                var displayFinalInfo = <Container id="finalContent" textAlign="left" style={{width: "750px"}}><p>Your NFT has been deployed to: {ratioNFT.address}</p><p>You can find the NFT content below or at: <a href={baseURI}>{baseURI}</a></p></Container>
+                var displayFinalContent = <TextArea id="finalContent" style={{width: "750px", height: "25vh"}}>{JSON.stringify(nftJSON, null, 4)}</TextArea>
+                this.setState({stepText: "NFT Created!", displayFinalInfo, displayFinalContent})
                 this.props.setLoading(false);
                 return;
             }
@@ -643,13 +641,6 @@ class Create extends Component{
         //var version =  await global.ipfs.version()
 
         this.props.setLoading(false)
-        
-    }
-
-    
-
-    calculateFee = () =>{
-
     }
 
     render(){
@@ -658,13 +649,14 @@ class Create extends Component{
 
         return(
             <div id="mainComponent">
-                <Segment basic inverted id="banner" style={{"marginTop": "auto", height: "25vh"}}>
+                <Segment basic inverted id="banner">
                         <Container textAlign="left">
                             <div id="bannerText">Create</div>
+                            <p id="bannerSub">Non-Fungible Tokens.</p>
                         </Container>
                 </Segment>
                 <div id="networkError">{this.props.networkError}</div>
-                <div id="createForm" style={{"padding-top": "6vh", color:"black", }}>
+                <div id="createForm">
                     <Container textAlign="left">
                         <div id="prompt">Use the form below to create NFT's utilizing the Ratio NFT Protocol. (see About)</div>
                         <div id="required">* Indicates Required Fields</div>
@@ -684,50 +676,43 @@ class Create extends Component{
                                 <div id="contentError">{this.state.contentError}</div>
 
                                 <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; *Name:</div>
-                                <input  style={{width: "50%", alignSelf: "center"}} onChange={this.setName}/>
+                                <input id="nameInput"  onChange={this.setName}/>
 
                                 <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; Description:</div>
-                                <textarea style={{width: "50%", height:"100px", alignSelf: "center"}}  onChange={this.setDescription}/>
+                                <textarea id="descriptionArea" onChange={this.setDescription}/>
 
-                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; Properties:</div>
-                                <div id="properties">
-                                    {this.state.properties.map((p, i) =>(
+                                <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; Attributes:</div>
+                                <div id="attributes">
+                                    {this.state.attributes.map((p, i) =>(
                                         <div className="prop">
-                                            {/*<Menu compact style={{width:"25%"}}>
-                                                    <Dropdown simple item placeholder="Type" id={"dropdown" + i} options={this.state.options} onChange={this.propertyDrop}/>
-                                                </Menu>*/}
-                                            <div>Name:</div>
-                                            <Form.Input id={"propInput" + i} key={i} style={{"marginLeft": "1vh"}} placeholder="Name" size="small" onChange={this.nameChange}/>
-                                            <div id="valuePropLabel">Value:</div>
-                                            <Form.Input id={"propInput" + i} key={i} style={{"marginLeft": "1vh"}} placeholder="Value" size="small" onChange={this.valueChange}/>
+                                            <input label="Trait type:" className="propInput" id={i}  placeholder="trait_type" size="small" onChange={this.traitChange}/>
+                                            <input style={{"marginLeft": "1vh"}} label="Value:" className="propInput" id={i} placeholder="value" size="small" onChange={this.valueChange}/>
                                         </div>
                                     ))}
                                         
-                                    <div id="propButtons"><Button icon="minus" onClick={this.removeProperty}/><Button icon="plus" onClick={this.addProperty}/></div>
+                                    <div id="propButtons"><Button icon="minus" color="black" onClick={this.removeAttribute} /><Button icon="plus" color="black" onClick={this.addAttribute}/></div>
                                 </div>
                                 <Divider />
                                 <div style={{"marginTop": "3vh", "font-size": "large"}}>&emsp; &nbsp; *Contract:</div>
                                 <div className="contractVars">
-                                    <div id="contractInput">
-                                        <div className="mintLabel">*Max Mint Count:</div>
-                                        <Form.Input size ="small"  placeholder="Mint Count"  onChange={this.maxMintCountChange}/>
+                                    <div className="contractInput">
+                                        <input className="cInput" size="small" placeholder="*Max Mint Count"  onChange={this.maxMintCountChange}/>
                                     </div>
                                     <br/>
-                                    <div id="contractInput">
-                                        <div className="mintLabel">*Mint Cost:</div>
-                                        <Form.Input size="small" placeholder="Mint Cost e.g., (1 Matic)"  onChange={this.mintCostChange}/>
+                                    <div className="contractInput">
+                                        <input className="cInput" size="small" placeholder="*Mint Cost"  onChange={this.mintCostChange}/>
                                     </div>
                                     <br/>
-                                    <div id="contractInput">
-                                        <div className="mintLabel"><Popup content="This field sets how much the distributor (creator address) will receive from the Mint Cost. " trigger={<Icon name="question circle"/>  } />Claim Value:</div>
-                                        <Form.Input size="small" placeholder="Default will be Mint Cost"  onChange={this.claimValueChange}/>
+                                    <div className="contractInput">
+                                        <input className="cInput" size="small"  placeholder="Claim Value"  onChange={this.claimValueChange}/>
+                                        <Popup content="This field sets how much the distributor (creator address) will receive from the Mint Cost. Default is Mint Cost." trigger={<Icon name="question circle"/>  } />
                                     </div>
                                     <br/>
-                                    <div id="contractInput">
-                                        <div id="burnable">
-                                            <Radio toggle onChange={this.toggleBurn}/>  &emsp; Enable Burning &nbsp; <Popup content={<div><p>When Burnable, Minted NFTs may be removed from circulation allowing owners to recieve part or all of the Mint Cost</p><p>(Mint Cost - Claim Value)</p></div>} trigger={<Icon name="question circle"/>  } />
-                                        </div>
+                                    <div className="contractInput">
+                                        <div id="burnable"><Radio toggle onChange={this.toggleBurn} /> &nbsp; &nbsp; Enable Burning</div>
+                                        <Popup content={<div><p>When Burnable, Minted NFTs may be removed from circulation allowing owners to recieve part or all of the Mint Cost</p><p>(Mint Cost - Claim Value)</p></div>} trigger={<Icon name="question circle"/>  } />
                                     </div>
+                                    
                                 </div>
                             </div>
                             <Divider id="subDivide"></Divider>
@@ -737,9 +722,6 @@ class Create extends Component{
                                 <div id="step">{this.state.stepText}</div>
                                 <div id="submission">
                                    {createButton}
-                                    <div id="verify">
-                                        <Radio toggle defaultChecked onChange={this.toggleHost}/> &emsp; Host With Ratio Labs &nbsp; <Popup content="Ensure your NFT is verified and distributed on IPFS via Ratio Labs." trigger={<Icon name="question circle"/>  } />
-                                    </div>
                                 </div>
                                 <div id="submitError">{this.state.createError}</div>
                                 {this.state.displayFinalInfo}
@@ -750,7 +732,6 @@ class Create extends Component{
                     </Container>
                 </div>
             </div>
-            
         )  
     }
 }

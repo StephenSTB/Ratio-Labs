@@ -1,15 +1,35 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-//import Particles from 'react-particles-js';
-
 import Particles from "react-tsparticles";
 
-import RatioText from "../../logos/content/RatioLabsMilkShake.png";
+//import RatioText from "../../logos/content/RatioLabsMilkShake.png";
 
-import {Container, Image, Segment, List} from 'semantic-ui-react';
+import RatioText from "../../logos/home/RatioLabsLogo_1266x462.png"
+
+import {Container, Image, Segment, List, Grid, Divider, Button, Card, Icon} from 'semantic-ui-react';
 
 import './Home.css';
+
+import oracleLogo from "../../logos/home/RatioOracleLogo.png";
+
+import progressLogo  from "../../logos/home/RatioProgressLogo0.png";
+
+import rocketLogo from "../../logos/home/RatioRocketLogo.png";
+
+import placeImage from "../../logos/content/white-image.png";
+
+import hotWallet from "../../logos/home/HotWalletLogo.png";
+
+import cryptoMonkey from "../../logos/home/CryptoMonkeyCard.png";
+
+import cryptoGame from "../../logos/home/CryptoGameLogo.png"
+
+import gitcoinLogo from "../../logos/home/GitcoinLogo.png"
+
+import bridgeLogo from "../../logos/home/BridgeLogo2.png"
+
+import governLogo from "../../logos/home/GovernLogo.png"
 
 class Home extends Component{
     constructor(props){
@@ -21,44 +41,137 @@ class Home extends Component{
     About(){
         return(
             <div>
-                <Segment inverted color="black" id="About"  >
-                    <Container style={{"marginTop": "2vh"}} textAlign="left">
-                        <div id="missionHeader">The Mission</div>
-                        <p className="pState"> &emsp; The primary goal of the projects featured on this site are to enable innovative interactions with blockchain technologies. To acheive this goal, projects designed for this site have been structured to solve real world use cases including, Seamless smart contract interactions, Digital asset verification and distribution, NFT gamification with virtual reality visualization, Cross chain asset transfer for legacy cryptocurrencies, and multichain DAO governance. Read bellow about the inovative projects that are being worked on. </p>
-                        <List style={{"marginTop": "3vh"}}>
-                            <List.Item>
-                                <List.Icon name="ethereum"/>
-                                <List.Content className="listItem">Hot wallet enables seamless smart contract interactions via its autonomous signatory transaction system.</List.Content>
-                            </List.Item>
-                            <br/>
-                            <List.Item>
-                                <List.Icon name="ethereum"/>
-                                <List.Content className="listItem">Ratio NFT Protocol provides reliable digital asset verificaiton and distribution.</List.Content>
-                            </List.Item>
-                            <br/>
-                            <List.Item>
-                                <List.Icon name="ethereum"/>
-                                <List.Content className="listItem">CryptoGame is a multi-stage NFT game focused on exploring concepts such as NFT's, GameFi. VRF Oracle Systems and Virtual Reality</List.Content>
-                            </List.Item>
-                            <br/>
-                            <List.Item>
-                                <List.Icon name="ethereum" />
-                                <List.Content className="listItem">Bridge enables non EVM compatible legacy cryptocurrencies to transfer value onto EVM chains via a DPOS VRF oracle.</List.Content>
-                            </List.Item>
-                            <br />
-                            <List.Item>
-                                <List.Icon name="ethereum"/>
-                                <List.Content className="listItem">Govern allows protocol and token economic changes via the Ratio token and POS VRF oracle.</List.Content>
-                            </List.Item>
-                            
-                        </List>
-                        <div id="designHeader">Progressive Project Design</div>
-                        <p className="pState"> &emsp; The nature of blockchain interactions targeted by these projects has a progressive design which can be summarized as follows. Periphery for direct blockchain interactions (HotWallet). Intermediary protocol for data security using blockchains (Ratio NFT Protocol). Fair outcome protocol for GameFi via central VRF oracle (CryptoGame). cross chain transfers from legacy cryptocurrencies (BTC, DOGE) to EVM Chain (Matic) via DPOS VRF oracle (Ratio Bridge). Large validator protocol for multichain dynamic governance via POS VRF oracle (Govern).</p>
-                        <div id="designHeader">Ratio Oracle Systems</div>
-                        <p className="pState"> &emsp; The bulk of the work being done at Ratio Labs involves developing technologies which aggregate information onto blockchains in a trustless manor. The approach taken for this task has been to leverage VRF (Verifiable, Random Function) consensus models to develop Ratio Labs Oracle Systems. The specifications of these systems can be seen in their respective documentation.</p>
-                        {/*<div id="engageHeader">Engage in emerging projects in the cryptocurrency space.</div>
-                        */}
-                    </Container>
+                <Segment inverted color="black" id="About">
+                    <div id="description1">A Research and Development Project,</div>
+                    <div id="description2">Building Web3 Technologies.</div>
+                    <a href="#projectsDiv" id="exploreLink"><button id="exploreButton">Explore</button></a>
+                    <Divider id="projectsDiv" />
+                    <div id="projectsHeader">Ratio Labs Projects</div>
+                    <div id="projects">
+                        <div className="projectCard">
+                            <img src={hotWallet} className="projectImg"/>
+                            <Divider className="projectCardDivder"/>
+                            <Card.Header className="projectCardHead">Hot Wallet</Card.Header>
+                            <Card.Content className="projectCardDesc">
+                                Enables seamless smart contract interactions via its autonomous signatory transaction system.
+                            </Card.Content>
+                        </div>
+                        <div className="projectCard" >
+                            <img src={cryptoMonkey} className="projectImg"/>
+                            <Divider className="projectCardDivder"/>
+                            <Card.Header className="projectCardHead">Non-Fungible Token Protocol</Card.Header>
+                            <Card.Content className="projectCardDesc">
+                                Provides reliable NFT distributor verificaiton via a central oracle.
+                            </Card.Content>
+                        </div>
+                        <div className="projectCard">
+                            <img src={cryptoGame} className="projectImg"/>
+                            <Divider className="projectCardDivder"/>
+                            <Card.Header className="projectCardHead">Crypto Game</Card.Header>
+                            <Card.Content className="projectCardDesc">
+                                A multi-stage NFT GameFi experience focused on exploring concepts such as NFT's, GameFi and VRF Oracle Systems.
+                            </Card.Content>
+                        </div>
+                        <div className="projectCard">
+                            <img src={bridgeLogo} className="projectImg"/>
+                            <Divider className="projectCardDivder"/>
+                            <Card.Header className="projectCardHead">Bridge</Card.Header>
+                            <Card.Content className="projectCardDesc">
+                                Enables non EVM compatible legacy cryptocurrencies to transfer value onto EVM chains via a colateralized POS VRF oracle.
+                            </Card.Content>
+                        </div>
+                        <div className="projectCard" >
+                            <img src={governLogo} className="projectImg"/>
+                            <Divider className="projectCardDivder"/>
+                            <Card.Header className="projectCardHead">Govern</Card.Header>
+                            <Card.Content className="projectCardDesc">
+                                A protocol enabling multi-chain DAO governance via the Ratio token and POS VRF oracle.
+                            </Card.Content>
+                        </div>
+                    </div>
+
+                    <Divider id="socialsDiv"/>
+                    <div id="socials">
+                        <Icon name="github" inverted size="huge" color="purple"/>
+                        <a href="https://twitter.com/0xRatioLabs"><Icon name="twitter" inverted size="huge" color="blue"/></a>
+                        <Icon size="hube"><img src={gitcoinLogo} id="gitcoinLogo"/></Icon>
+                        
+                    </div>
+                    <div id="copywrite">
+                        <p>Ratio Labs &copy; {new Date().getFullYear()}</p>
+                    </div>
+                    {/*
+                    <Grid className="formatGrid" style={{"marginTop": "2vh"}}>
+                        <Grid.Row>
+                            <Grid.Column width={10} textAlign="left">
+                                <div id="missionHeader">The Mission</div>
+                                <p className="pState"> &emsp; The primary goal of the projects featured on this site are to enable innovative interactions with web3 technologies. 
+                                                                To acheive this goal, projects designed for this site have been structured to solve use cases including, Seamless smart contract interactions, 
+                                                                Digital asset verification and distribution, NFT Defi gamification, 
+                                                                Cross chain asset transfer for legacy cryptocurrencies, and multichain DAO governance. Read below about the inovative projects that are being worked on. </p>
+                                
+                                <List style={{"marginTop": "3vh",color: "#54c18a"}}>
+                                    <List.Item>
+                                        <List.Icon name="ethereum"/>
+                                        <List.Content className="listItem">Hot wallet enables seamless smart contract interactions via its autonomous signatory transaction system.</List.Content>
+                                    </List.Item>
+                                    <br/>
+                                    <List.Item>
+                                        <List.Icon name="ethereum"/>
+                                        <List.Content className="listItem">Ratio NFT Protocol provides reliable NFT distributor verificaiton via a central oracle.</List.Content>
+                                    </List.Item>
+                                    <br/>
+                                    <List.Item>
+                                        <List.Icon name="ethereum"/>
+                                        <List.Content className="listItem">CryptoGame is a multi-stage NFT Defi game focused on exploring concepts such as NFT's, GameFi VRF Oracle Systems </List.Content>
+                                    </List.Item>
+                                    <br/>
+                                    <List.Item>
+                                        <List.Icon name="ethereum" />
+                                        <List.Content className="listItem">Bridge enables non EVM compatible legacy cryptocurrencies to transfer value onto EVM chains via a colateralized POS VRF oracle.</List.Content>
+                                    </List.Item>
+                                    <br />
+                                    <List.Item>
+                                        <List.Icon name="ethereum"/>
+                                        <List.Content className="listItem">Govern allows multi-chain protocol and token economic changes via the Ratio token and POS VRF oracle.</List.Content>
+                                    </List.Item>
+                                </List>
+                            </Grid.Column>
+                            <Grid.Column width={6} floated="right" textAlign="justified" verticalAlign="bottom">
+                                <img src={rocketLogo} id="oracleImg"/>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    
+                    <div id="space"/>
+                    <Divider/>
+                    <Grid  className="formatGrid">
+                        <Grid.Row>
+                            <Grid.Column width={6} textAlign="justified" verticalAlign="bottom">
+                                <img src={progressLogo} id="oracleImg"/>
+                            </Grid.Column>
+                            <Grid.Column floated='right' width={10} textAlign="justified" verticalAlign="bottom">
+                                <div id="designHeader">Progressive Project Design</div>
+                                <p className="pState"> &emsp; The nature of blockchain interactions targeted by these projects has a progressive design which improves research and development of future projects. Periphery for direct blockchain interactions (HotWallet). Intermediary protocol for data security using blockchains (Ratio NFT Protocol). Fair outcome protocol for GameFi via central VRF oracle (Crypto Game). cross chain transfers from legacy cryptocurrencies (BTC, DOGE) to EVM Chain (Matic) via DPOS VRF oracle (Ratio Bridge). Large validator protocol for multichain dynamic governance via POS VRF oracle (Govern).</p>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    <div id="space"/>
+                    <Divider/>
+                    <Grid className="formatGrid">
+                        <Grid.Row>
+                            <Grid.Column width={10} textAlign="left" verticalAlign="middle">
+                                <div id="designHeader">Ratio Oracle Systems</div>
+                                <p className="pState"> &emsp; Work being done at Ratio Labs involves developing technologies which aggregate information onto blockchains in a trustless manor. The approach taken for this task has been to leverage VRF (Verifiable, Random Function) consensus models to develop Ratio Labs Oracle Systems. The specifications of these systems can be seen in their respective documentation.</p>
+                                
+                            </Grid.Column>
+                            <Grid.Column width={6} floated="right" textAlign="justified" verticalAlign="bottom">
+                                <img src={oracleLogo} id="oracleImg"/>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                    */}
+                    
                 </Segment>
             </div>
         );

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import 'semantic-ui-css/semantic.min.css';
 
-import {Container, Segment, Button, Loader, Card, Menu, Popup, Icon, Input, Divider, Form} from 'semantic-ui-react';
+import {Card, Container, Segment, Button, Loader, Menu, Popup, Icon, Input, Divider, Form} from 'semantic-ui-react';
 
 import  "@google/model-viewer";
 
@@ -11,6 +11,8 @@ import deployedContracts from "../../data/Deployed_Contracts.json"
 import networkData from "../../data/Network_Data.json"
 
 import * as axios from 'axios';
+
+import "./NFT.css"
 
 class Display extends Component{
 
@@ -29,6 +31,7 @@ class Display extends Component{
         if(this.NFTProtocol === null || this.NFTProtocol === undefined){
             return;
         }
+        
 
         var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
         this.nftProtocol = await this.NFTProtocol.at(protocolAddress);
@@ -50,7 +53,7 @@ class Display extends Component{
 
         console.log("Display Component Update")
 
-        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "")
+        if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "" || prevProps === undefined)
             return;
 
 
@@ -182,75 +185,92 @@ class Display extends Component{
         catch(e){
             
         }
+
+        var details = false;
         
         //console.log(`nft content: ${JSON.stringify(content)}`);
         
-        return {info, content, display}
+        return {info, content, display, details}
     }
 
     createNFTCard = (nftObj, index, section) =>{
 
-        var nftCard =   <Card id="nftBox" key={index}>
-                            <Card id="nftContentDisp" style={{"marginTop" : "50px"}}>
+        var nftCard =   <div id="nftBox" key={index} >
+                            <div id="nftContentDisp">
                                 {nftObj.display}
-                            </Card>
-                            <Card.Content extra id="nftMenu">
+                            </div>
+                            <div id="nftMenu">
                                 <Menu color="teal" inverted widths={4}>
                                     {nftObj.content.map((content, j) =>(
-                                        <Menu.Item style={{color:"white"}} active={content.active} onClick={() => this.updateNFT(index, j, nftObj, section)}>{content.type}</Menu.Item>
+                                        <Menu.Item style={{color:"white"}} active={content.active} onClick={() => this.updateNFT({nftIndex: index, mediaIndex: j, nftObj, section, details: nftObj.details})}>{content.type}</Menu.Item>
                                     ))}
                                 </Menu>
-                            </Card.Content>
-                            <Card.Content >
-                                <Card.Header><p id = "nftHeader">{nftObj.info._name} </p></Card.Header>
-                                <Card.Description>
-                                    <Menu color="black"  attached='top' tabular>
-                                        <Menu.Item  style={{"background-color" : "#cbedca"}}name="Description" active={true}></Menu.Item>
-                                    </Menu>
-                                    <Segment style={{"background-color" : "#cbedca"}} attached="bottom" className = "nftInfo">
-                                        <div className="infoElement"><div className="infoName">Contract:</div><div className="infoValue" onClick={() => this.copyContract(nftObj.info._contract.address)}>{nftObj.info._address} <Popup content="Copied!" on='click' position="right center" trigger = {<Icon name="copy"/>}/></div></div>
-                                        <div className="infoElement"><div className="infoName">Base URI:</div><div className="infoValue"><a href={nftObj.info._base}>{nftObj.info._baseText}</a></div></div>
-                                        <div className="infoElement"><div className="infoName">Price:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._mintValue, "ether")}</div></div>
-                                        <div className="infoElement"><div className="infoName">Claim Value:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._claimValue, "ether")}</div></div>
-                                        <div className="infoElement"><div className="infoName">Burnable:</div><div className="infoValue">{nftObj.info._burnable ? "yes" : "no"}</div></div>
-                                        {nftObj.info._burnable ? <div className="infoElement"><div className="infoName">Burn Value:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._burnValue, "ether")}</div></div> : <div></div>}
-                                        <div className="infoElement"><div className="infoName">Max Supply:</div><div className="infoValue">{nftObj.info._maxSupply.toString()}</div></div>
-                                        <div className="infoElement"><div className="infoName">Minted:</div><div className="infoValue">{nftObj.info._minted.toString()}</div></div>
-                                        {Number(nftObj.info._claimValue) > 0 ? <div className="infoElement"><div className="infoName">Unclaimed:</div><div className="infoValue">{nftObj.info._unclaimed}</div></div> : <div></div>}
-                                    </Segment>
-                                    {nftObj.info._minted === "0" ? this.state.initLoad ? <Button loading>Loading</Button> : <Button id="initMint" centered secondary onClick={() => this.mint}>Initial Mint &nbsp; <Popup content="Be the first to mint your NFT! (Needed for Opensea integration)." trigger={<Icon name="question circle"/>  } /></Button> : <div/>}
+                            </div>
+                            <Divider />
+                            <div>
+                               <p id = "nftHeader">{nftObj.info._name} </p>
+                                <div>
+                                    {nftObj.details ? <Icon name="chevron up" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: false})}/> : <Icon name="chevron down" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: true})}/>}
+                                    {nftObj.details ? 
+                                        <div>
+                                            <Segment className="nftInfo" attached="bottom" >
+                                                <div className="infoElement"><div className="infoName">Contract:</div><div className="infoValue" onClick={() => this.copyContract(nftObj.info._contract.address)}>{nftObj.info._address} <Popup content="Copied!" on='click' position="right center" trigger = {<Icon name="copy"/>}/></div></div>
+                                                <div className="infoElement"><div className="infoName">Base URI:</div><div className="infoValue"><a href={nftObj.info._base}>{nftObj.info._baseText}</a></div></div>
+                                                <div className="infoElement"><div className="infoName">Price:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._mintValue, "ether")}</div></div>
+                                                <div className="infoElement"><div className="infoName">Claim Value:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._claimValue, "ether")}</div></div>
+                                                <div className="infoElement"><div className="infoName">Burnable:</div><div className="infoValue">{nftObj.info._burnable ? "yes" : "no"}</div></div>
+                                                {nftObj.info._burnable ? <div className="infoElement"><div className="infoName">Burn Value:</div><div className="infoValue">{this.props.utils.fromWei(nftObj.info._burnValue, "ether")}</div></div> : <div></div>}
+                                                <div className="infoElement"><div className="infoName">Max Supply:</div><div className="infoValue">{nftObj.info._maxSupply.toString()}</div></div>
+                                                <div className="infoElement"><div className="infoName">Minted:</div><div className="infoValue">{nftObj.info._minted.toString()}</div></div>
+                                                {Number(nftObj.info._claimValue) > 0 ? <div className="infoElement"><div className="infoName">Unclaimed:</div><div className="infoValue">{nftObj.info._unclaimed}</div></div> : <div></div>}
+                                            </Segment>
+                                            <div className="detailButtons">
+                                                {nftObj.info._minted === "0" ? this.state.initLoad ? <Button className="initMint" loading>Loading</Button> : <Button className="initMint" centered secondary onClick={() => this.mint}>Initial Mint &nbsp; <Popup content="Be the first to mint your NFT! (Needed for Opensea integration)." trigger={<Icon name="question circle"/>  } /></Button> : <div/>}
+                                            </div>
+                                        </div>
+                                    :
+                                    <div></div>
+                                }
                                     
-                                </Card.Description>
-                            </Card.Content>
-                        </Card>
+                                    
+                                </div>
+                            </div>
+                        </div>
 
         return nftCard;
     }
 
-    updateNFT = (nftIndex, mIndex, nftObj, section) =>{
+    updateNFT = (nft) =>{
         console.log("updateNFT!")
+
+        var {nftIndex, mediaIndex, nftObj, section, details} = nft;
+
+        nftObj.details = details;
 
         //console.log(JSON.stringify(nft.content))
 
-        var content = nftObj.content;
+        if(mediaIndex !== null){
+            var content = nftObj.content;
 
-        for(var c of content){
-            c.active = false;
+            for(var c of content){
+                c.active = false;
+            }
+
+            content[mediaIndex].active = true;
+            
+            var display = content[mediaIndex].type === "image" ? 
+                                <img src={content[mediaIndex].src}  id="uploadedContent"/> :
+                        content[mediaIndex].type === "audio" ? 
+                                <audio id="uploadedContent" controls="Pause, Play"> <source src={content[mediaIndex].src} /></audio> :
+                        content[mediaIndex].type === "video" ? 
+                                <video id="uploadedContent" autoPlay muted> <source src={content[mediaIndex].src} /></video> :
+                        content[mediaIndex].type === "model" ?
+                                <model-viewer id="uploadedContent" src={content[mediaIndex].src} camera-controls/> : <div></div>
+
+            nftObj.display = display;
         }
 
-        content[mIndex].active = true;
         
-        var display = content[mIndex].type === "image" ? 
-                            <img src={content[mIndex].src}  id="uploadedContent"/> :
-                      content[mIndex].type === "audio" ? 
-                            <audio id="uploadedContent" controls="Pause, Play"> <source src={content[mIndex].src} /></audio> :
-                      content[mIndex].type === "video" ? 
-                            <video id="uploadedContent" autoPlay muted> <source src={content[mIndex].src} /></video> :
-                      content[mIndex].type === "model" ?
-                            <model-viewer id="uploadedContent" src={content[mIndex].src} camera-controls/> : <div></div>
-
-        nftObj.display = display;
-
         //console.log(JSON.stringify(nft.content))
 
         if(section === "main"){
@@ -355,22 +375,25 @@ class Display extends Component{
                 <Segment basic inverted id="banner" style={{height: "25vh"}}>
                         <Container textAlign="left">
                             <div id="bannerText">Display</div>
+                            <p id="bannerSub">Non-Fungible Tokens.</p>
                         </Container>
                 </Segment>
                 <div id="networkError">{this.props.networkError}</div>
                 <Container id="searchContainer">
                     <div id="searchDiv">
                         <Form onSubmit={() => this.searchNFT()}>
-                            <Input icon={<Icon name="search" circular link onClick={() => this.searchNFT()}></Icon>}  placeholder='Search for Contract 0x...' fluid onChange={this.searchChange}/>
+                            <Input id="searchBar" icon={<Icon inverted name="search" circular link onClick={() => this.searchNFT()}></Icon>}  placeholder='Search for Contract 0x...' fluid onChange={this.searchChange}/>
                         </Form>
                     </div>
                     <div id="searchError">{this.state.searchError}</div>
-                    {this.state.searchNFT}
+                    <div id="nftContainer">
+                        {this.state.searchNFT}
+                    </div>
                 </Container>
                 <Divider></Divider>
-                <Card.Group style={{"padding-top": "3vh", color:"black"}} id="nftContainer" itemsPerRow={1} centered>
+                <div id="nftContainer">
                     {this.state.mainNFTs}
-                </Card.Group>
+                </div>
             </div>
         );
     }

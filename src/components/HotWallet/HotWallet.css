@@ -1,4 +1,4 @@
-#createPrompt, #createWallet, #import, #unlock, #display, #send{
+#createPrompt, #createWallet, #import, #unlock, #display, #send, #about, #back{
     color: white;
     
 }
@@ -7,13 +7,13 @@
     text-align: left;
 }
 
-#linkButton{
+.linkButton{
     background: none;
     border: none;
-    color: #74ea1f;
+    color: white;    
 }
 
-#linkButton:hover{
+.linkButton:hover{
     background: none;
     text-decoration: underline;
 }
@@ -37,6 +37,10 @@
     align-items: flex-end;
 }
 
+#qrbutton{
+    
+}
+
 #sendBalance{
     background: none;
     border: none;
@@ -53,3 +57,23 @@
     justify-content: center;
     align-items: center;
 }
+
+#unlockBottom{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+#aboutButton{
+   margin-left: 40%;
+}
+
+
+#receiveAddress{
+    display: flex;
+    flex-direction: row;
+    font-size: 9pt;
+}
+
+
+

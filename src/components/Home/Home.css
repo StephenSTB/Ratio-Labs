@@ -1,36 +1,269 @@
 @font-face { font-family: Milkshake; 
   src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
 
-  @font-face { font-family: Lato; 
-    src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
+@font-face { font-family: Lato; 
+  src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
 
-.Home{
-  background-color: black;
-}
-#particles-js{ 
-  background-image: url("../../logos/content/RatioColors.png"); 
-  background-repeat: no-repeat;
-  height: 71vh;
+@font-face { font-family: OpenSans; 
+  src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+
+/* Desktop */
+@media screen and (min-width: 900px) {
+
+  #particles-js{ 
+    background-image: url("../../logos/content/RatioColors.png"); 
+    background-repeat: no-repeat;
+    height: 50vh;
+  }
+
+  #Ratio-Text{
+    position: absolute;
+    pointer-events: none;
+    align-self: center;
+    margin-top: 5vh;
+    z-index: 1;
+  }
+
+  #description1{
+    align-self: center;
+    color: #54c18a;
+    font-family: Milkshake;
+    width: 40vw;
+    font-size: 35pt;
+    line-height: normal;
+    margin-top: 15vh;
+    text-align: center;
+  }
+  
+  #description2{
+    align-self: center;
+    color: #54c18a;
+    font-family: Milkshake;
+    width: 35vw;
+    font-size: 35pt;
+    line-height: normal;
+    text-align: center;
+  }
+
+  #projectsHeader{
+    color: #54c18a;
+    font-family: Milkshake;
+    font-size: 35pt;
+    margin-top: 8vh;
+    margin-bottom: 5vh;
+    text-align: center;
+  }
+
+  #projects{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 70vw;
+    /*border: solid 1px #44abc6;*/
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .projectCard{
+    display: flex;
+    flex-direction: column;
+    border: solid 1px #44abc6;
+    border-radius: 20px;
+    width: 30vw;
+    background: none !important;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    margin-left: 1vw ;
+    margin-right: 1vw ;
+    min-height: 60vh;
+    text-align: center;
+  
+  }
+
+  .projectCardHead{
+    color: #54c18a;
+    margin-top: 4vh;
+    font-size: 32pt;
+    font-family: Milkshake;
+    line-height: 5vh;
+  }
+
+  #socials{
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-right: 2vw;
+  }
+
+  #copywrite{
+    margin-left: 0vw;
+    text-align: center;
+  }
   
 }
 
-#Ratio-Text{
-  position: absolute;
-  pointer-events: none;
-  width: 100vw;
-  z-index: 1;
+/* mobile css */
+@media screen and (max-width: 600px) {
+
+  #particles-js{ 
+    background-image: url("../../logos/content/RatioColors.png"); 
+    background-repeat: no-repeat;
+    height: 36vh;
+    background-size: 105vw 100vh;
+  }
+
+  #Ratio-Text{
+    position: absolute;
+    pointer-events: none;
+    align-self: center;
+    margin-top: 9vh;
+    z-index: 1;
+  }
+
+  #description1{
+    align-self: center;
+    color: #54c18a;
+    font-family: Milkshake;
+    width: 99vw;
+    font-size: 20pt;
+    line-height: normal;
+    margin-top: 15vh;
+    text-align: center;
+  }
+  
+  #description2{
+    align-self: center;
+    color: #54c18a;
+    font-family: Milkshake;
+    width: 90vw;
+    font-size: 20pt;
+    line-height: normal;
+    margin-bottom: 15vh;
+    text-align: center;
+  }
+
+  #projectsHeader{
+    color: #54c18a;
+    font-family: Milkshake;
+    font-size: 30pt;
+    margin-top: 8vh;
+    margin-bottom: 5vh;
+    text-align: center;
+  }
+
+  #projects{
+    display: flex;
+    flex-direction: column;
+    width: 70vw;
+    /*border: solid 1px #44abc6;*/
+    align-self: center;
+    align-items: center;
+   
+  }
+
+  .projectCard{
+    display: flex;
+    flex-direction: column;
+    border: solid 1px #44abc6;
+    border-radius: 20px;
+    width: 100%;
+    background: none !important;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    margin-left: 1vw ;
+    margin-right: 1vw ;
+    text-align: center;
+  }
+
+  .projectCardHead{
+    color: #54c18a;
+    margin-top: 4vh;
+    font-size: 32pt;
+    font-family: Milkshake;
+    line-height: 5vh;
+  }
+
+  #socials{
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-right: 8vw;
+  }
+
+  #copywrite{
+    margin-left: 2vw;
+    text-align: center;
+  }
+}
+
+.Home{
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+#About{
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;
+}
+
+#exploreLink{
+  align-self: center;
+  height: 35px;
+  width: 200px;
+  border-radius: 20px;
+  margin-top: 5vh;
+  margin-bottom: 10vh;
+}
+
+#exploreButton{
+  color: #44abc6;
+  height: 35px;
+  width: 200px;
+  align-self: center;
+  border: 1px solid #44abc6;
+  background: none;
+  border-radius: 20px;
+  z-index: 0;
+  cursor: pointer;
+}
+
+.projectImg{
+  margin-top: 1vh;
+}
+
+.projectCardDesc{
+  color: #4db8c6;
+  margin-top: 3vh !important;
+  margin-bottom: 3vh !important;
+  font-size: 12pt !important;
+  font-family: Lato;
+  padding: 20px;
 }
 
 #missionHeader,#designHeader{
   font-family: Milkshake;
   margin-top: 5vh; 
-  color: #cbedca;
+  color: #54c18a;
 }
 
 #missionHeader{
   font-size: 52pt;
-  
 }
+
+#missionText{
+  margin-top: "2vh";
+  width: 75%;
+}
+
 #designHeader{
   font-size: 32pt;
 }
@@ -39,9 +272,23 @@
   font-family: Lato;
   margin-top: 3vh;
   font-size: 12pt;
-  color: #cbedca;
+  color: #54c18a;
 }
 
+#socialsDiv{
+  margin-top: 5vh;
+}
+
+
+
+#gitcoinLogo{
+  width: 60px;
+ 
+}
+
+
+
+/** old main page css*/
 #engageHeader{
   font-size: x-large;
   margin-top: 2.5vh;
@@ -49,5 +296,20 @@
 
 .listItem{
   font-size : medium;
-  color: #cbedca;
+  color: #54c18a;
+}
+
+#oracleImg{
+  width: 75%;
+}
+
+#space{
+  height: 100px;
+}
+
+.formatGrid{
+  width: 70vw;
+  /*border: coral solid 1px;*/
+  margin-right: 15vw;
+  align-self: center;
 }

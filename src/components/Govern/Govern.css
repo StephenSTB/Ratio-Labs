@@ -1,0 +1,19 @@
+@font-face { font-family: OpenSans; 
+    src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+@font-face { font-family: Milkshake; 
+    src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
+
+#mainComponent{
+    background-color: #cbedca;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#bannerText{
+    margin-top: 10vh;
+    font-size: 6em;
+    color: #cbedca;
+    font-family: Milkshake !important;
+}

@@ -2,10 +2,25 @@
     src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
 
 @font-face { font-family: Lato; 
-    src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
+    src: url('../../fonts/Lato/Lato-Bold.ttf'); }
 
-#TopMenu{
-    background-image: url("../../logos/content/RatioColors.png") !important; 
+
+@media screen and (min-width: 900px) {
+    #TopMenu{
+        background-image: url("../../logos/content/RatioColors.png") !important;
+        height: 60px !important;
+        width: 100vw;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    #TopMenu{
+        background-image: url("../../logos/content/RatioColors.png") !important;
+        height: 60px !important;
+        width: 100vw;
+    }
+
 }
 
 #link, #connect{
@@ -17,7 +32,7 @@
 #connect{
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 2vh;
+    height: 18px;
     padding: .2vh;
 }
 
@@ -40,8 +55,22 @@
     height: 18px;
 }
 
+#mobileMenu{
+    background-image: url("../../logos/content/RatioColors.png") !important;
+    background-repeat: no-repeat;
+    background-position: left !important;
+    height: 50vh;
+    margin-top: 8vh;
+}
+
 .cardStyle{
     width: 500px;
+    background-image: url("../../logos/content/RatioColors.png") !important;
+    background-position: right !important;
+}
+
+.mobileCardStyle{
+    width: 100vw;
     background-image: url("../../logos/content/RatioColors.png") !important;
     background-position: right !important;
 }

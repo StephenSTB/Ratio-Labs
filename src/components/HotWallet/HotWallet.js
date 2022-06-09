@@ -1,6 +1,6 @@
 import React, { Component, useState } from "react";
 
-import {Button, Icon, Segment, Input, Popup, Card, Form, Image, Header, Dropdown, Divider, Label, Loader} from 'semantic-ui-react';
+import {Button, Icon, Segment, Input, Popup, Card, Form, Image, Header, Dropdown, Divider, Label, Loader, Container} from 'semantic-ui-react';
 
 import HDWalletProvider from "@truffle/hdwallet-provider";
 
@@ -10,7 +10,7 @@ import Web3 from 'web3';
 
 import * as bip39 from 'bip39';
 
-import fire from "../../logos/wallet/Fire.png";
+import flame from "../../logos/wallet/flameR.gif";
 
 import polygonImage from "../../logos/wallet/chains/polygonSymbol.jpg";
 
@@ -20,7 +20,13 @@ import ganacheImage from "../../logos/wallet/chains/ganache.png";
 
 import kovanImage from "../../logos/wallet/chains/kovan.png";
 
+import diagram from "../../logos/wallet/about/HotWalletDiagram.png";
+
 import QRCode from 'qrcode';
+
+import { QrReader } from 'react-qr-reader';
+
+import QrScanner from '../../../node_modules/qr-scanner/qr-scanner.min.js';
 
 import providers from "../../data/Providers.json"
 
@@ -49,7 +55,7 @@ class HotWallet extends Component{
         this.state = {CreateImport: false, Create: false , Import: false, Unlock: false, Display: false, Send: false, 
                       passwordOne: "", passwordTwo: "", mnemonic: "",
                       error: "",
-                      accounts: null, account: null, accountPlaceholder: null, balance: null,
+                      walletaccounts: null, account: null, accountPlaceholder: null, balance: null,
                       providers: null, providerPlaceholder: null,
                       asset: null, assetImage: null,
 
@@ -65,7 +71,11 @@ class HotWallet extends Component{
         this.changeAccount = this.changeAccount.bind(this)
         this.changeProvider = this.changeProvider.bind(this)
         this.sendPrompt = this.sendPrompt.bind(this);
-        this.test = true;
+        this.aboutPrompt = this.aboutPrompt.bind(this)
+        this.initializeProviders = this.initializeProviders.bind(this);
+        this.initializeWallet = this.initializeWallet.bind(this);
+        this.changeProvider = this.changeProvider.bind(this);
+        this.test = false;
     }
 
     componentDidMount = async() => {
@@ -82,8 +92,6 @@ class HotWallet extends Component{
         var wallet = localStorage.getItem("hotWallet");
         //console.log("wallet: " + wallet);
 
-
-
         if(wallet === null){
             //console.log("wallet was null create new wallet?")
 
@@ -92,13 +100,30 @@ class HotWallet extends Component{
         }
         else{
             //localStorage.removeItem("hotWallet")
-            this.setState({Unlock: true})
-            //this.setState({Display:true})
+            if(this.props.unlocked){
+                web3 = this.props.web3;
+                provider = this.props.web3.currentProvider;
+                console.log(`Hotwallet provider : ${provider.chainId}`)
+                this.setState({Display: true})
+                return;
+            }
+            this.setState({Unlock: true});
+            //this.setState({About:true})
+            //
             return;
         }
     }
 
     componentDidUpdate = (prevProps) =>{
+
+        if(prevProps === undefined){
+            return
+        }
+
+        if(this.props.network === null || prevProps.network === null){
+            return;
+        }
+
         if(prevProps.network.toString() !== this.props.network.toString()){
             console.log(prevProps.network)
             console.log(this.props.network)
@@ -132,7 +157,6 @@ class HotWallet extends Component{
         this.setState({passwordOne: event.target.value})
     }
    
-
     setPasswordTwo= async (event) =>{
         this.setState({passwordTwo: event.target.value})
     }
@@ -212,7 +236,9 @@ class HotWallet extends Component{
 
         this.initializeProviders()
 
-        provider = new HDWalletProvider({mnemonic: decryptedMnemonic, providerOrUrl: providers["Mumbai"].url})
+        var network = this.props.network !== null ? this.props.network: "80001"
+
+        provider = new HDWalletProvider({mnemonic: decryptedMnemonic, providerOrUrl: providers[networkData[network].chainName].url})
 
         web3  = new Web3(provider);
 
@@ -220,7 +246,9 @@ class HotWallet extends Component{
 
         this.setState({Display: true, Unlock: false})
 
-        this.initializeWallet()
+        await this.initializeWallet()
+
+        this.props.updateWeb3(web3, this.state.account);
     }
 
     changeProvider = async (event, {value}) =>{
@@ -244,9 +272,10 @@ class HotWallet extends Component{
 
         await this.retrieveInfo(this.state.account);
 
+        console.log(provider.chainId)
         
-        this.setState({asset: networkData[provider.chainId].nativeCurrency.symbol , assetImage: networkSymbols[networkData[provider.chainId].chainName],
-                       providerText: networkData[provider.chainId].chainName , providerValue: value})
+        this.setState({asset: networkData[provider.chainId.toString()].nativeCurrency.symbol , assetImage: networkSymbols[networkData[provider.chainId.toString()].chainName],
+                       providerText: networkData[provider.chainId.toString()].chainName , providerValue: value})
 
         //console.log(provider)
         
@@ -259,27 +288,27 @@ class HotWallet extends Component{
         }
         console.log(prov)
 
-        this.setState({providers: prov, providerPlaceholder: "Mumbai", asset: providers["Mumbai"].asset, assetImage: networkSymbols["Mumbai"] })
+        var network = this.props.network !== null ? this.props.network : "80001"
+
+        this.setState({providers: prov, providerPlaceholder: networkData[network].chainName, asset: providers[networkData[network].chainName].asset, assetImage: networkSymbols[networkData[network].chainName] })
     }
 
     initializeWallet = async () =>{
-        var accounts = await web3.eth.getAccounts();
-        //.log(accounts)
+        var walletaccounts = await web3.eth.getAccounts();
+        console.log(walletaccounts)
 
-        var account = accounts[0];
-
-        for(var i=0; i< accounts.length; i++){
-            var text = accounts[i].slice(0,5) + "..." + accounts[i].slice(38)
-            accounts[i] = {key: accounts[i], text, value: accounts[i]}
+        var account = walletaccounts[0];
+        
+        for(var i=0; i< walletaccounts.length; i++){
+            var text = walletaccounts[i].slice(0,5) + "..." + walletaccounts[i].slice(38)
+            walletaccounts[i] = {key: walletaccounts[i], text, value: walletaccounts[i]}
         }
 
         var accountPlaceholder = account.slice(0,5) + "..." + account.slice(38);
 
-        this.setState({accounts, account, accountPlaceholder})
+        this.setState({walletaccounts, account, accountPlaceholder})
 
         this.retrieveInfo(account);
-
-        this.props.updateWeb3(web3, account);
     }
 
     changeAccount = async (event, {value}) =>{
@@ -295,7 +324,7 @@ class HotWallet extends Component{
 
         var balance = await web3.eth.getBalance(account);
 
-        balance = utils.fromWei(balance, "ether");
+        balance = Number(utils.fromWei(balance, "ether")).toFixed(8);
 
         this.setState({balance})
     }
@@ -312,7 +341,11 @@ class HotWallet extends Component{
         if (localStorage.getItem("hotWallet") === null)
             this.setState({CreateImport: true, Import: false})
         else
-            this.setState({Unlock: true, Import: false, Display:false})
+            this.setState({Unlock: true, Import: false, Display: false, About: false})
+    }
+
+    aboutPrompt = () =>{
+        this.setState({About: true, Unlock: false})
     }
 
     render(){
@@ -328,9 +361,12 @@ class HotWallet extends Component{
                                                               setPasswordOne: this.setPasswordOne,
                                                               setPasswordTwo : this.setPasswordTwo   
                                                             }} {...this.state}/> :
-                      this.state.Unlock ? <Unlock unlockWallet = {this.unlockWallet} importWallet = {this.importWallet} {...this.state}/> : 
-                      this.state.Display? <Display sendPrompt = {this.sendPrompt} changeAccount = {this.changeAccount} changeProvider= {this.changeProvider} backUnlock={this.backUnlock}{...this.state}/> : 
-                      this.state.Send ? <Send back = {this.backDisplay} retrieveInfo = {this.retrieveInfo}  {...this.state}/> :<div></div>;
+                      this.state.Unlock ? <Unlock unlockWallet = {this.unlockWallet} importWallet = {this.importWallet} aboutPrompt={this.aboutPrompt} handleClose={this.props.handleClose} {...this.state}  /> : 
+                      this.state.Display? <Display sendPrompt = {this.sendPrompt} changeAccount = {this.changeAccount} changeProvider= {this.changeProvider}
+                                                     backUnlock={this.backUnlock} initializeProviders = {this.initializeProviders} 
+                                                     initializeWallet = {this.initializeWallet} {...this.state} {...this.props}/> : 
+                      this.state.Send ? <Send back = {this.backDisplay} retrieveInfo = {this.retrieveInfo}  {...this.state}/> :
+                      this.state.About ? <About backUnlock={this.backUnlock}/> : <div></div>;
 
         return(
                 <Card.Content>
@@ -344,7 +380,9 @@ class Send extends Component{
     constructor(props){
         super();
         this.props = props;
-        this.state = {asset: null, recipient: null, amount: null, error: ""}
+        this.state = {asset: null, recipient: null, recipientPlaceholder: "0xCA7...Cd63", amount: null, error: "",
+                      qrScanner: ""}
+        
     }
 
     componentDidMount = () =>{
@@ -357,7 +395,7 @@ class Send extends Component{
     }
 
     changeAmount = async (event) =>{
-        //console.log(event.target.value);
+        console.log(event.target.value);
         this.setState({amount: event.target.value})
     }
 
@@ -397,6 +435,27 @@ class Send extends Component{
         this.props.retrieveInfo(this.props.account);
     }
 
+    scanQr = () =>{
+        //(videoElem)
+        //this.qrScaner = new QrScanner(videoElem, result => console.log('decoded qr code:', result));
+
+        var qrScanner =<>
+                        <QrReader
+                            onResult={(result, error) => {
+                                if (!!result) {
+                                    this.setState({receipt: result?.text});
+                                }
+                                if (!!error) {
+                                console.info(error);
+                                }
+                            }}
+                            style={{ width: '100%' }}
+                        />
+                        <p>{this.state.data}</p>
+                    </>
+        this.setState({qrScanner})
+    }
+
     render(){
         var sendButton = this.state.sending ? <Button secondary loading>Send</Button>: <Button secondary onClick={this.send}>Send</Button>
         return(
@@ -405,8 +464,12 @@ class Send extends Component{
                     <div id="compHeader"> <button id="back" onClick ={this.props.back}><Icon size="large" name = "arrow left"/></button> <Header color="blue">Send {this.state.asset}</Header> </div>
                     <Divider/>
                     <Form inverted>
-                        <Form.Input label="Recipient:" placeholder="0xCA7...Cd63" onChange={this.changeRecipient}/>
-                        <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">
+                        <Form.Input label="Recipient:" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}>
+                            <input />
+                            <Label id = "assetLabel"><button id="qrButton" onClick={() => this.scanQr()}><Icon name="qrcode"/></button></Label>  
+                            {this.state.qrScaner}
+                        </Form.Input>
+                        <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
                             <input />
                             <Label id = "assetLabel">{this.state.asset}</Label>
                         </Form.Input>
@@ -428,9 +491,19 @@ class Display extends Component{
     
     componentDidMount = async () =>{
         //web3.eth.getAccounts().then(console.log)
-
         console.log("display mount")
         
+        await this.props.initializeProviders();
+
+        await this.props.initializeWallet()
+
+        if(this.props.network === null){
+            return;
+        }
+
+        var url = providers[networkData[this.props.network.toString()].chainName].url
+
+        await this.props.changeProvider(null, {value: url});
     }
     
     copyAccount = () =>{
@@ -452,22 +525,54 @@ class Display extends Component{
     render(){
         return(
             <div id="display">
-                <div id="compHeader"> <button id="back" onClick ={this.props.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div id="linkButton">Display</div></Header> </div>
+                <div id="compHeader"> <button id="back" onClick ={this.props.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Display</div></Header> </div>
                 <div id ="networkDropdown">
                     <Dropdown button selection placeholder={this.props.providerPlaceholder} text={this.props.providerText} value={this.props.providerValue} options = {this.props.providers} onChange={this.props.changeProvider}></Dropdown>
                     <Icon name="globe"/>
                 </div ><br/>
                 <Divider />
-                <Dropdown button selection placeholder={this.props.accountPlaceholder} options ={this.props.accounts} onChange = {this.props.changeAccount}/>
+                <Dropdown button selection placeholder={this.props.accountPlaceholder} options ={this.props.walletaccounts} onChange = {this.props.changeAccount}/>
                 <Popup content="Copied!" on='click' position="top right" offset={[20,10]} trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/><br/><br/>
                 <Image src = {this.props.assetImage} size = "mini" circular/>
                 <Header inverted>{this.props.balance} {this.props.asset}</Header>
                 <Button secondary onClick={this.props.sendPrompt}>Send</Button>
                 <Popup on ='click' trigger = {<Button secondary onClick={this.updateQr}>Receive</Button>} content = {
-                    <Image src = {this.state.qrCode} size="large"/> 
+                    <div>
+                        <Image src = {this.state.qrCode} size="large"/>
+                        <div id="receiveAddress">{this.props.account} &emsp; <Popup content="Copied!" on='click' position="top right" offset={[20,10]} trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/></div>
+                    </div>
                 } />
             </div>
         ) 
+    }
+}
+
+class About extends Component{
+    constructor(props)
+    {
+        super()
+        this.props = props
+    }
+
+    render(){
+        return(
+            <div id="about">
+                <div id="compHeader"> <button id="back" onClick ={this.props.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">About</div></Header> </div>
+                <h3>About Hot Wallet.</h3>
+                <Container textAlign="left" style={{"marginTop": "1vh"}}>
+                    &emsp;The app you are interacting with is called Hot Wallet which provides seamless blockchain interactions. 
+                    One of the limiting factors of utilizing blockchains is the transaction based model where each operation a user wants to make must be created in a transaction to be posted on chain. 
+                    Wallets which interact with EVM chains today prioritize security creating a slow transaction acceptance model and makes applications such as social media less appealing. 
+                    Hot wallet enables users to bypass the transaction acceptance process on the Ratio Labs webpage enabling user friendly interactions. 
+                    The Ratio Labs webpage being deployed on IPFS ensures that the same webpage can be accessed each time mitigating risk of unintended transaction sequences.
+                </Container>
+                <Divider/>
+                <div>
+                    <h3>How it works.</h3>
+                    <img src={diagram} id="diagram"/>
+                </div>
+            </div>
+        );
     }
 }
 
@@ -494,15 +599,19 @@ class Unlock extends Component{
     render(){
         return(
             <div id="unlock">
-                <Image src={fire} size="tiny"/>
+                <div id="compHeader"> <button id="back" onClick ={this.props.handleClose}><Icon size="large" name = "arrow left"/></button></div>
+                <Image src={flame} size="small"/>
                 <Header inverted>Unlock Wallet</Header><br/>
                 <Divider/>
-                <div  id="leftAlign">
+                <div id="leftAlign">
                     <Form onSubmit={() => this.props.unlockWallet(this.state.password)} inverted>
                         <Form.Input label='Password:' placeholder='Passsword' type='password' onChange={this.setPassword} />
                         <div>{this.props.error}<br/><br/></div>
-                        <Button color='black' onClick={() => this.props.unlockWallet(this.state.password)}><div id="linkButton">Unlock</div></Button><br/><br/><br/><br/>
-                        <button id="linkButton" onClick={() => this.props.importWallet()}><b><u>Import</u> wallet using mnemonic.</b></button>
+                        <Button color='black' onClick={() => this.props.unlockWallet(this.state.password)}><div className="linkButton">Unlock</div></Button><br/><br/><br/><br/>
+                        <div id="unlockBottom">
+                            <button className="linkButton" onClick={() => this.props.importWallet()}><b><u>Import</u> wallet using mnemonic.</b></button> 
+                            <button className="linkButton" id="aboutButton" onClick={() => this.props.aboutPrompt()}><b>About</b></button>
+                        </div>
                     </Form>
                 </div>
             </div>
@@ -536,7 +645,7 @@ class Import extends Component{
         return(
             <div id = "import">
                 <div id ="leftAlign">
-                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div id="linkButton">Import</div></Header> </div>
+                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Import</div></Header> </div>
                     <Header inverted size="small">Import wallet using mnemonic.</Header><br/><br/>
                     <Form inverted onSubmit={this.methods.setWallet}>
                         <Form.Input label="Mnemonic Phrase:" type={this.state.type} onChange={this.methods.setMnemomnic}/>
@@ -581,7 +690,7 @@ class Create extends Component{
         return(
             <div id="createWallet">
                 <div id="leftAlign">
-                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div id="linkButton">Create</div></Header> </div><br/>
+                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Create</div></Header> </div><br/>
                     Mnemonic: <br/>
                     <Popup content="Copied!" on='click' position="top right"
                     trigger={<Segment inverted onClick={() => this.copyMnemonic()} id="MnemonicText">

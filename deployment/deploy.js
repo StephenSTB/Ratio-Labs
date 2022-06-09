@@ -210,7 +210,6 @@ deploy = async() =>{
 
             deployedContracts[args[0]]["PolyCards"][nft] = {address: polyCard.address, baseURI: uri};
         }
-
     }
 
     //console.log(deployedContracts);
