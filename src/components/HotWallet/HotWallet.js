@@ -26,7 +26,7 @@ import QRCode from 'qrcode';
 
 import { QrReader } from 'react-qr-reader';
 
-import QrScanner from '../../../node_modules/qr-scanner/qr-scanner.min.js';
+//import QrScanner from  '../../../node_modules/qr-scanner/qr-scanner.min.js';
 
 import providers from "../../data/Providers.json"
 
@@ -381,7 +381,7 @@ class Send extends Component{
         super();
         this.props = props;
         this.state = {asset: null, recipient: null, recipientPlaceholder: "0xCA7...Cd63", amount: null, error: "",
-                      qrScanner: ""}
+                      qrScanner: "" , changeRecipientElem: <video id="videoElem"></video>, scanQr: false}
         
     }
 
@@ -436,38 +436,51 @@ class Send extends Component{
     }
 
     scanQr = () =>{
-        //(videoElem)
-        //this.qrScaner = new QrScanner(videoElem, result => console.log('decoded qr code:', result));
-
-        var qrScanner =<>
-                        <QrReader
-                            onResult={(result, error) => {
-                                if (!!result) {
-                                    this.setState({receipt: result?.text});
-                                }
-                                if (!!error) {
-                                console.info(error);
-                                }
-                            }}
-                            style={{ width: '100%' }}
-                        />
-                        <p>{this.state.data}</p>
-                    </>
-        this.setState({qrScanner})
+        var scanQr = true
+        
+        this.setState({scanQr});
+       
     }
 
     render(){
         var sendButton = this.state.sending ? <Button secondary loading>Send</Button>: <Button secondary onClick={this.send}>Send</Button>
+
+        const QrScanner = (props) => {
+            const [data, setData] = useState('No result');
+          
+            return (
+              <>
+                <QrReader
+                  onResult={(result, error) => {
+                    if (!!result) {
+                      var  result = result?.text;
+                      console.log(result)
+                      setData(result?.text);
+                      this.setState({result})
+                    }
+          
+                    if (!!error) {
+                      console.info(error);
+                    }
+                  }}
+                  style={{ width: '100%' }}
+                />
+                <p>{data}</p>
+              </>
+            );
+          };
+        
+
         return(
             <div id = "send">
                 <div id='leftAlign'>
                     <div id="compHeader"> <button id="back" onClick ={this.props.back}><Icon size="large" name = "arrow left"/></button> <Header color="blue">Send {this.state.asset}</Header> </div>
                     <Divider/>
+                    {this.state.scanQr ? <QrScanner /> : <div />}
                     <Form inverted>
                         <Form.Input label="Recipient:" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}>
                             <input />
                             <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode"/></button></Label>  
-                            {this.state.qrScaner}
                         </Form.Input>
                         <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
                             <input />
@@ -508,7 +521,10 @@ class Display extends Component{
     
     copyAccount = () =>{
         //console.log(this.state.account)
+
         navigator.clipboard.writeText(this.props.account);
+        
+        
     }
 
     updateQr = () =>{
@@ -536,10 +552,10 @@ class Display extends Component{
                 <Image src = {this.props.assetImage} size = "mini" circular/>
                 <Header inverted>{this.props.balance} {this.props.asset}</Header>
                 <Button secondary onClick={this.props.sendPrompt}>Send</Button>
-                <Popup on ='click' trigger = {<Button secondary onClick={this.updateQr}>Receive</Button>} content = {
+                <Popup on ='click' position="top right" offset={[100,10]} trigger = {<Button secondary onClick={this.updateQr}>Receive</Button>} content = {
                     <div>
-                        <Image src = {this.state.qrCode} size="large"/>
-                        <div id="receiveAddress">{this.props.account} &emsp; <Popup content="Copied!" on='click' position="top right" offset={[20,10]} trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/></div>
+                        <Image src = {this.state.qrCode} size="medium"/>
+                        <div id="receiveAddress">{this.props.account} &emsp; <Popup content="Copied!" on='click'  trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/></div>
                     </div>
                 } />
             </div>
