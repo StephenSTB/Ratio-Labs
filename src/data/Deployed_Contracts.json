@@ -1,0 +1,12 @@
+{
+    "Ganache": {
+        "NFTProtocol": {
+            "address": "0xA6774c3baB0E8f74A9657862D39313C9443F20C7"
+        }
+    },
+    "Mumbai": {
+        "NFTProtocol": {
+            "address": "0xCE24A5519EA7607A958e3103E3D83cEb6e4e784D"
+        }
+    }
+}

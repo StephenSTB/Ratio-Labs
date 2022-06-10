@@ -466,7 +466,7 @@ class Send extends Component{
                     <Form inverted>
                         <Form.Input label="Recipient:" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}>
                             <input />
-                            <Label id = "assetLabel"><button id="qrButton" onClick={() => this.scanQr()}><Icon name="qrcode"/></button></Label>  
+                            <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode"/></button></Label>  
                             {this.state.qrScaner}
                         </Form.Input>
                         <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
@@ -701,7 +701,7 @@ class Create extends Component{
                         <Form.Input label='Password:' placeholder='Passsword' type='password' onChange={this.methods.setPasswordOne} />
                         <Form.Input label='Confirm Password:' placeholder='Confirm Password' type='password' onChange={this.methods.setPasswordTwo} />
                         <div>{this.props.error}<br/><br/></div>
-                        <Button color="black" onClick={() => this.methods.setWallet}>Create Wallet</Button>
+                        <Button color="black" onClick={this.methods.setWallet}>Create Wallet</Button>
                     </Form>
                 </div> 
             </div>

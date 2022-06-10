@@ -30,7 +30,7 @@ yarn-error.log*
 .secret
 
 # providers
-/src/data
+/src/data/Providers.json
 
 /development/providers.json
 

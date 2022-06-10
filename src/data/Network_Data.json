@@ -1,0 +1,44 @@
+{
+    "137": {
+        "chainId": "0x89",
+        "chainName": "Polygon",
+        "rpcUrls": [
+            "https://rpc-mainnet.maticvigil.com/"
+        ],
+        "nativeCurrency": {
+            "name": "Matic",
+            "symbol": "MATIC",
+            "decimals": 18
+        },
+        "blockExplorerUrls": [
+            "https://explorer-mainnet.maticvigil.com/"
+        ]
+    },
+    "1337": {
+        "chainId": "0x539",
+        "chainName": "Ganache",
+        "rpcUrls": [
+            "http://172.21.128.223:8545"
+        ],
+        "nativeCurrency": {
+            "name": "Ganache",
+            "symbol": "ETH",
+            "decimals": 18
+        }
+    },
+    "80001": {
+        "chainId": "0x13881",
+        "chainName": "Mumbai",
+        "rpcUrls": [
+            "https://rpc-mumbai.maticvigil.com"
+        ],
+        "nativeCurrency": {
+            "name": "Matic",
+            "symbol": "MATIC",
+            "decimals": 18
+        },
+        "blockExplorerUrls": [
+            "https://mumbai.polygonscan.com/"
+        ]
+    }
+}

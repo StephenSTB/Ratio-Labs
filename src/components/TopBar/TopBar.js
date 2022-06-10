@@ -4,7 +4,7 @@ import {Button, Menu, Image, Dimmer, Card, Header, Grid} from 'semantic-ui-react
 
 import { createMedia } from '@artsy/fresnel'
 
-import RatioSymbol from "../../logos/content/RatioSymbol2.svg";
+import RatioSymbol from "../../logos/content/RatioSymbolFull.png";
 
 import "./TopBar.css";
 
