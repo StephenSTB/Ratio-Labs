@@ -37,8 +37,14 @@
     align-items: flex-end;
 }
 
-#qrbutton{
-    
+#qrButton{
+    width: 100%;
+    height: 100%;
+    border: none !important;
+}
+
+#qrButton:hover{
+    cursor: pointer;
 }
 
 #sendBalance{
@@ -50,6 +56,7 @@
 #assetLabel{
     display: flex;
     align-items: center;
+    padding: none !important;
 }
 
 #networkDropdown{

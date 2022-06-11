@@ -26,8 +26,6 @@ import QRCode from 'qrcode';
 
 import { QrReader } from 'react-qr-reader';
 
-//import QrScanner from  '../../../node_modules/qr-scanner/qr-scanner.min.js';
-
 import providers from "../../data/Providers.json"
 
 import networkData from "../../data/Network_Data.json"
@@ -436,10 +434,7 @@ class Send extends Component{
     }
 
     scanQr = () =>{
-        var scanQr = true
-        
-        this.setState({scanQr});
-       
+        this.setState({scanQr : !this.state.scanQr});
     }
 
     render(){
@@ -453,10 +448,14 @@ class Send extends Component{
                 <QrReader
                   onResult={(result, error) => {
                     if (!!result) {
-                      var  result = result?.text;
-                      console.log(result)
-                      setData(result?.text);
-                      this.setState({result})
+                      
+                      if(!utils.isAddress(result?.text)){
+                        return;
+                      }
+                      var recipientInput = this.state.recipientInput;
+                      recipientInput.value = result?.text;
+
+                      this.scanQr();
                     }
           
                     if (!!error) {
@@ -478,9 +477,9 @@ class Send extends Component{
                     <Divider/>
                     {this.state.scanQr ? <QrScanner /> : <div />}
                     <Form inverted>
-                        <Form.Input label="Recipient:" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}>
-                            <input />
-                            <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode"/></button></Label>  
+                        <Form.Input label="Recipient:">
+                            <input id="recipientInput" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}/>
+                            <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode" size="large"/></button></Label>  
                         </Form.Input>
                         <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
                             <input />
