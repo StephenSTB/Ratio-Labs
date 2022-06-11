@@ -380,11 +380,14 @@ class Send extends Component{
         this.props = props;
         this.state = {asset: null, recipient: null, recipientPlaceholder: "0xCA7...Cd63", amount: null, error: "",
                       qrScanner: "" , changeRecipientElem: <video id="videoElem"></video>, scanQr: false}
-        
+    
     }
 
     componentDidMount = () =>{
-        this.setState({asset: "Matic"})
+        this.setState({asset: "Matic",
+        receiptInput:
+                    <input id="recipientInput" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}/>
+    })
         //this.props.account
     }
 
@@ -478,7 +481,7 @@ class Send extends Component{
                     {this.state.scanQr ? <QrScanner /> : <div />}
                     <Form inverted>
                         <Form.Input label="Recipient:">
-                            <input id="recipientInput" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}/>
+                            {this.state.recipientInput}
                             <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode" size="large"/></button></Label>  
                         </Form.Input>
                         <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
