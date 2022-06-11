@@ -385,7 +385,7 @@ class Send extends Component{
 
     componentDidMount = () =>{
         this.setState({asset: "Matic",
-        receiptInput:
+        recipientInput:
                     <input id="recipientInput" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}/>
     })
         //this.props.account
@@ -437,7 +437,7 @@ class Send extends Component{
     }
 
     scanQr = () =>{
-        this.setState({scanQr : !this.state.scanQr});
+        this.setState({scanQr : true});
     }
 
     render(){
@@ -449,16 +449,17 @@ class Send extends Component{
             return (
               <>
                 <QrReader
-                  onResult={(result, error) => {
+                  constraints = {{ "facingMode": 'environment' }}
+                  onResult={(result, error) => {    
                     if (!!result) {
-                      
-                      if(!utils.isAddress(result?.text)){
-                        return;
-                      }
-                      var recipientInput = this.state.recipientInput;
-                      recipientInput.value = result?.text;
 
-                      this.scanQr();
+                        var result = result?.text;
+                        console.log(result)
+                        if(!utils.isAddress(result)){
+                            return;
+                        }
+                        this.setState({recipientInput: <input id="recipientInput" placeholder={this.state.recipientPlaceholder} value={result} onChange={this.changeRecipient}/>,
+                                       scanQr:false})
                     }
           
                     if (!!error) {
@@ -467,7 +468,7 @@ class Send extends Component{
                   }}
                   style={{ width: '100%' }}
                 />
-                <p>{data}</p>
+                {/*<p>{data}</p>*/}
               </>
             );
           };
