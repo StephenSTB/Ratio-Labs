@@ -60,7 +60,8 @@
   },
   "scripts": {
     "dev": "run-p start webrtc",
-    "start": "CHOKIDAR_USEPOLLING=true BROWSER=chrome HTTPS=true react-scripts start",
+    "start": "CHOKIDAR_USEPOLLING=true BROWSER=chrome react-scripts start",
+    "startHTTPS": "CHOKIDAR_USEPOLLING=true BROWSER=chrome HTTPS=true react-scripts start",
     "build": "BROWSER=chrome react-scripts -max-old-space-size=4096 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

@@ -14,7 +14,7 @@ import metamask from "../../logos/wallet/MetaMask.png";
 
 import coinbase from "../../logos/wallet/Coinbase.png";
 
-import flame from "../../logos/wallet/flameR.gif";
+import flame from "../../logos/wallet/flame.gif";
 
 import HotWallet from "../HotWallet/HotWallet";
 
@@ -37,8 +37,13 @@ class TopBar extends Component{
     constructor(props){
         super();
         this.props = props;
+        this.wallet = this.props.wallet;
         this.state = {dim: false, loadWallet:false, dimP: false, menuActive: false}
         this.handleClose = this.handleClose.bind(this)
+    }
+
+    componentDidUpdate(){
+        this.wallet = this.props.wallet;
     }
 
     handleOpen = () =>{
@@ -58,19 +63,19 @@ class TopBar extends Component{
     }
 
     changeProvider = async (network) => {
-       
-        if(!this.props.unlocked){
-            await this.props.updateWeb3(null)
+        if(!this.wallet.unlocked){
+            await this.props.updateWeb3()
         }
         else{
-            await this.props.setProvider(this.props.web3, network)
+            this.wallet.changeProvider(network)
+            await this.props.updateWallet(this.wallet)
         }
         this.setState({dimP:false})
     }
 
     getWallet = () =>{
        return(this.state.loadWallet ? 
-                <HotWallet updateWeb3 = {this.props.updateWeb3} handleClose={this.handleClose} {...this.state} {...this.props}/>
+                <HotWallet updateWallet = {this.props.updateWallet} handleClose={this.handleClose} {...this.state} {...this.props}/>
                 : 
                 <Card.Content>
                     <Card.Content>

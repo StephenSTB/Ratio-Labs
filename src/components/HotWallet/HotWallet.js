@@ -1,16 +1,8 @@
-import React, { Component, useState } from "react";
+import React, {Component} from "react";
 
-import {Button, Icon, Segment, Input, Popup, Card, Form, Image, Header, Dropdown, Divider, Label, Loader, Container} from 'semantic-ui-react';
-
-import HDWalletProvider from "@truffle/hdwallet-provider";
+import {Card} from 'semantic-ui-react';
 
 import "./HotWallet.css";
-
-import Web3 from 'web3';
-
-import * as bip39 from 'bip39';
-
-import flame from "../../logos/wallet/flameR.gif";
 
 import polygonImage from "../../logos/wallet/chains/polygonSymbol.jpg";
 
@@ -20,23 +12,19 @@ import ganacheImage from "../../logos/wallet/chains/ganache.png";
 
 import kovanImage from "../../logos/wallet/chains/kovan.png";
 
-import diagram from "../../logos/wallet/about/HotWalletDiagram.png";
+import CreatePrompt from "./components/CreatePrompt"
 
-import QRCode from 'qrcode';
+import Create from "./components/Create"
 
-import { QrReader } from 'react-qr-reader';
+import Import from "./components/Import";
 
-import providers from "../../data/Providers.json"
+import Unlock from "./components/Unlock";
 
-import networkData from "../../data/Network_Data.json"
+import Display from "./components/Display";
 
-var web3;
+import Send from "./components/Send";
 
-var provider;
-
-var utils = Web3.utils;
-
-const CryptoJS = require("crypto-js");
+import About from "./components/About";
 
 var networkSymbols = {
     "Polygon" : polygonImage,
@@ -53,10 +41,9 @@ class HotWallet extends Component{
         this.state = {CreateImport: false, Create: false , Import: false, Unlock: false, Display: false, Send: false, 
                       passwordOne: "", passwordTwo: "", mnemonic: "",
                       error: "",
-                      walletaccounts: null, account: null, accountPlaceholder: null, balance: null,
+                      walletAccounts: null, account: null, accountPlaceholder: null, balance: null,
                       providers: null, providerPlaceholder: null,
                       asset: null, assetImage: null,
-
                      }
         this.createWallet = this.createWallet.bind(this);
         this.setPasswordOne = this.setPasswordOne.bind(this)
@@ -70,7 +57,7 @@ class HotWallet extends Component{
         this.changeProvider = this.changeProvider.bind(this)
         this.sendPrompt = this.sendPrompt.bind(this);
         this.aboutPrompt = this.aboutPrompt.bind(this)
-        this.initializeProviders = this.initializeProviders.bind(this);
+        this.initializeNetworkData = this.initializeNetworkData.bind(this);
         this.initializeWallet = this.initializeWallet.bind(this);
         this.changeProvider = this.changeProvider.bind(this);
         this.test = false;
@@ -80,28 +67,30 @@ class HotWallet extends Component{
 
         //console.log(this.props.loadWallet)
 
-        console.log(this.props);
+        this.wallet = this.props.wallet;
+
+        //console.log(this.props);
 
         if(this.test){
-            await this.unlockWallet("password1234")
+            //await this.unlockWallet("password1234")
+            this.wallet.unlockWallet("password1234", "80001")
             return
         }
-        
-        var wallet = localStorage.getItem("hotWallet");
-        //console.log("wallet: " + wallet);
 
-        if(wallet === null){
-            //console.log("wallet was null create new wallet?")
+        var cookie = this.wallet.retrieve();
+        //console.log(`cookie: ${cookie}`);
 
+        if(cookie === null){
             this.setState({CreateImport: true})
             return;
         }
         else{
             //localStorage.removeItem("hotWallet")
-            if(this.props.unlocked){
+            if(this.wallet.unlocked){
+                /*
                 web3 = this.props.web3;
                 provider = this.props.web3.currentProvider;
-                console.log(`Hotwallet provider : ${provider.chainId}`)
+                console.log(`Hotwallet provider : ${provider.chainId}`)*/
                 this.setState({Display: true})
                 return;
             }
@@ -113,33 +102,11 @@ class HotWallet extends Component{
     }
 
     componentDidUpdate = (prevProps) =>{
-
-        if(prevProps === undefined){
-            return
-        }
-
-        if(this.props.network === null || prevProps.network === null){
-            return;
-        }
-
-        if(prevProps.network.toString() !== this.props.network.toString()){
-            console.log(prevProps.network)
-            console.log(this.props.network)
-
-            var url = providers[networkData[this.props.network.toString()].chainName].url
-
-            console.log(url)
-
-            this.changeProvider(null, {value: url })
-        }
-
+        this.wallet = this.props.wallet;
     }
-
+    
     createWallet = () =>{
-        //console.log("create Wallet");
-        var mnemonic = bip39.generateMnemonic();
-
-        this.setState(()=>({CreateImport: false, Create: true, mnemonic}))
+        this.setState(()=>({CreateImport: false, Create: true, mnemonic: this.wallet.createMnemonic()}))
     }
     
     importWallet = () =>{
@@ -147,7 +114,6 @@ class HotWallet extends Component{
     }
 
     setMnemomnic = async (event) =>{
-        //console.log(event.target.value)
         this.setState(() =>({mnemonic: event.target.value}))
     }
 
@@ -163,166 +129,117 @@ class HotWallet extends Component{
         var passwordOne = this.state.passwordOne;
         var passwordTwo = this.state.passwordTwo;
         var mnemonic = this.state.mnemonic;
-
         var error = "";
 
         if(passwordOne.toString().length < 12 || passwordTwo.toString().length < 12){
-            error = "Password length must be greater than 11 characters \n \n"   
+            error = "Password length must be greater than 11 characters. \n \n"   
             this.setState(() => ({error}));
             return
         }
         if(passwordOne !== passwordTwo){
             error = "Passwords do not match. \n \n"
             this.setState(() => ({error}));
-            return;     
+            return;
         }
         console.log(mnemonic)
 
-        var validMnemonic = bip39.validateMnemonic(mnemonic);
+        this.wallet.setWallet(mnemonic, passwordOne);
 
-        if(!validMnemonic){
-            error = "Invalid Mnemonic Phrase. \n \n"
-            this.setState(() => ({error}));
-            return;
-        }
-
-        var encryptedMnemonic = CryptoJS.AES.encrypt(mnemonic, passwordOne).toString();
-
-        var hmac =  CryptoJS.HmacSHA256(encryptedMnemonic, CryptoJS.SHA256(passwordOne)).toString();
-        
-        //console.log(encryptedMnemonic);
-
-        //console.log(hmac);
-
-        localStorage.setItem("hotWallet", JSON.stringify({encryptedMnemonic: encryptedMnemonic, hmac: hmac}));
-
-        var wallet = localStorage.getItem("hotWallet");
-
-        console.log(JSON.stringify(wallet));
+        console.log(JSON.stringify(this.wallet.retrieve()));
 
         this.setState(()=>({ CreateImport: false, Create: false, Import: false, Display: false, Unlock: true, mnemonic: "", error: ""}))
     }
 
     unlockWallet = async (password) =>{
-        //if(this.state.password)
         console.log("unlock");
-        var wallet = JSON.parse(localStorage.getItem('hotWallet'));
 
-        //console.log(wallet["encryptedMnemonic"])
+        var network = this.props.network
 
-        // verify hmac
-        var vhmac = CryptoJS.HmacSHA256(wallet["encryptedMnemonic"], CryptoJS.SHA256(password)).toString();
-
-        //console.log(vhmac);
-        //console.log(wallet["hmac"]);
-
-        if(wallet["hmac"] !== vhmac){
-            var error = "Incorrect Password or Wallet. Try password again or import wallet."
-            this.setState(()=>({error}))
-            return;
+        if(network === null){
+            network = "80001"
         }
 
-        var decryptedMnemonic = CryptoJS.AES.decrypt(wallet["encryptedMnemonic"], password).toString(CryptoJS.enc.Utf8)
-        //console.log(decryptedMnemonic);
-
-        /*
-        var seed = bip39.mnemonicToSeeddecrypted(decryptedMnemonic)
-
-        var accountKey = HDKey.fromMasterSeed(Buffer.from(seed, 'hex'))
-
-        var account = web3.eth.accounts.privateKeyToAccount(accountKey._privateKey)*/
-
-        this.initializeProviders()
-
-        var network = this.props.network !== null ? this.props.network: "80001"
-
-        provider = new HDWalletProvider({mnemonic: decryptedMnemonic, providerOrUrl: providers[networkData[network].chainName].url})
-
-        web3  = new Web3(provider);
-
-        //console.log(provider);
+        this.wallet.unlockWallet(password, network);
 
         this.setState({Display: true, Unlock: false})
 
-        await this.initializeWallet()
-
-        this.props.updateWeb3(web3, this.state.account);
+        await this.props.updateWallet(this.wallet);
     }
 
     changeProvider = async (event, {value}) =>{
 
-        console.log(value)
+        this.wallet.changeProvider(value)
 
-        console.log(event)
-        
-        var pkey = []
-        for(var a in provider.wallets){
-            pkey.push(provider.wallets[a].privateKey.toString('hex'))
-        }
-
-        //console.log(key)
-
-        provider = new HDWalletProvider({privateKeys: pkey, providerOrUrl: value})
-
-        web3 = new Web3(provider)
-
-        await this.props.updateWeb3(web3, this.state.account);
+        await this.props.updateWallet(this.wallet);
 
         await this.retrieveInfo(this.state.account);
-
-        console.log(provider.chainId)
-        
-        this.setState({asset: networkData[provider.chainId.toString()].nativeCurrency.symbol , assetImage: networkSymbols[networkData[provider.chainId.toString()].chainName],
-                       providerText: networkData[provider.chainId.toString()].chainName , providerValue: value})
-
-        //console.log(provider)
-        
     }
 
-    initializeProviders = async () =>{
-        var prov = []
-        for(var a in providers){
-            prov.push({key: a, text: a, value: providers[a].url})
-        }
-        console.log(prov)
-
+    initializeNetworkData = async () =>{
+        var networks = []
+        var networkData = this.wallet.getNetworkData();
+        //console.log(networkData);
         var network = this.props.network !== null ? this.props.network : "80001"
 
-        this.setState({providers: prov, providerPlaceholder: networkData[network].chainName, asset: providers[networkData[network].chainName].asset, assetImage: networkSymbols[networkData[network].chainName] })
+        console.log(network)
+        
+        var currentNetwork;
+
+        for(var n of networkData){
+            console.log(n);
+            if(n.id === network){
+                currentNetwork = n;
+            }
+            networks.push({key: n.name, text: n.name, value: n.id})
+        }
+
+        console.log(currentNetwork)
+
+        this.setState({networks, providerPlaceholder: currentNetwork.name, asset: currentNetwork.asset, assetImage: networkSymbols[currentNetwork.name]})
     }
 
-    initializeWallet = async () =>{
-        var walletaccounts = await web3.eth.getAccounts();
-        console.log(walletaccounts)
 
-        var account = walletaccounts[0];
+    initializeWallet = async () =>{
+
+        var accounts = this.wallet.accounts;
+
+        //console.log(accounts)
+
+        var walletAccounts = []
+
+        var account = this.wallet.account;
         
-        for(var i=0; i< walletaccounts.length; i++){
-            var text = walletaccounts[i].slice(0,5) + "..." + walletaccounts[i].slice(38)
-            walletaccounts[i] = {key: walletaccounts[i], text, value: walletaccounts[i]}
+        for(var i=0; i < accounts.length; i++){
+            var text = accounts[i].slice(0,5) + "..." + accounts[i].slice(38)
+            walletAccounts[i] = ({key: accounts[i], text, value: accounts[i]})
         }
 
         var accountPlaceholder = account.slice(0,5) + "..." + account.slice(38);
 
-        this.setState({walletaccounts, account, accountPlaceholder})
+        //console.log(walletAccounts)
+
+        console.log(this.wallet.accounts)
+
+        this.setState({walletAccounts, account, accountPlaceholder})
 
         this.retrieveInfo(account);
     }
 
     changeAccount = async (event, {value}) =>{
-        //console.log(value)
+
+        this.wallet.changeAccount(value)
+
         this.setState(() => ({account: value}))
-        await this.retrieveInfo(value)
-        
-        this.props.updateWeb3(web3, value);
+
+        await this.retrieveInfo()
+
+        this.props.updateWallet(this.wallet);
     }
 
-    retrieveInfo = async(account) =>{
-        //console.log(account)
+    retrieveInfo = async() =>{
+        var balance = await this.wallet.getBalance();
 
-        var balance = await web3.eth.getBalance(account);
-
-        balance = Number(utils.fromWei(balance, "ether")).toFixed(8);
+        balance = Number(this.wallet.utils.fromWei(balance, "ether")).toFixed(8);
 
         this.setState({balance})
     }
@@ -336,7 +253,7 @@ class HotWallet extends Component{
     }
 
     backUnlock = () =>{
-        if (localStorage.getItem("hotWallet") === null)
+        if (this.wallet.retrieve() === null)
             this.setState({CreateImport: true, Import: false})
         else
             this.setState({Unlock: true, Import: false, Display: false, About: false})
@@ -346,6 +263,11 @@ class HotWallet extends Component{
         this.setState({About: true, Unlock: false})
     }
 
+    methods = () =>{
+        return {
+            
+        }
+    }
     render(){
         var content = this.state.CreateImport ? <CreatePrompt createWallet = {this.createWallet} importWallet = {this.importWallet}/> :
                       this.state.Create ? <Create methods = {{setWallet : this.setWallet,
@@ -361,9 +283,10 @@ class HotWallet extends Component{
                                                             }} {...this.state}/> :
                       this.state.Unlock ? <Unlock unlockWallet = {this.unlockWallet} importWallet = {this.importWallet} aboutPrompt={this.aboutPrompt} handleClose={this.props.handleClose} {...this.state}  /> : 
                       this.state.Display? <Display sendPrompt = {this.sendPrompt} changeAccount = {this.changeAccount} changeProvider= {this.changeProvider}
-                                                     backUnlock={this.backUnlock} initializeProviders = {this.initializeProviders} 
+                                                     initializeNetworkData={this.initializeNetworkData}
+                                                     backUnlock={this.backUnlock}
                                                      initializeWallet = {this.initializeWallet} {...this.state} {...this.props}/> : 
-                      this.state.Send ? <Send back = {this.backDisplay} retrieveInfo = {this.retrieveInfo}  {...this.state}/> :
+                      this.state.Send ? <Send back = {this.backDisplay} retrieveInfo = {this.retrieveInfo}  {...this.state} {...this.props}/> :
                       this.state.About ? <About backUnlock={this.backUnlock}/> : <div></div>;
 
         return(
@@ -373,362 +296,5 @@ class HotWallet extends Component{
             )    
     }
 }
-
-class Send extends Component{
-    constructor(props){
-        super();
-        this.props = props;
-        this.state = {asset: null, recipient: null, recipientPlaceholder: "0xCA7...Cd63", amount: null, error: "",
-                      qrScanner: "" , changeRecipientElem: <video id="videoElem"></video>, scanQr: false}
-    
-    }
-
-    componentDidMount = () =>{
-        this.setState({asset: "Matic",
-        recipientInput:
-                    <input id="recipientInput" placeholder={this.state.recipientPlaceholder} onChange={this.changeRecipient}/>
-    })
-        //this.props.account
-    }
-
-    changeRecipient = async(event) =>{
-        this.setState({recipient: event.target.value});
-    }
-
-    changeAmount = async (event) =>{
-        console.log(event.target.value);
-        this.setState({amount: event.target.value})
-    }
-
-    setAmount = () =>{
-        this.setState({amount: this.props.balance})
-    }
-
-    send = async () =>{
-        this.setState({error:""})
-        if(!utils.isAddress(this.state.recipient)){
-            this.setState({error: "Invaild recipient address given. Cannot send transaction."})
-            return;
-        }
-
-        if(!Number(this.state.amount) || !(Number(this.state.amount) < Number(this.props.balance))){
-            //console.log(this.state.amount)
-            this.setState({error: "Invalid amount entered."})
-            return
-        }
-
-        var tx = {
-            from: this.props.account, 
-            to: this.state.recipient,
-            value: utils.toWei(this.state.amount.toString(), "ether")
-        }
-
-        console.log(tx);
-
-        this.setState({sending:true})
-
-        var receipt =  await web3.eth.sendTransaction(tx)
-
-        console.log(receipt)
-
-        this.setState({sending:false})
-
-        this.props.retrieveInfo(this.props.account);
-    }
-
-    scanQr = () =>{
-        this.setState({scanQr : true});
-    }
-
-    render(){
-        var sendButton = this.state.sending ? <Button secondary loading>Send</Button>: <Button secondary onClick={this.send}>Send</Button>
-
-        const QrScanner = (props) => {
-            const [data, setData] = useState('No result');
-          
-            return (
-              <>
-                <QrReader
-                  constraints = {{ "facingMode": 'environment' }}
-                  onResult={(result, error) => {    
-                    if (!!result) {
-
-                        var result = result?.text;
-                        console.log(result)
-                        if(!utils.isAddress(result)){
-                            return;
-                        }
-                        this.setState({recipientInput: <input id="recipientInput" placeholder={this.state.recipientPlaceholder} value={result} onChange={this.changeRecipient}/>,
-                                       scanQr:false})
-                    }
-          
-                    if (!!error) {
-                      console.info(error);
-                    }
-                  }}
-                  style={{ width: '100%' }}
-                />
-                {/*<p>{data}</p>*/}
-              </>
-            );
-          };
-        
-
-        return(
-            <div id = "send">
-                <div id='leftAlign'>
-                    <div id="compHeader"> <button id="back" onClick ={this.props.back}><Icon size="large" name = "arrow left"/></button> <Header color="blue">Send {this.state.asset}</Header> </div>
-                    <Divider/>
-                    {this.state.scanQr ? <QrScanner /> : <div />}
-                    <Form inverted>
-                        <Form.Input label="Recipient:">
-                            {this.state.recipientInput}
-                            <Label id = "assetLabel"><button id="qrButton" onClick={this.scanQr}><Icon name="qrcode" size="large"/></button></Label>  
-                        </Form.Input>
-                        <Form.Input defaultValue={this.state.amount} onChange={this.changeAmount} label={<div className ="amountLabel">Amount: <button id="sendBalance" onClick={this.setAmount}><Icon name="balance"/>{this.props.balance}</button></div>} placeholder="0.000000">    
-                            <input />
-                            <Label id = "assetLabel">{this.state.asset}</Label>
-                        </Form.Input>
-                        <div>{this.state.error}</div><br/>
-                        {sendButton}
-                    </Form>
-                </div>
-            </div>
-        );
-    }
-}
-
-class Display extends Component{
-    constructor(props){
-        super();
-        this.props = props;
-        this.state = {accounts: null, account: null, balance: null};
-    }
-    
-    componentDidMount = async () =>{
-        //web3.eth.getAccounts().then(console.log)
-        console.log("display mount")
-        
-        await this.props.initializeProviders();
-
-        await this.props.initializeWallet()
-
-        if(this.props.network === null){
-            return;
-        }
-
-        var url = providers[networkData[this.props.network.toString()].chainName].url
-
-        await this.props.changeProvider(null, {value: url});
-    }
-    
-    copyAccount = () =>{
-        //console.log(this.state.account)
-
-        navigator.clipboard.writeText(this.props.account);
-        
-        
-    }
-
-    updateQr = () =>{
-        QRCode.toDataURL(this.props.account)
-        .then(url => {
-            console.log(url)
-            this.setState({qrCode: url})
-        })
-        .catch(err => {
-            console.error(err)
-        })
-    } 
-
-    render(){
-        return(
-            <div id="display">
-                <div id="compHeader"> <button id="back" onClick ={this.props.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Display</div></Header> </div>
-                <div id ="networkDropdown">
-                    <Dropdown button selection placeholder={this.props.providerPlaceholder} text={this.props.providerText} value={this.props.providerValue} options = {this.props.providers} onChange={this.props.changeProvider}></Dropdown>
-                    <Icon name="globe"/>
-                </div ><br/>
-                <Divider />
-                <Dropdown button selection placeholder={this.props.accountPlaceholder} options ={this.props.walletaccounts} onChange = {this.props.changeAccount}/>
-                <Popup content="Copied!" on='click' position="top right" offset={[20,10]} trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/><br/><br/>
-                <Image src = {this.props.assetImage} size = "mini" circular/>
-                <Header inverted>{this.props.balance} {this.props.asset}</Header>
-                <Button secondary onClick={this.props.sendPrompt}>Send</Button>
-                <Popup on ='click' position="top right" offset={[100,10]} trigger = {<Button secondary onClick={this.updateQr}>Receive</Button>} content = {
-                    <div>
-                        <Image src = {this.state.qrCode} size="medium"/>
-                        <div id="receiveAddress">{this.props.account} &emsp; <Popup content="Copied!" on='click'  trigger = {<Icon name="copy" onClick={this.copyAccount}/>}/></div>
-                    </div>
-                } />
-            </div>
-        ) 
-    }
-}
-
-class About extends Component{
-    constructor(props)
-    {
-        super()
-        this.props = props
-    }
-
-    render(){
-        return(
-            <div id="about">
-                <div id="compHeader"> <button id="back" onClick ={this.props.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">About</div></Header> </div>
-                <h3>About Hot Wallet.</h3>
-                <Container textAlign="left" style={{"marginTop": "1vh"}}>
-                    &emsp;The app you are interacting with is called Hot Wallet which provides seamless blockchain interactions. 
-                    One of the limiting factors of utilizing blockchains is the transaction based model where each operation a user wants to make must be created in a transaction to be posted on chain. 
-                    Wallets which interact with EVM chains today prioritize security creating a slow transaction acceptance model and makes applications such as social media less appealing. 
-                    Hot wallet enables users to bypass the transaction acceptance process on the Ratio Labs webpage enabling user friendly interactions. 
-                    The Ratio Labs webpage being deployed on IPFS ensures that the same webpage can be accessed each time mitigating risk of unintended transaction sequences.
-                </Container>
-                <Divider/>
-                <div>
-                    <h3>How it works.</h3>
-                    <img src={diagram} id="diagram"/>
-                </div>
-            </div>
-        );
-    }
-}
-
-class Unlock extends Component{
-
-    //var decryptedMnemonic = CryptoJS.AES.decrypt(encryptedMnemonic, this.state.password).toString(CryptoJS.enc.Utf8);
-        //console.log(decryptedMnemonic)
-
-    constructor(props){
-        super();
-        this.props = props;
-        this.state = {password: "", error:""}
-    }
-
-    componentDidMount() {
-        //console.log("Unlock")
-        //var encryptedMnemonic = localStorage.getItem("hotWallet");
-    }
-
-    setPassword =  async (event) =>{
-        this.setState({password: event.target.value})
-    }
-
-    render(){
-        return(
-            <div id="unlock">
-                <div id="compHeader"> <button id="back" onClick ={this.props.handleClose}><Icon size="large" name = "arrow left"/></button></div>
-                <Image src={flame} size="small"/>
-                <Header inverted>Unlock Wallet</Header><br/>
-                <Divider/>
-                <div id="leftAlign">
-                    <Form onSubmit={() => this.props.unlockWallet(this.state.password)} inverted>
-                        <Form.Input label='Password:' placeholder='Passsword' type='password' onChange={this.setPassword} />
-                        <div>{this.props.error}<br/><br/></div>
-                        <Button color='black' onClick={() => this.props.unlockWallet(this.state.password)}><div className="linkButton">Unlock</div></Button><br/><br/><br/><br/>
-                        <div id="unlockBottom">
-                            <button className="linkButton" onClick={() => this.props.importWallet()}><b><u>Import</u> wallet using mnemonic.</b></button> 
-                            <button className="linkButton" id="aboutButton" onClick={() => this.props.aboutPrompt()}><b>About</b></button>
-                        </div>
-                    </Form>
-                </div>
-            </div>
-            )
-    }
-}
-
-class Import extends Component{
-
-    state = {type: "password"}
-
-    constructor(props){
-        super();
-        this.props = props;
-        this.methods = this.props.methods;
-    }
-
-    componentDidMount(){
-        //console.log(this.methods)
-    }
-
-    changeType = async (event) =>{
-        if(this.state.type === "password"){
-            this.setState({type: "text"})
-            return;
-        }
-        this.setState({type: "password"})
-    }
-
-    render(){
-        return(
-            <div id = "import">
-                <div id ="leftAlign">
-                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Import</div></Header> </div>
-                    <Header inverted size="small">Import wallet using mnemonic.</Header><br/><br/>
-                    <Form inverted onSubmit={this.methods.setWallet}>
-                        <Form.Input label="Mnemonic Phrase:" type={this.state.type} onChange={this.methods.setMnemomnic}/>
-                        <Form.Checkbox label = "Show Mnemonic." onChange={this.changeType}/><br/><br/>
-                        <Form.Input label="Password:" placeholder="Password" type='password' onChange={this.methods.setPasswordOne}/>
-                        <Form.Input label='Confirm Password:' placeholder='Confirm Password' type='password' onChange={this.methods.setPasswordTwo} />
-                        <div style={{color: "white"}}>{this.props.error}</div><br/><br/>
-                        <Button color="black" onClick={this.methods.setWallet}>Import Wallet</Button>
-                    </Form>
-                </div>
-            </div>
-        )
-    }
-}
-
-class CreatePrompt extends Component{
-
-    render(){
-        return(
-            <div id="createPrompt">
-                <p>Hot Wallet was not found. Create or import hot wallet.</p>
-                <Button color="black" onClick={this.props.createWallet}> Create </Button>
-                <Button color="black" onClick={this.props.importWallet}> Import </Button>
-            </div>
-            )
-    }
-}
-
-class Create extends Component{
-
-    constructor(props){
-        super();
-        this.props = props;
-        this.methods = this.props.methods;
-    }
-
-    copyMnemonic = () =>{
-        navigator.clipboard.writeText(this.props.mnemonic)
-    }
-
-    render(){
-        return(
-            <div id="createWallet">
-                <div id="leftAlign">
-                    <div id="compHeader"> <button id="back" onClick ={this.methods.backUnlock}><Icon size="large" name = "arrow left"/></button> <Header><div className="linkButton">Create</div></Header> </div><br/>
-                    Mnemonic: <br/>
-                    <Popup content="Copied!" on='click' position="top right"
-                    trigger={<Segment inverted onClick={() => this.copyMnemonic()} id="MnemonicText">
-                                <div>{this.props.mnemonic}</div>
-                                <div style={{'width': '100%', 'text-align': 'right'}}><Icon name="copy"/></div>
-                            </Segment>} />
-                    <Form inverted onSubmit={() => this.methods.setWallet}>
-                        <Form.Input label='Password:' placeholder='Passsword' type='password' onChange={this.methods.setPasswordOne} />
-                        <Form.Input label='Confirm Password:' placeholder='Confirm Password' type='password' onChange={this.methods.setPasswordTwo} />
-                        <div>{this.props.error}<br/><br/></div>
-                        <Button color="black" onClick={this.methods.setWallet}>Create Wallet</Button>
-                    </Form>
-                </div> 
-            </div>
-            )
-    }
-}
-
-
-export {CreatePrompt, Create, Import, Unlock, Display, Send}
 
 export default HotWallet

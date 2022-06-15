@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import 'semantic-ui-css/semantic.min.css';
 
-import {Card, Container, Segment, Button, Loader, Menu, Popup, Icon, Input, Divider, Form} from 'semantic-ui-react';
+import {Container, Segment, Button, Loader, Menu, Popup, Icon, Input, Divider, Form} from 'semantic-ui-react';
 
 import  "@google/model-viewer";
 
@@ -206,11 +206,11 @@ class Display extends Component{
                                     ))}
                                 </Menu>
                             </div>
-                            <Divider />
+                            <Divider className="nftDivider"/>
                             <div>
-                               <p id = "nftHeader">{nftObj.info._name} </p>
-                                <div>
-                                    {nftObj.details ? <Icon name="chevron up" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: false})}/> : <Icon name="chevron down" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: true})}/>}
+                                <div className="nftHeader">{nftObj.info._name} </div>
+                                <div className="nftDetails">
+                                    {nftObj.details ? <Icon name="chevron up" className="infoButton" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: false})}/> : <Icon name="chevron down" className="infoButton" onClick={() => this.updateNFT({nftIndex: index, mediaIndex: null, nftObj, section, details: true})}/>}
                                     {nftObj.details ? 
                                         <div>
                                             <Segment className="nftInfo" attached="bottom" >

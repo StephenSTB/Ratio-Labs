@@ -9,8 +9,6 @@ import deployedContracts from "../../data/Deployed_Contracts.json"
 
 import networkData from "../../data/Network_Data.json"
 
-import testnft from "./CryptoMonkeyRatioNFT.json";
-
 import * as nftGatewayAPI from "./nftGatewayAPI.js";
 
 import { MerkleTree } from 'merkletreejs';
@@ -18,7 +16,6 @@ import { MerkleTree } from 'merkletreejs';
 import * as keccak256 from 'keccak256';
 
 import * as mime from 'mime-types';
-import { concat } from "uint8arrays/concat";
 
 var gatewayApi;
 
@@ -59,8 +56,6 @@ class Create extends Component{
         gatewayApi = new nftGatewayAPI(host);
     
         this.addContent = this.addContent.bind(this);
-
-        
     }
 
     componentDidMount = async () =>{
@@ -70,7 +65,6 @@ class Create extends Component{
             return;   
         }
         
-       
         /*this.NFTProtocol.setProvider(this.props.web3.currentProvider)*/
 
         //console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
@@ -474,8 +468,6 @@ class Create extends Component{
 
             console.log(`NFT Vars: { name: ${this.state.name}, mintCount: ${this.state.maxMintCount}, mintCost: ${web3.utils.toWei(this.state.mintCost.toString(), "ether")}, claimValue: ${ web3.utils.toWei(claimValue.toString(),"ether")}, burnable: ${this.state.burnable} from: ${this.props.account}}}`);
 
-            console.log(this.RatioSingleNFT.currentProvider)
-
             var ratioNFT = await this.props.RatioSingleNFT.new(this.state.name, "RNFT", this.state.maxMintCount, web3.utils.toWei(this.state.mintCost.toString(), "ether"), web3.utils.toWei(claimValue.toString(), "ether"), this.state.burnable, {from: this.props.account});
             contentJSON["contract"] = ratioNFT.address;
             contentJSON["distributor"] = this.props.account;
@@ -483,7 +475,8 @@ class Create extends Component{
             this.setState({stepText: "Signing NFT..."});
 
             var contentHash = web3.utils.soliditySha3(JSON.stringify(contentJSON))
-            var signedContent = await web3.eth.personal.sign(contentHash, this.props.account)
+            console.log(web3.eth.personal)
+            var signedContent = await web3.eth.sign(contentHash, this.props.account) //this.wallet.unlocked ? wallet.sign(contentHash) : 
             //console.log(signedContent)
             var nftJSON = {}
             nftJSON["content"] = contentJSON;
@@ -503,6 +496,7 @@ class Create extends Component{
 
             this.setState({stepText: "Setting NFT Contract BaseURI..."});
 
+            /*
             if(!this.state.host){
                 await ratioNFT.setBaseURI(baseURI, false, protocolAddress, {from: this.props.account});
                 var displayFinalInfo = <Container id="finalContent" textAlign="left" style={{width: "750px"}}><p>Your NFT has been deployed to: {ratioNFT.address}</p><p>You can find the NFT content below or at: <a href={baseURI}>{baseURI}</a></p></Container>
@@ -510,7 +504,7 @@ class Create extends Component{
                 this.setState({stepText: "NFT Created!", displayFinalInfo, displayFinalContent})
                 this.props.setLoading(false);
                 return;
-            }
+            }*/
 
             var block = (await ratioNFT.setBaseURI(baseURI, true, protocolAddress, {from: this.props.account, value: web3.utils.toWei(".01", "ether")})).receipt.blockNumber;
 

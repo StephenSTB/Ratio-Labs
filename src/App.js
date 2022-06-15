@@ -1,24 +1,22 @@
 import React, { Component} from "react";
 
-import { createMedia } from '@artsy/fresnel';
-
 import 'semantic-ui-css/semantic.min.css';
+
+import './App.css';
 
 import Web3 from "web3";
 
-import './App.css';
+import {BrowserRouter} from "react-router-dom";
 
 import TopBar from "./components/TopBar/TopBar";
 
 import Main from "./components/Main/Main";
 
-import {BrowserRouter} from "react-router-dom";
-
 import networkData from "./data/Network_Data.json";
 
-import deployedContracts from "./data/Deployed_Contracts.json"
-
 import * as contract from "@truffle/contract";
+
+import deployedContracts from "./data/Deployed_Contracts.json"
 
 import RatioSingleNFT from './contracts/RatioSingleNFT.json';
 
@@ -34,14 +32,7 @@ import kovan from "./logos/wallet/chains/kovan.png";
 
 import * as IPFS from 'ipfs-core';
 
-const { MediaContextProvider, Media } = createMedia({
-  breakpoints: {
-    mobile: 0,
-    tablet: 768,
-    computer: 1024,
-  },
-})
-
+import Wallet from './components/HotWallet/Wallet.js'
 
 var images  = {
                   "80001": mumbai,
@@ -56,11 +47,10 @@ class App extends Component{
     super();
     this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false,
                     NFTProtocol: null, RatioSingleNFT: null,
-                    networkError: ""
-                    
+                    networkError: "",
                   }
     this.updateWeb3 = this.updateWeb3.bind(this);
-    this.setProvider = this.setProvider.bind(this);
+    this.updateWallet = this.updateWallet.bind(this);
     this.setLoading = this.setLoading.bind(this);
     this.test = true;
 
@@ -71,6 +61,19 @@ class App extends Component{
 
   componentDidMount = async () =>{
 
+    // Wallet INIT;
+
+    this.wallet = new Wallet()
+
+    this.setState({wallet : this.wallet})
+
+    //console.log(`wallet cookie: ${wallet.retreive()}`)
+
+    //wallet.unlockWallet("password1234","80001");
+
+    //console.log(wallet.web3.currentProvider)
+
+    //IPFS INIT
     console.log(global.ipfs)
 
     if(global.ipfs === undefined){
@@ -107,7 +110,20 @@ class App extends Component{
   }
 
   componentDidUpdate = async (prevProps, prevState) =>{
-  
+        ///console.log("update")
+  }
+
+  updateWallet = async (wallet) =>{
+    this.wallet = wallet;
+    if(!wallet.unlocked){
+      this.setState({wallet});
+      return;
+    }
+
+    this.setState({wallet, web3: wallet.web3, utils: wallet.utils, accounts: wallet.accounts, account: wallet.account, 
+                           selectedAccount:  wallet.account.slice(0,5) + "..." + wallet.account.slice(38)})
+
+    await this.setProvider(wallet.web3, wallet.network);
   }
 
   setLoading = (loading) =>{
@@ -126,7 +142,7 @@ class App extends Component{
         var networkHex = networkData[network].chainId;
         var selectedProviderImage = images[network]
 
-        console.log(networkHex)
+        //console.log(networkHex)
 
         this.RatioSingleNFT.setProvider(web3.currentProvider)
 
@@ -141,24 +157,9 @@ class App extends Component{
 
   }
 
-  updateWeb3 = async (web3, account) =>{
+  updateWeb3 = async () =>{
 
-    //console.log("web3" + web3)
-    if(web3 != null){
-      
-      const accounts = await web3.eth.getAccounts();
-
-      const selectedAccount = account.slice(0,5) + "..." + account.slice(38); 
-      
-      const network = await web3.eth.getChainId();
-
-      const utils = web3.utils;
-
-      await this.setProvider(web3, network.toString())
-
-      var unlocked = true
-
-      this.setState({web3, utils, accounts, account, network, selectedAccount, unlocked});
+    if(this.wallet.unlocked){
       return;
     }
 
@@ -205,16 +206,16 @@ class App extends Component{
         }
       }
 
-      this.setProvider(web3, network,toString());
+      this.setProvider(web3, network.toString());
       
-      this.setState({web3, utils, accounts, account, network, selectedAccount});
+      this.setState({web3, utils, accounts, account, selectedAccount});
 
       //console.log("state" + this.state.network)
 
       window.ethereum.on('accountsChanged', (accounts) => {
         // Handle the new accounts, or lack thereof.
         // "accounts" will always be an array, but it can be empty.
-        this.updateWeb3(null);
+        this.updateWeb3();
       });
 
 
@@ -223,7 +224,7 @@ class App extends Component{
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
         //window.location.reload();
-        this.updateWeb3(null);
+        this.updateWeb3();
       });
       
     }
@@ -233,7 +234,7 @@ class App extends Component{
     return (
       <div >
         <BrowserRouter >
-            <TopBar {...this.state} updateWeb3 = {this.updateWeb3} setProvider ={this.setProvider} setLoading = {this.setLoading}/>
+            <TopBar {...this.state} updateWeb3 = {this.updateWeb3} updateWallet = {this.updateWallet} setLoading = {this.setLoading}/>
             <Main {...this.state} setLoading = {this.setLoading}/>
         </BrowserRouter>
       </div>

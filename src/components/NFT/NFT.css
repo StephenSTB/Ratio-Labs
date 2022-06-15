@@ -421,14 +421,19 @@
     margin-top: 20px;
 }
 
-#nftHeader{
-    font-size: xx-large;
-    font-family: Milkshake;
-    
+.nftDivider{
+    width: 100% !important;
 }
 
-.nftInfoMenu{
-    background-color: var(--green) !important;
+.nftHeader{
+    font-size: xx-large;
+    font-family: Milkshake;
+    /*border: solid 1px black;*/
+}
+
+.nftDetails{
+    margin-top: 2vh;
+    /*border: solid 1px black;*/
 }
 
 .nftInfo{
@@ -441,6 +446,8 @@
    border: 1px solid var(--black) !important;
    border-radius: 20px !important;
 }
+
+
 
 .infoElement{
     display: flex;
@@ -463,10 +470,16 @@
     
 }
 
+.infoButton{
+    margin-bottom: 2vh !important;
+    /*border: solid 1px black;*/
+}
+
 .detailButtons{
     display: flex;
     flex-direction: row;
     justify-content: center;
+    margin-bottom: 1vh !important;
 }
 
 /* NFT Protocol About */
