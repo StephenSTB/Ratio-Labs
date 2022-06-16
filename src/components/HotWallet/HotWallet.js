@@ -65,7 +65,7 @@ class HotWallet extends Component{
 
     componentDidMount = async() => {
 
-        //console.log(this.props.loadWallet)
+        console.log(this.props.loadHotWallet)
 
         this.wallet = this.props.wallet;
 
@@ -253,10 +253,14 @@ class HotWallet extends Component{
     }
 
     backUnlock = () =>{
-        if (this.wallet.retrieve() === null)
+        if (this.wallet.retrieve() === null){
             this.setState({CreateImport: true, Import: false})
-        else
+        }
+        else{
+            this.wallet.lockWallet()
             this.setState({Unlock: true, Import: false, Display: false, About: false})
+            this.props.updateWallet(this.wallet)
+        }
     }
 
     aboutPrompt = () =>{
@@ -281,7 +285,7 @@ class HotWallet extends Component{
                                                               setPasswordOne: this.setPasswordOne,
                                                               setPasswordTwo : this.setPasswordTwo   
                                                             }} {...this.state}/> :
-                      this.state.Unlock ? <Unlock unlockWallet = {this.unlockWallet} importWallet = {this.importWallet} aboutPrompt={this.aboutPrompt} handleClose={this.props.handleClose} {...this.state}  /> : 
+                      this.state.Unlock ? <Unlock unlockWallet = {this.unlockWallet} importWallet = {this.importWallet} aboutPrompt={this.aboutPrompt} loadHotWallet={this.props.loadHotWallet} handleClose={this.props.handleClose} {...this.state}  /> : 
                       this.state.Display? <Display sendPrompt = {this.sendPrompt} changeAccount = {this.changeAccount} changeProvider= {this.changeProvider}
                                                      initializeNetworkData={this.initializeNetworkData}
                                                      backUnlock={this.backUnlock}

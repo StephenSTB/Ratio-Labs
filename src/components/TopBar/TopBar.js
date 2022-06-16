@@ -40,6 +40,7 @@ class TopBar extends Component{
         this.wallet = this.props.wallet;
         this.state = {dim: false, loadWallet:false, dimP: false, menuActive: false}
         this.handleClose = this.handleClose.bind(this)
+        this.loadHotWallet = this.loadHotWallet.bind(this)
     }
 
     componentDidUpdate(){
@@ -54,8 +55,9 @@ class TopBar extends Component{
         this.setState({dim: false, dimP: false, dimM: false, });
     }
 
-    loadHotWallet = () =>{    
-        this.setState({loadWallet: true})
+    loadHotWallet = (loadWallet) =>{
+        console.log("load")
+        this.setState({loadWallet})
     }
 
     providerOpen = () =>{
@@ -75,7 +77,7 @@ class TopBar extends Component{
 
     getWallet = () =>{
        return(this.state.loadWallet ? 
-                <HotWallet updateWallet = {this.props.updateWallet} handleClose={this.handleClose} {...this.state} {...this.props}/>
+                <HotWallet updateWallet = {this.props.updateWallet} loadHotWallet = {this.loadHotWallet} handleClose={this.handleClose} {...this.state} {...this.props}/>
                 : 
                 <Card.Content>
                     <Card.Content>
@@ -85,7 +87,7 @@ class TopBar extends Component{
                         <Card.Header > 
                             <Image src={metamask} onClick={() => this.props.updateWeb3(null).then(() =>{this.setState({dim:false})})}  size="mini" /> 
                             <Image src={coinbase} onClick={() => this.props.updateWeb3(null).then(() =>{this.setState({dim:false})})}  size="tiny" />
-                            <Image src={flame} onClick={this.loadHotWallet} size="mini"/>
+                            <Image src={flame} onClick={() => this.loadHotWallet(true)} size="mini"/>
                         </Card.Header>
                     </Card.Content>
                 </Card.Content>) 

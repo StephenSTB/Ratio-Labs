@@ -39,6 +39,7 @@ class Create extends Component{
                                     <div id="addIcon" >(Image, Video, Audio, or Model)</div>
                                 </label>], contentType: [], files: [],
                         contentButtons: null, addSection: true, contentError: null,
+                        animation_url: null, animation_type: null,
                         name: "", description: "",
                         attributes:[],
                         options:[{key: "number", text:"Number", value:"number"}, {key:"string", text:"Word", value:"string"}, ],
@@ -168,6 +169,7 @@ class Create extends Component{
                 var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection} /><Button icon="plus" color="black" disabled/></div>
                 this.setState({contentButtons})
             }
+
             
         })
         reader.readAsDataURL(file)
@@ -298,6 +300,46 @@ class Create extends Component{
         this.setState({burnable: !burnable})
     }
 
+    addMetaData(nftJSON){
+
+        var result = {success: false}
+
+        if(this.state.name.length < 5){
+            var createError = "*Name must be at least 5 characters."
+            this.setState({createError, stepText: ""});
+            this.props.setLoading(false)
+            return result;
+        }
+
+        nftJSON["name"] = this.state.name;
+
+        if(this.state.description !== ""){
+            nftJSON["description"] = this.state.description;
+        }
+
+        // insert attributes into nft
+        if(this.state.attributes.length > 0){
+            nftJSON["attributes"] = [];
+            for(var i = 0; i < this.state.attributes; i++){
+                var attribute = {}
+                var attributeName = this.state.attributes[i]["trait_type"];
+                if(attributeName === ""){
+                    continue;
+                }
+                var attributeValue = this.state.attributes[i]["value"];
+                if(attributeValue === ""){
+                    continue
+                }
+                attribute[attributeName] = attributeValue;
+                console.log(attribute)
+                nftJSON["attributes"].push(attribute);
+            }
+        }
+
+        return {success: true, nftJSON}
+
+    }
+
     createContent = async(files, ipfs) =>{
 
         var result = {success: false}
@@ -313,20 +355,7 @@ class Create extends Component{
             return result;
         }
 
-        if(this.state.name.length < 5){
-            var createError = "*Name must be at least 5 characters."
-            this.setState({createError, stepText: ""});
-            this.props.setLoading(false)
-            return result;
-        }
-
         var contentJSON = {};
-
-        contentJSON["name"] = this.state.name;
-
-        if(this.state.description !== ""){
-            contentJSON["description"] = this.state.description;
-        }
 
         // Place files uri content into contentJSON
         for(var i = 0; i < files.length; i++){
@@ -344,39 +373,20 @@ class Create extends Component{
         }
         
         // Insert subURIs in correct placement for hashing.
-        var main = [contentJSON["image"], contentJSON["audio"],  contentJSON["video"], contentJSON["model"]]
+        var subURIsT = [contentJSON["image"], contentJSON["audio"],  contentJSON["video"], contentJSON["model"]]
 
         var subURIs = [];
 
-        for(var i = 0; i < main.length; i++ ){
-            if(main[i] !== undefined){
-                subURIs.push(main[i])
+        for(var i = 0; i < subURIsT.length; i++ ){
+            if(subURIsT[i] !== undefined){
+                subURIs.push(subURIsT[i])
                 continue;
             }
-            main[i] = "";
+            subURIsT[i] = "";
         }
         console.log(`SubURIs: ${subURIs}`)
 
-        // insert attributes into nft content
-        if(this.state.attributes.length > 0){
-            contentJSON["attributes"] = [];
-            for(var i = 0; i < this.state.attributes; i++){
-                var attribute = {}
-                var attributeName = this.state.attributes[i]["trait_type"];
-                if(attributeName === ""){
-                    continue;
-                }
-                var attributeValue = this.state.attributes[i]["value"];
-                if(attributeValue === ""){
-                    continue
-                }
-                attribute[attributeName] = attributeValue;
-                console.log(attribute)
-                contentJSON["attributes"].push(attribute);
-            }
-        }
-
-        return {success: true, contentJSON, subURIs, main};
+        return {success: true, contentJSON, subURIs, subURIsT};
     }
 
     evaluateContractVars = () =>{
@@ -435,9 +445,17 @@ class Create extends Component{
             return;
         }
 
+        var nftObj = this.addMetaData();
+
+        if(!nftObj.success){
+            return;
+        }
+
+        var nftJSON = nftObj.nftJSON;
+
         var contentObj = await this.createContent(files, ipfs);
 
-        if(contentObj.success === false){
+        if(!contentObj.success){
             return;
         }
 
@@ -445,7 +463,21 @@ class Create extends Component{
 
         var subURIs = contentObj.subURIs;
 
-        var main = contentObj.main;
+        var subURIsT = contentObj.subURIsT;
+
+        if(contentJSON["image"] !== undefined){
+            nftJSON["image"] = contentJSON["image"];
+        }
+
+        if(contentJSON["video"] !== undefined ){
+            nftJSON["animation_url"] = contentJSON["video"]
+        }
+        else if (contentJSON["model"] !== undefined){
+            nftJSON["animation_url"] = contentJSON["model"]
+        }
+        else if(contentJSON["audio"] !== undefined){
+            nftJSON["animation_url"] = contentJSON["audio"]
+        }
 
         //console.log(contentJSON);
 
@@ -478,11 +510,12 @@ class Create extends Component{
             console.log(web3.eth.personal)
             var signedContent = await web3.eth.sign(contentHash, this.props.account) //this.wallet.unlocked ? wallet.sign(contentHash) : 
             //console.log(signedContent)
-            var nftJSON = {}
             nftJSON["content"] = contentJSON;
             nftJSON["signature"] = signedContent;
 
             console.log(JSON.stringify(nftJSON))
+
+            //Add 
 
             var nft = await ipfs.add(JSON.stringify(nftJSON));
 
@@ -519,8 +552,6 @@ class Create extends Component{
             var latestBlock = await nftProtocol.latestBlock();
 
             console.log(`latestBlock: ${latestBlock}`);
-
-            //TODO: update verification process.
             
             var state = await gatewayApi.state(nftJSON.content.contract);
 
@@ -615,9 +646,9 @@ class Create extends Component{
 
             this.setState({stepText: "Setting NFT Contract SubURIs..."})
 
-            console.log(`subRUIs: ${main}`);
+            console.log(`subRUIs: ${subURIsT}`);
 
-            await ratioNFT.setSubURIs(main[0], main[1], main[2], main[3], {from: this.props.account})
+            await ratioNFT.setSubURIs(subURIsT[0], subURIsT[1], subURIsT[2], subURIsT[3], {from: this.props.account})
 
             this.setState({stepText: "NFT Created!"})
 

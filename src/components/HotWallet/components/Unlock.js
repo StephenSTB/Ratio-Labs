@@ -18,16 +18,22 @@ class Unlock extends Component{
     componentDidMount() {
         //console.log("Unlock")
         //var encryptedMnemonic = localStorage.getItem("hotWallet");
+        console.log(this.props.loadHotWallet)
     }
 
     setPassword =  async (event) =>{
         this.setState({password: event.target.value})
     }
 
+    close = () =>{
+        this.props.loadHotWallet(false)
+        this.props.handleClose();
+    }
+
     render(){
         return(
             <div id="unlock">
-                <div id="compHeader"> <button id="back" onClick ={this.props.handleClose}><Icon size="large" name = "arrow left"/></button></div>
+                <div id="compHeader"> <button id="back" onClick ={this.close}><Icon size="large" name = "arrow left"/></button></div>
                 <Image src={flame} size="small"/>
                 <Header inverted>Unlock Wallet</Header><br/>
                 <Divider/>

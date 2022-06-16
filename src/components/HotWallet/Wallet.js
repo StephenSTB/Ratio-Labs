@@ -16,6 +16,8 @@ export default class Wallet{
         this.utils = Web3.utils;
         this.unlocked = false;
 
+        this.networkData = [];
+
         for(var n in networkData){
             this.networkData.push({name: networkData[n].chainName, id: n, asset: providers[networkData[n].chainName].asset});
         }
@@ -114,6 +116,7 @@ export default class Wallet{
         delete this.accounts;
         delete this.account;
         delete this.networkData;
+        delete this.networkID
 
         this.unlocked = false;
     }

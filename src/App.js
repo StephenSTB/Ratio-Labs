@@ -45,7 +45,7 @@ class App extends Component{
 
   constructor(){
     super();
-    this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId  ,selectedProviderImage: images["80001"], unlocked: false, loading: false,
+    this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId , selectedProviderImage: images["80001"], unlocked: false, loading: false,
                     NFTProtocol: null, RatioSingleNFT: null,
                     networkError: "",
                   }
@@ -103,10 +103,10 @@ class App extends Component{
       }
      
     }
-    
+    /*
     if (window.ethereum) {
       this.updateWeb3(null);
-    }
+    }*/
   }
 
   componentDidUpdate = async (prevProps, prevState) =>{
@@ -116,7 +116,7 @@ class App extends Component{
   updateWallet = async (wallet) =>{
     this.wallet = wallet;
     if(!wallet.unlocked){
-      this.setState({wallet});
+      this.setState({wallet, selectedAccount: "Connect Wallet"});;
       return;
     }
 

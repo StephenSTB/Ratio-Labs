@@ -62,11 +62,11 @@ routes = (app, db, ipfs, web3) =>{
            result.error = 'Invalid signature data type.'
            return result;
         }
-        
+        /*
         if(typeof content.name !== 'string'){
             result.error = `Invalid name data type.`;
             return result;
-        }
+        }*/
 
         var subURIs = [content.image, content.audio, content.video, content.model];
 
