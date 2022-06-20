@@ -4,7 +4,7 @@ import 'semantic-ui-css/semantic.min.css';
 
 import 'aframe'
 
-import 'aframe-gif-shader'
+/*import 'aframe-gif-shader'*/
 
 import floor from "./Content/Images/Marbel-009.jpg";
 
@@ -101,7 +101,7 @@ class View extends Component{
 
                     {this.state.images}
 
-                    <a-entity position="0 2 -4" rotation="0 25 0" geometry="primitive:box;" material="shader:gif;src:url(https://media0.giphy.com/media/xT9IgsOaEG15pWz17y/giphy.gif)"></a-entity>
+                    {/*<a-entity position="0 2 -4" rotation="0 25 0" geometry="primitive:box;" material="shader:gif;src:url(https://media0.giphy.com/media/xT9IgsOaEG15pWz17y/giphy.gif)"></a-entity>*/}
 
                     {/*<a-plane width="425" height="425" rotation="-90 0 0"  material="src:#wall;"/>*/}
 

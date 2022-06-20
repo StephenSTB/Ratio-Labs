@@ -3,11 +3,13 @@ import 'semantic-ui-css/semantic.min.css';
 
 import Particles from "react-tsparticles";
 
+import { loadFull } from "tsparticles";
+
 //import RatioText from "../../logos/content/RatioLabsMilkShake.png";
 
 import RatioText from "../../logos/home/RatioLabsLogo_1266x462.png"
 
-import {Container, Image, Segment, List, Grid, Divider, Button, Card, Icon} from 'semantic-ui-react';
+import {Image, Segment, Divider, Card, Icon} from 'semantic-ui-react';
 
 import './Home.css';
 
@@ -94,7 +96,7 @@ class Home extends Component{
                     <div id="socials">
                         <Icon name="github" inverted size="huge" color="purple"/>
                         <a href="https://twitter.com/0xRatioLabs"><Icon name="twitter" inverted size="huge" color="blue"/></a>
-                        <Icon size="hube"><img src={gitcoinLogo} id="gitcoinLogo"/></Icon>
+                        <Icon ><img src={gitcoinLogo} id="gitcoinLogo"/></Icon>
                         
                     </div>
                     <div id="copywrite">
@@ -177,12 +179,25 @@ class Home extends Component{
         );
     }
 
+    particlesInit = async (main) => {
+        console.log(main);
+    
+        // you can initialize the tsParticles instance (main) here, adding custom shapes or presets
+        // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+        // starting from v2 you can add only the features you need reducing the bundle size
+        await loadFull(main);
+    };
+
+    particlesLoaded = (container) => {
+        console.log(container);
+    }
+    
     render(){
         return(
             <div className="Home">
                 <Image src={RatioText} id = "Ratio-Text"/>
                 {/*this.state.particle*/}
-                <Particles id = 'particles-js' params={{
+                <Particles id = 'particles-js' init={this.particlesInit} loaded={this.particlesLoaded} options={{
                         "particles": {
                         "number": {
                             "value": 150,

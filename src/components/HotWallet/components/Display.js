@@ -25,7 +25,8 @@ class Display extends Component{
 
         var url = providers[networkData[this.props.network.toString()].chainName].url
 
-        await this.props.changeProvider(null, {value: url});*/
+        await this.props.changeProvider(null, {value: url});
+        */
     }
 
     copyAccount = () =>{

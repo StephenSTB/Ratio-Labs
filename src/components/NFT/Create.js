@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-import {Container, Segment, Form, Icon, Button, Dropdown, Divider, Menu, Input, Radio, Popup, TextArea} from 'semantic-ui-react';
+import {Container, Segment, Form, Icon, Button, Divider, Radio, Popup, TextArea} from 'semantic-ui-react';
 
 import  "@google/model-viewer";
 
