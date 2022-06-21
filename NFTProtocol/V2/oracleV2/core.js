@@ -21,8 +21,7 @@ var nftProtocol;
 const path = require('path');  
 const fs = require("fs-extra");
 
-const {sync: mime_kind, async} = require('mime-kind');
-const { writeFileSync } = require('fs');
+const {sync: mime_kind} = require('mime-kind');
 
 const uploadPath = path.join(__dirname, 'nft/'); // Register the upload path
 fs.ensureDir(uploadPath); // Make sure that he upload path exits

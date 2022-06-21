@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-import {Menu, Segment,} from 'semantic-ui-react';
+import {Menu} from 'semantic-ui-react';
 
 import {Link,Routes, Route} from 'react-router-dom';
 
@@ -20,7 +20,6 @@ const { MediaContextProvider, Media } = createMedia({
       computer: 1024,
     },
   })
-
 
 class CryptoGameMenu extends Component{
     constructor(props){

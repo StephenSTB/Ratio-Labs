@@ -1,4 +1,4 @@
-const CID = require('multiformats/cid').CID
+const {CID} = require('ipfs');
 const path = require('path');  
 //const fs = require("fs-extra");
 
