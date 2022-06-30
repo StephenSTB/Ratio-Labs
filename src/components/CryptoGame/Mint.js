@@ -1,13 +1,17 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-import {Container, Image, Segment, List, Menu, Dropdown} from 'semantic-ui-react';
+import {Container, Segment} from 'semantic-ui-react';
 
-import * as IPFS from "ipfs";
+//import {Container, Image, Segment, List, Menu, Dropdown} from 'semantic-ui-react';
 
-import nft_cids from "../../data/NFT_CID.json"
+//import * as IPFS from "ipfs";
+
+//import nft_cids from "../../data/NFT_CID.json"
 
 import deployedContracts from "../../data/Deployed_Contracts.json";
+
+import Message from "../Message/Message";
 
 class Mint extends Component{
     constructor(props){
@@ -53,18 +57,25 @@ class Mint extends Component{
     render(){
 
         return(
-            <div id="MintComponent">
-                <Segment basic inverted id="MintBanner" style={{"marginTop": "auto", height: "25vh"}}>
-                    <Container textAlign="left">
-                        <div id="MintText">Mint</div>
-                    </Container>
+            <div id="subComponent">
+                <Segment basic inverted id="banner">
+                        <Container textAlign="left">
+                            <div id="bannerText">Mint</div>
+                            <p id="bannerSub">Crypto Game Non-Fungible Tokens.</p>
+                        </Container>
                 </Segment>
                 <div id="MintSection" style={{"padding-top":"6vh"}}>
-                    <Container id="MintInterface" text textAlign="left">
-                        <Dropdown button placeholder="Select NFT" selection fluid options={this.state.options} onChange ={this.changeNFT} id="Dropdown"/>
-                        <Image src={this.state.nftImage} style={{margin: "auto", padding: "2vh"}} />
-                    </Container>
+                    {
+                        /*
+                        <Container id="MintInterface" text textAlign="left">
+                            <Dropdown button placeholder="Select NFT" selection fluid options={this.state.options} onChange ={this.changeNFT} id="Dropdown"/>
+                            <Image src={this.state.nftImage} style={{margin: "auto", padding: "2vh"}} />
+                        </Container>
+                    */
+                    }
+                    
                 </div>
+                <Message message={"Development In Progress..."}/>
             </div>
         );
     }

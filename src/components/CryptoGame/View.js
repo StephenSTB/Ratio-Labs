@@ -8,17 +8,17 @@ import 'aframe'
 
 import floor from "./Content/Images/Marbel-009.jpg";
 
-import rainbow from "./Content/Images/Rainbow_on_the_Azores.jpg"
+//import rainbow from "./Content/Images/Rainbow_on_the_Azores.jpg"
 
 import sky from "./Content/Images/360sky.jpg"
 
-import wall from "./Content/Images/Marbel-009.jpg"
+//import wall from "./Content/Images/Marbel-009.jpg"
 
 import ground from "./Content/Images/ground.jpg"
 
 import concrete from "./Content/Images/Concrete-011.jpg"
 
-import chairM from "./Content/Models/chair/scene.glb"
+//import chairM from "./Content/Models/chair/scene.glb"
 
 import "./AframeComponents/color-toggle"
 

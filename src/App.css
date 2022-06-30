@@ -1,3 +1,91 @@
+@font-face { font-family: OpenSans; 
+  src: url('./fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+
+@font-face { font-family: Milkshake; 
+  src: url("./fonts/Milkshake/Milkshake 400.ttf"); } 
+
+:root{
+  --green: #54c18a;
+  --teal: #44abc6;
+  --purple:  #8347e6;
+  --red: #701420;
+  --black : #1a1a1a;
+}
+
+/*
+74ea14
+
+44abc6
+*/
+
+
+
+/* Desktop */
+@media screen and (min-width: 900px) {
+
+  #banner{
+    height: 25vh;
+  }
+
+  #bannerText{
+      margin-top: 10vh;
+      font-size: 6em;
+      color: var(--green);
+      font-family: Milkshake !important;
+  }
+
+}
+
+/*Mobile*/
+@media screen and (max-width: 600px) {
+
+  #bannerText{
+    margin-top: 5vh;
+    font-size: 6em;
+    color: var(--green);
+    font-family: Milkshake !important;
+  }
+
+}
+
+#baseComponent{
+  background-color: var(--green);
+  color: black;
+  border: none;
+  height: 100vh;
+  font-family: OpenSans;
+}
+
+#subMenu{
+  background-image: url("./logos/content/RatioColorsAnalogous.png") !important; 
+  border: none;
+  margin: auto;
+  margin-top: 60px;
+  height: 60px;
+  border-radius: 0px !important;
+}
+
+#subSpace{
+  border: none;
+  margin: auto;
+  margin-top: 60px;
+  border-radius: 0px !important;
+}
+
+#subComponent{
+  background-color: var(--green);
+  display: flex;
+  flex-direction: column;
+}
+
+#bannerSub{
+    margin-top: 40px;
+    font-size: 2em;
+    color: var(--green);
+    font-family: Milkshake !important;
+    padding-left: 100px;
+   
+  }
 
 /* width */
 ::-webkit-scrollbar {

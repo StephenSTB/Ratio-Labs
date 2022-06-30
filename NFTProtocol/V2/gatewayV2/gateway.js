@@ -64,16 +64,21 @@ const fs = require("fs");
 
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+const networkData = require('../../../src/data/Network_Data.json');
+
 const providers = require('../../../src/data/Providers.json');
+
+const deployedContracts = require('../../../src/data/Deployed_Contracts.json');
 
 var provider = null;
 
 var web3 = null;
 
-// IPFS
-const IPFS = require("ipfs");
- 
-const ipfs_http = require('ipfs-http-client');
+const contract = require('@truffle/contract');
+
+const NFTProtocol = contract(require('../../../src/contracts/NFTProtocol.json'));
+
+var nftProtocol;
 
 var ipfs;
 
@@ -90,7 +95,7 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
 
     await ipfsinit()
     
-    gateVerify(db, web3);
+    gateVerify(db, ipfs, nftProtocol);
 
     routes(app, db, ipfs, web3)
     
@@ -127,6 +132,11 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
 }
 
 ipfsinit = async () =>{
+
+    // IPFS
+    const IPFS = await import("ipfs");
+ 
+    ipfs_http = await import('ipfs-http-client');
 
     ipfs = await ipfs_http.create('/ip4/127.0.0.1/tcp/5001');
 
@@ -189,6 +199,18 @@ web3init = async () =>{
     }
     
     web3 = new Web3(provider);
+
+    await NFTProtocol.setProvider(provider);
+
+    var chainId = await web3.eth.getChainId();
+
+    console.log(chainId)
+
+    var providerName = networkData[chainId].chainName;
+
+    nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
+
+    console.log(`NFTProtocol Address: ${deployedContracts[providerName].NFTProtocol.address}`)
 
 }
 

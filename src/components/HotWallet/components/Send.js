@@ -1,4 +1,4 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
 
 import {Button, Icon, Form, Header, Divider, Label} from 'semantic-ui-react';
 
@@ -67,7 +67,7 @@ class Send extends Component{
         var sendButton = this.state.sending ? <Button secondary loading>Send</Button>: <Button secondary onClick={this.send}>Send</Button>
 
         const QrScanner = (props) => {
-            const [data, setData] = useState('No result');
+            //const [data, setData] = useState('No result');
           
             return (
               <>
@@ -76,13 +76,13 @@ class Send extends Component{
                   onResult={(result, error) => {    
                     if (!!result) {
 
-                        var result = result?.text;
-                        console.log(result)
-                        if(!this.props.utils.isAddress(result)){
+                        var res = result?.text;
+                        console.log(res)
+                        if(!this.props.utils.isAddress(res)){
                             return;
                         }
-                        this.setState({recipientInput: <input id="recipientInput" placeholder={this.state.recipientPlaceholder} value={result} onChange={this.changeRecipient}/>,
-                                       scanQr:false, recipient: result})
+                        this.setState({recipientInput: <input id="recipientInput" placeholder={this.state.recipientPlaceholder} value={res} onChange={this.changeRecipient}/>,
+                                       scanQr:false, recipient: res})
                     }
           
                     if (!!error) {

@@ -2,7 +2,7 @@ const contract = require('@truffle/contract');
 
 const { MerkleTree } = require('merkletreejs')
 
-const {CID} = require('ipfs');
+const {CID} = require('multiformats/cid');
 
 const all = require("it-all");
 
@@ -35,6 +35,8 @@ core = async (db, web3, ipfs) =>{
     var account = wallet["4"].address;
 
     //console.log(account)
+    
+    // TODO handle multiple providers. MASS UPGRADE.
 
     var provider = await web3.eth.currentProvider;
 
@@ -313,6 +315,8 @@ core = async (db, web3, ipfs) =>{
         console.log('\x1b[35m%s\x1b[0m', "Verifying NFTs: {")
         var nfts = await db.collection("nft").find({state: "new"}).toArray();
 
+        //console.log(nfts)
+
         var currentBlock =  await web3.eth.getBlockNumber();
 
         var staleBlock = currentBlock - (4 * slot);// 7200 blocks // Original 21600;
@@ -357,6 +361,8 @@ core = async (db, web3, ipfs) =>{
                     console.log('\x1b[31m%s\x1b[0m',`Rejected: { contract: ${n.contract}, error: ${result.error} },`);
                     await db.collection('logs').insertOne({contract: n.contract, error: result.error})
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
+                    //var nft0 =  await db.collection('nft').findOne({contract: n.contract});
+                    //console.log(nft0)
                     continue;
                 }
 
@@ -452,16 +458,36 @@ core = async (db, web3, ipfs) =>{
                 return;
             }
 
+            var ipfsLeaves = {leaves};
+
+            var cid = (await ipfs.add(JSON.stringify(ipfsLeaves))).cid.toString();
+
+            fs.writeFile(__dirname + "/leaves/" + (cid + ".json"), JSON.stringify(ipfsLeaves, null, 4), (e) =>{
+                if(e){
+                    console.log(`error writing ${cid + ".json"}`);
+                }
+            })
+
+            await ipfs.pin.add(CID.parse(cid));
+
             //console.log("   Current transactions:" + leaves)
 
             var tree = new MerkleTree(leaves, keccak256, {sort: true});
 
             var root = tree.getHexRoot();
 
-            var prev = web3.utils.soliditySha3(latestBlock._prev, latestBlock._root, latestBlock._block);
+            var prev = web3.utils.soliditySha3(latestBlock._prev, latestBlock._root, latestBlock._leaves, latestBlock._block);
 
-            var block = {_prev: prev, _root: root, _leaves: leaves, _block: 0}
+            var block = {_prev: prev, _root: root, _leaves: cid, _block: 0}
 
+            try{
+                var contractBalance = await web3.eth.getBalance(nftProtocol.address);
+                console.log(contractBalance);
+
+            }catch(e){
+                console.log("nft protocol claim error: " + e)
+            }
+            
             try{
                 var receipt = await nftProtocol.submitBlock(block);
                 console.log('\x1b[32m%s\x1b[0m',`   Submitted Root: ${receipt.logs[0].args[0]._root} \n}\n`);
@@ -510,10 +536,6 @@ core = async (db, web3, ipfs) =>{
 
     });
 
-    await web3.eth
-
-    
-
     var latest = await nftProtocol.latestBlock();
     var block = await web3.eth.getBlockNumber();
     var slot = 20;
@@ -543,7 +565,11 @@ core = async (db, web3, ipfs) =>{
 
         console.log('\x1b[36m%s\x1b[0m',`Verification Request: { contract: ${contract}, distributor: ${distributor},baseCID: ${baseCID}, block: ${block} }\n` );
 
-        await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, baseCID: baseCID, state: "new", block: block})  
+        var nft = await db.collection("nft").findOne({contract})
+
+        if(nft === null){
+            await db.collection("nft").insertOne({contract: contract, distributor: distributor, baseURI: baseURI, baseCID: baseCID, state: "new", block: block})  
+        }
     }
 
     // Core loop.

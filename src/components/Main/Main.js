@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
 
-import {BrowserRouter, Routes, Route, } from "react-router-dom";
+import { Routes, Route, } from "react-router-dom";
 
 import Home from "../Home/Home";
 
@@ -11,7 +11,7 @@ import Bridge from "../Bridge/Bridge";
 
 import CryptoGameMenu from "../CryptoGame/CryptoGameMenu";
 
-import NFT_Menu from "../NFT/NFT_Menu";
+import NFT_MENU from "../NFT/NFT_Menu";
 
 class Main extends Component{
     constructor(props){
@@ -27,7 +27,7 @@ class Main extends Component{
                     <Route path="/Govern" element = {<Govern/>}/>
                     <Route path="/Bridge" element = {<Bridge/>}/>
                     <Route path="/CryptoGameMenu/*" element = {< CryptoGameMenu {...this.props}/> }/> 
-                    <Route path="/NFT_Menu/*" element = {< NFT_Menu {...this.props} setLoading = {this.props.setLoading}/> }/> 
+                    <Route path="/NFT_Menu/*" element = {< NFT_MENU {...this.props} setLoading = {this.props.setLoading}/> }/> 
                 </Routes>
             </div>
         );

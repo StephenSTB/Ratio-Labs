@@ -145,6 +145,49 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "voter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "support",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "weight",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "params",
+          "type": "bytes"
+        }
+      ],
+      "name": "VoteCastWithParams",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "COUNTING_MODE",
       "outputs": [
@@ -252,6 +295,89 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "support",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "params",
+          "type": "bytes"
+        }
+      ],
+      "name": "castVoteWithReasonAndParams",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "proposalId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "support",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "params",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "castVoteWithReasonAndParamsBySig",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address[]",
           "name": "targets",
           "type": "address[]"
@@ -297,6 +423,35 @@
         }
       ],
       "name": "getVotes",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "blockNumber",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "params",
+          "type": "bytes"
+        }
+      ],
+      "name": "getVotesWithParams",
       "outputs": [
         {
           "internalType": "uint256",
@@ -613,7 +768,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"ProposalCanceled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"indexed\":false,\"internalType\":\"string[]\",\"name\":\"signatures\",\"type\":\"string[]\"},{\"indexed\":false,\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"startBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"endBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"name\":\"ProposalCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"ProposalExecuted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"eta\",\"type\":\"uint256\"}],\"name\":\"ProposalQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"weight\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"VoteCast\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"COUNTING_MODE\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"}],\"name\":\"castVote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"castVoteBySig\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"castVoteWithReason\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"execute\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"getVotes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasVoted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"hashProposal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalDeadline\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalEta\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalSnapshot\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"name\":\"propose\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"queue\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"quorum\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"state\",\"outputs\":[{\"internalType\":\"enum IGovernor.ProposalState\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"timelock\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votingDelay\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votingPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Extension of the {IGovernor} for timelock supporting modules. _Available since v4.3._\",\"kind\":\"dev\",\"methods\":{\"COUNTING_MODE()\":{\"details\":\"A description of the possible `support` values for {castVote} and the way these votes are counted, meant to be consumed by UIs to show correct vote options and interpret the results. The string is a URL-encoded sequence of key-value pairs that each describe one aspect, for example `support=bravo&quorum=for,abstain`. There are 2 standard keys: `support` and `quorum`. - `support=bravo` refers to the vote options 0 = For, 1 = Against, 2 = Abstain, as in `GovernorBravo`. - `quorum=bravo` means that only For votes are counted towards quorum. - `quorum=for,abstain` means that both For and Abstain votes are counted towards quorum. NOTE: The string can be decoded by the standard https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams[`URLSearchParams`] JavaScript class.\"},\"castVote(uint256,uint8)\":{\"details\":\"Cast a vote Emits a {VoteCast} event.\"},\"castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)\":{\"details\":\"Cast a vote using the user cryptographic signature. Emits a {VoteCast} event.\"},\"castVoteWithReason(uint256,uint8,string)\":{\"details\":\"Cast a with a reason Emits a {VoteCast} event.\"},\"execute(address[],uint256[],bytes[],bytes32)\":{\"details\":\"Execute a successful proposal. This requires the quorum to be reached, the vote to be successful, and the deadline to be reached. Emits a {ProposalExecuted} event. Note: some module can modify the requirements for execution, for example by adding an additional timelock.\"},\"getVotes(address,uint256)\":{\"details\":\"Voting power of an `account` at a specific `blockNumber`. Note: this can be implemented in a number of ways, for example by reading the delegated balance from one (or multiple), {ERC20Votes} tokens.\"},\"hasVoted(uint256,address)\":{\"details\":\"Returns weither `account` has cast a vote on `proposalId`.\"},\"hashProposal(address[],uint256[],bytes[],bytes32)\":{\"details\":\"Hashing function used to (re)build the proposal id from the proposal details..\"},\"name()\":{\"details\":\"Name of the governor instance (used in building the ERC712 domain separator).\"},\"proposalDeadline(uint256)\":{\"details\":\"timestamp at which votes close.\"},\"proposalSnapshot(uint256)\":{\"details\":\"block number used to retrieve user's votes and quorum.\"},\"propose(address[],uint256[],bytes[],string)\":{\"details\":\"Create a new proposal. Vote start {IGovernor-votingDelay} blocks after the proposal is created and ends {IGovernor-votingPeriod} blocks after the voting starts. Emits a {ProposalCreated} event.\"},\"quorum(uint256)\":{\"details\":\"Minimum number of cast voted required for a proposal to be successful. Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the quroum depending on values such as the totalSupply of a token at this block (see {ERC20Votes}).\"},\"state(uint256)\":{\"details\":\"Current state of a proposal, following Compound's convention\"},\"supportsInterface(bytes4)\":{\"details\":\"Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.\"},\"version()\":{\"details\":\"Version of the governor instance (used in building the ERC712 domain separator). Default: \\\"1\\\"\"},\"votingDelay()\":{\"details\":\"delay, in number of block, between the proposal is created and the vote starts. This can be increassed to leave time for users to buy voting power, of delegate it, before the voting of a proposal starts.\"},\"votingPeriod()\":{\"details\":\"delay, in number of blocks, between the vote start and vote ends. Note: the {votingDelay} can delay the start of the vote. This must be considered when setting the voting duration compared to the voting delay.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"COUNTING_MODE()\":{\"notice\":\"module:voting\"},\"getVotes(address,uint256)\":{\"notice\":\"module:reputation\"},\"hasVoted(uint256,address)\":{\"notice\":\"module:voting\"},\"hashProposal(address[],uint256[],bytes[],bytes32)\":{\"notice\":\"module:core\"},\"name()\":{\"notice\":\"module:core\"},\"proposalDeadline(uint256)\":{\"notice\":\"module:core\"},\"proposalSnapshot(uint256)\":{\"notice\":\"module:core\"},\"quorum(uint256)\":{\"notice\":\"module:user-config\"},\"state(uint256)\":{\"notice\":\"module:core\"},\"version()\":{\"notice\":\"module:core\"},\"votingDelay()\":{\"notice\":\"module:user-config\"},\"votingPeriod()\":{\"notice\":\"module:user-config\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol\":\"IGovernorTimelock\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/governance/IGovernor.sol\":{\"keccak256\":\"0x3b606afdde81d7f48dd1a3213f87c2216de6ba52401ad49acd8ec2598d650c5e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ee2cb967bb223a58524a2c899c23b77a45b0bc198b1347907d6b941d204ac479\",\"dweb:/ipfs/QmUix62WSHqVzLrsAynduZrAepQ4YdKbPZnNt9NUjekuFG\"]},\"@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol\":{\"keccak256\":\"0x0a176aaabf21aa87ab10f9a388ece85bf630bb6786f5cc875f5b683f02c7b6dc\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://00d2aab9f7c635f9cfdcb535d9367daba35ddac6ec6d2682ff1708bf3cfb618f\",\"dweb:/ipfs/QmUHHTbDk9XUeLNafEqvbn4jxs8Wt4rVTNQrJEW8ZMVbqQ\"]},\"@openzeppelin/contracts/utils/introspection/ERC165.sol\":{\"keccak256\":\"0x5718c5df9bd67ac68a796961df938821bb5dc0cd4c6118d77e9145afb187409b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d10e1d9b26042424789246603906ad06143bf9a928f4e99de8b5e3bdc662f549\",\"dweb:/ipfs/Qmejonoaj5MLekPus229rJQHcC6E9dz2xorjHJR84fMfmn\"]},\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0xa28007762d9da9db878dd421960c8cb9a10471f47ab5c1b3309bfe48e9e79ff4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://796ab6e88af7bf0e78def0f059310c903af6a312b565344e0ff524a0f26e81c6\",\"dweb:/ipfs/QmcsVgLgzWdor3UnAztUkXKNGcysm1MPneWksF72AvnwBx\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"ProposalCanceled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"proposer\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"indexed\":false,\"internalType\":\"string[]\",\"name\":\"signatures\",\"type\":\"string[]\"},{\"indexed\":false,\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"startBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"endBlock\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"name\":\"ProposalCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"ProposalExecuted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"eta\",\"type\":\"uint256\"}],\"name\":\"ProposalQueued\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"weight\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"VoteCast\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"weight\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"params\",\"type\":\"bytes\"}],\"name\":\"VoteCastWithParams\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"COUNTING_MODE\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"}],\"name\":\"castVote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"castVoteBySig\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"castVoteWithReason\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"params\",\"type\":\"bytes\"}],\"name\":\"castVoteWithReasonAndParams\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"support\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"params\",\"type\":\"bytes\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"castVoteWithReasonAndParamsBySig\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"execute\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"getVotes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"params\",\"type\":\"bytes\"}],\"name\":\"getVotesWithParams\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasVoted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"hashProposal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalDeadline\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalEta\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"proposalSnapshot\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"name\":\"propose\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"targets\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes[]\",\"name\":\"calldatas\",\"type\":\"bytes[]\"},{\"internalType\":\"bytes32\",\"name\":\"descriptionHash\",\"type\":\"bytes32\"}],\"name\":\"queue\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"quorum\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"proposalId\",\"type\":\"uint256\"}],\"name\":\"state\",\"outputs\":[{\"internalType\":\"enum IGovernor.ProposalState\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"timelock\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votingDelay\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"votingPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Extension of the {IGovernor} for timelock supporting modules. _Available since v4.3._\",\"kind\":\"dev\",\"methods\":{\"COUNTING_MODE()\":{\"details\":\"A description of the possible `support` values for {castVote} and the way these votes are counted, meant to be consumed by UIs to show correct vote options and interpret the results. The string is a URL-encoded sequence of key-value pairs that each describe one aspect, for example `support=bravo&quorum=for,abstain`. There are 2 standard keys: `support` and `quorum`. - `support=bravo` refers to the vote options 0 = Against, 1 = For, 2 = Abstain, as in `GovernorBravo`. - `quorum=bravo` means that only For votes are counted towards quorum. - `quorum=for,abstain` means that both For and Abstain votes are counted towards quorum. If a counting module makes use of encoded `params`, it should  include this under a `params` key with a unique name that describes the behavior. For example: - `params=fractional` might refer to a scheme where votes are divided fractionally between for/against/abstain. - `params=erc721` might refer to a scheme where specific NFTs are delegated to vote. NOTE: The string can be decoded by the standard https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams[`URLSearchParams`] JavaScript class.\"},\"castVote(uint256,uint8)\":{\"details\":\"Cast a vote Emits a {VoteCast} event.\"},\"castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)\":{\"details\":\"Cast a vote using the user's cryptographic signature. Emits a {VoteCast} event.\"},\"castVoteWithReason(uint256,uint8,string)\":{\"details\":\"Cast a vote with a reason Emits a {VoteCast} event.\"},\"castVoteWithReasonAndParams(uint256,uint8,string,bytes)\":{\"details\":\"Cast a vote with a reason and additional encoded parameters Emits a {VoteCast} event.\"},\"castVoteWithReasonAndParamsBySig(uint256,uint8,string,bytes,uint8,bytes32,bytes32)\":{\"details\":\"Cast a vote with a reason and additional encoded parameters using the user's cryptographic signature. Emits a {VoteCast} event.\"},\"execute(address[],uint256[],bytes[],bytes32)\":{\"details\":\"Execute a successful proposal. This requires the quorum to be reached, the vote to be successful, and the deadline to be reached. Emits a {ProposalExecuted} event. Note: some module can modify the requirements for execution, for example by adding an additional timelock.\"},\"getVotes(address,uint256)\":{\"details\":\"Voting power of an `account` at a specific `blockNumber`. Note: this can be implemented in a number of ways, for example by reading the delegated balance from one (or multiple), {ERC20Votes} tokens.\"},\"getVotesWithParams(address,uint256,bytes)\":{\"details\":\"Voting power of an `account` at a specific `blockNumber` given additional encoded parameters.\"},\"hasVoted(uint256,address)\":{\"details\":\"Returns weither `account` has cast a vote on `proposalId`.\"},\"hashProposal(address[],uint256[],bytes[],bytes32)\":{\"details\":\"Hashing function used to (re)build the proposal id from the proposal details..\"},\"name()\":{\"details\":\"Name of the governor instance (used in building the ERC712 domain separator).\"},\"proposalDeadline(uint256)\":{\"details\":\"Block number at which votes close. Votes close at the end of this block, so it is possible to cast a vote during this block.\"},\"proposalSnapshot(uint256)\":{\"details\":\"Block number used to retrieve user's votes and quorum. As per Compound's Comp and OpenZeppelin's ERC20Votes, the snapshot is performed at the end of this block. Hence, voting for this proposal starts at the beginning of the following block.\"},\"propose(address[],uint256[],bytes[],string)\":{\"details\":\"Create a new proposal. Vote start {IGovernor-votingDelay} blocks after the proposal is created and ends {IGovernor-votingPeriod} blocks after the voting starts. Emits a {ProposalCreated} event.\"},\"quorum(uint256)\":{\"details\":\"Minimum number of cast voted required for a proposal to be successful. Note: The `blockNumber` parameter corresponds to the snapshot used for counting vote. This allows to scale the quorum depending on values such as the totalSupply of a token at this block (see {ERC20Votes}).\"},\"state(uint256)\":{\"details\":\"Current state of a proposal, following Compound's convention\"},\"supportsInterface(bytes4)\":{\"details\":\"Returns true if this contract implements the interface defined by `interfaceId`. See the corresponding https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section] to learn more about how these ids are created. This function call must use less than 30 000 gas.\"},\"version()\":{\"details\":\"Version of the governor instance (used in building the ERC712 domain separator). Default: \\\"1\\\"\"},\"votingDelay()\":{\"details\":\"Delay, in number of block, between the proposal is created and the vote starts. This can be increassed to leave time for users to buy voting power, of delegate it, before the voting of a proposal starts.\"},\"votingPeriod()\":{\"details\":\"Delay, in number of blocks, between the vote start and vote ends. NOTE: The {votingDelay} can delay the start of the vote. This must be considered when setting the voting duration compared to the voting delay.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"COUNTING_MODE()\":{\"notice\":\"module:voting\"},\"getVotes(address,uint256)\":{\"notice\":\"module:reputation\"},\"getVotesWithParams(address,uint256,bytes)\":{\"notice\":\"module:reputation\"},\"hasVoted(uint256,address)\":{\"notice\":\"module:voting\"},\"hashProposal(address[],uint256[],bytes[],bytes32)\":{\"notice\":\"module:core\"},\"name()\":{\"notice\":\"module:core\"},\"proposalDeadline(uint256)\":{\"notice\":\"module:core\"},\"proposalSnapshot(uint256)\":{\"notice\":\"module:core\"},\"quorum(uint256)\":{\"notice\":\"module:user-config\"},\"state(uint256)\":{\"notice\":\"module:core\"},\"version()\":{\"notice\":\"module:core\"},\"votingDelay()\":{\"notice\":\"module:user-config\"},\"votingPeriod()\":{\"notice\":\"module:user-config\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol\":\"IGovernorTimelock\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/governance/IGovernor.sol\":{\"keccak256\":\"0xb8c693f945c199962aff3fc79e5ea522610e91d0878dcfa2e83b39477c033c4f\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://1cad40628d9e079c30862405f7c5d2001f8ef73026fa5c1aae62c96dab6274d0\",\"dweb:/ipfs/QmcWNK7rWbj3x1PCTxBUQp8zyDc77iZyjkaotUMc3FqvZP\"]},\"@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol\":{\"keccak256\":\"0xe6234ac4ba0508a3371a46543cdf4bf3a1a404d2d3c3470006741a0da294f974\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://f65e0806425afa3946ba400879444d73b0b9320534eaecb2c64dc3689cff0614\",\"dweb:/ipfs/QmbpjBrErEMrx9qbS529XXbfooHfkihCj9iBz2QWiw4Xe4\"]},\"@openzeppelin/contracts/utils/introspection/ERC165.sol\":{\"keccak256\":\"0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fb0048dee081f6fffa5f74afc3fb328483c2a30504e94a0ddd2a5114d731ec4d\",\"dweb:/ipfs/QmZptt1nmYoA5SgjwnSgWqgUSDgm4q52Yos3xhnMv3MV43\"]},\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"keccak256\":\"0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://be161e54f24e5c6fae81a12db1a8ae87bc5ae1b0ddc805d82a1440a68455088f\",\"dweb:/ipfs/QmP7C3CHdY9urF4dEMb9wmsp1wMxHF6nhA2yQE5SKiPAdy\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -621,30 +776,30 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.0;\n\nimport \"../IGovernor.sol\";\n\n/**\n * @dev Extension of the {IGovernor} for timelock supporting modules.\n *\n * _Available since v4.3._\n */\nabstract contract IGovernorTimelock is IGovernor {\n    event ProposalQueued(uint256 proposalId, uint256 eta);\n\n    function timelock() public view virtual returns (address);\n\n    function proposalEta(uint256 proposalId) public view virtual returns (uint256);\n\n    function queue(\n        address[] memory targets,\n        uint256[] memory values,\n        bytes[] memory calldatas,\n        bytes32 descriptionHash\n    ) public virtual returns (uint256 proposalId);\n}\n",
+  "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts v4.4.1 (governance/extensions/IGovernorTimelock.sol)\n\npragma solidity ^0.8.0;\n\nimport \"../IGovernor.sol\";\n\n/**\n * @dev Extension of the {IGovernor} for timelock supporting modules.\n *\n * _Available since v4.3._\n */\nabstract contract IGovernorTimelock is IGovernor {\n    event ProposalQueued(uint256 proposalId, uint256 eta);\n\n    function timelock() public view virtual returns (address);\n\n    function proposalEta(uint256 proposalId) public view virtual returns (uint256);\n\n    function queue(\n        address[] memory targets,\n        uint256[] memory values,\n        bytes[] memory calldatas,\n        bytes32 descriptionHash\n    ) public virtual returns (uint256 proposalId);\n}\n",
   "sourcePath": "@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol",
   "ast": {
     "absolutePath": "@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol",
     "exportedSymbols": {
       "ERC165": [
-        8590
+        14825
       ],
       "IERC165": [
-        8855
+        15090
       ],
       "IGovernor": [
-        1501
+        7319
       ],
       "IGovernorTimelock": [
-        4053
+        9938
       ]
     },
-    "id": 4054,
+    "id": 9939,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4014,
+        "id": 9899,
         "literals": [
           "solidity",
           "^",
@@ -652,17 +807,17 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:13"
+        "src": "112:23:37"
       },
       {
         "absolutePath": "@openzeppelin/contracts/governance/IGovernor.sol",
         "file": "../IGovernor.sol",
-        "id": 4015,
+        "id": 9900,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 4054,
-        "sourceUnit": 1502,
-        "src": "58:26:13",
+        "scope": 9939,
+        "sourceUnit": 7320,
+        "src": "137:26:37",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -671,56 +826,56 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 4017,
+              "id": 9902,
               "name": "IGovernor",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1501,
-              "src": "233:9:13"
+              "referencedDeclaration": 7319,
+              "src": "312:9:37"
             },
-            "id": 4018,
+            "id": 9903,
             "nodeType": "InheritanceSpecifier",
-            "src": "233:9:13"
+            "src": "312:9:37"
           }
         ],
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 4016,
+          "id": 9901,
           "nodeType": "StructuredDocumentation",
-          "src": "86:107:13",
+          "src": "165:107:37",
           "text": " @dev Extension of the {IGovernor} for timelock supporting modules.\n _Available since v4.3._"
         },
         "fullyImplemented": false,
-        "id": 4053,
+        "id": 9938,
         "linearizedBaseContracts": [
-          4053,
-          1501,
-          8855
+          9938,
+          7319,
+          15090
         ],
         "name": "IGovernorTimelock",
-        "nameLocation": "212:17:13",
+        "nameLocation": "291:17:37",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "anonymous": false,
-            "id": 4024,
+            "id": 9909,
             "name": "ProposalQueued",
-            "nameLocation": "255:14:13",
+            "nameLocation": "334:14:37",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 4023,
+              "id": 9908,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4020,
+                  "id": 9905,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "278:10:13",
+                  "nameLocation": "357:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4024,
-                  "src": "270:18:13",
+                  "scope": 9909,
+                  "src": "349:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -728,10 +883,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4019,
+                    "id": 9904,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "270:7:13",
+                    "src": "349:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -741,14 +896,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 4022,
+                  "id": 9907,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "eta",
-                  "nameLocation": "298:3:13",
+                  "nameLocation": "377:3:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4024,
-                  "src": "290:11:13",
+                  "scope": 9909,
+                  "src": "369:11:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -756,10 +911,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4021,
+                    "id": 9906,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "290:7:13",
+                    "src": "369:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -768,38 +923,38 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "269:33:13"
+              "src": "348:33:37"
             },
-            "src": "249:54:13"
+            "src": "328:54:37"
           },
           {
             "functionSelector": "d33219b4",
-            "id": 4029,
+            "id": 9914,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "timelock",
-            "nameLocation": "318:8:13",
+            "nameLocation": "397:8:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4025,
+              "id": 9910,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "326:2:13"
+              "src": "405:2:37"
             },
             "returnParameters": {
-              "id": 4028,
+              "id": 9913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4027,
+                  "id": 9912,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4029,
-                  "src": "358:7:13",
+                  "scope": 9914,
+                  "src": "437:7:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -807,10 +962,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4026,
+                    "id": 9911,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "358:7:13",
+                    "src": "437:7:37",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -820,36 +975,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "357:9:13"
+              "src": "436:9:37"
             },
-            "scope": 4053,
-            "src": "309:58:13",
+            "scope": 9938,
+            "src": "388:58:37",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "public"
           },
           {
             "functionSelector": "ab58fb8e",
-            "id": 4036,
+            "id": 9921,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "proposalEta",
-            "nameLocation": "382:11:13",
+            "nameLocation": "461:11:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4032,
+              "id": 9917,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4031,
+                  "id": 9916,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "402:10:13",
+                  "nameLocation": "481:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4036,
-                  "src": "394:18:13",
+                  "scope": 9921,
+                  "src": "473:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -857,10 +1012,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4030,
+                    "id": 9915,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "394:7:13",
+                    "src": "473:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -869,21 +1024,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "393:20:13"
+              "src": "472:20:37"
             },
             "returnParameters": {
-              "id": 4035,
+              "id": 9920,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4034,
+                  "id": 9919,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4036,
-                  "src": "443:7:13",
+                  "scope": 9921,
+                  "src": "522:7:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -891,10 +1046,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4033,
+                    "id": 9918,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "443:7:13",
+                    "src": "522:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -903,36 +1058,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "442:9:13"
+              "src": "521:9:37"
             },
-            "scope": 4053,
-            "src": "373:79:13",
+            "scope": 9938,
+            "src": "452:79:37",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "public"
           },
           {
             "functionSelector": "160cbed7",
-            "id": 4052,
+            "id": 9937,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "queue",
-            "nameLocation": "467:5:13",
+            "nameLocation": "546:5:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4048,
+              "id": 9933,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4039,
+                  "id": 9924,
                   "mutability": "mutable",
                   "name": "targets",
-                  "nameLocation": "499:7:13",
+                  "nameLocation": "578:7:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "482:24:13",
+                  "scope": 9937,
+                  "src": "561:24:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -941,19 +1096,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4037,
+                      "id": 9922,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "482:7:13",
+                      "src": "561:7:37",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 4038,
+                    "id": 9923,
                     "nodeType": "ArrayTypeName",
-                    "src": "482:9:13",
+                    "src": "561:9:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -963,13 +1118,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4042,
+                  "id": 9927,
                   "mutability": "mutable",
                   "name": "values",
-                  "nameLocation": "533:6:13",
+                  "nameLocation": "612:6:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "516:23:13",
+                  "scope": 9937,
+                  "src": "595:23:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -978,18 +1133,18 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4040,
+                      "id": 9925,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "516:7:13",
+                      "src": "595:7:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 4041,
+                    "id": 9926,
                     "nodeType": "ArrayTypeName",
-                    "src": "516:9:13",
+                    "src": "595:9:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -999,13 +1154,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4045,
+                  "id": 9930,
                   "mutability": "mutable",
                   "name": "calldatas",
-                  "nameLocation": "564:9:13",
+                  "nameLocation": "643:9:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "549:24:13",
+                  "scope": 9937,
+                  "src": "628:24:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1014,18 +1169,18 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4043,
+                      "id": 9928,
                       "name": "bytes",
                       "nodeType": "ElementaryTypeName",
-                      "src": "549:5:13",
+                      "src": "628:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes_storage_ptr",
                         "typeString": "bytes"
                       }
                     },
-                    "id": 4044,
+                    "id": 9929,
                     "nodeType": "ArrayTypeName",
-                    "src": "549:7:13",
+                    "src": "628:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
                       "typeString": "bytes[]"
@@ -1035,13 +1190,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4047,
+                  "id": 9932,
                   "mutability": "mutable",
                   "name": "descriptionHash",
-                  "nameLocation": "591:15:13",
+                  "nameLocation": "670:15:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "583:23:13",
+                  "scope": 9937,
+                  "src": "662:23:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1049,10 +1204,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 4046,
+                    "id": 9931,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "583:7:13",
+                    "src": "662:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1061,21 +1216,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "472:140:13"
+              "src": "551:140:37"
             },
             "returnParameters": {
-              "id": 4051,
+              "id": 9936,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4050,
+                  "id": 9935,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "645:10:13",
+                  "nameLocation": "724:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "637:18:13",
+                  "scope": 9937,
+                  "src": "716:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1083,10 +1238,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4049,
+                    "id": 9934,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "637:7:13",
+                    "src": "716:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1095,44 +1250,44 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "636:20:13"
+              "src": "715:20:37"
             },
-            "scope": 4053,
-            "src": "458:199:13",
+            "scope": 9938,
+            "src": "537:199:37",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "public"
           }
         ],
-        "scope": 4054,
-        "src": "194:465:13",
+        "scope": 9939,
+        "src": "273:465:37",
         "usedErrors": []
       }
     ],
-    "src": "33:627:13"
+    "src": "112:627:37"
   },
   "legacyAST": {
     "absolutePath": "@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol",
     "exportedSymbols": {
       "ERC165": [
-        8590
+        14825
       ],
       "IERC165": [
-        8855
+        15090
       ],
       "IGovernor": [
-        1501
+        7319
       ],
       "IGovernorTimelock": [
-        4053
+        9938
       ]
     },
-    "id": 4054,
+    "id": 9939,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4014,
+        "id": 9899,
         "literals": [
           "solidity",
           "^",
@@ -1140,17 +1295,17 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:13"
+        "src": "112:23:37"
       },
       {
         "absolutePath": "@openzeppelin/contracts/governance/IGovernor.sol",
         "file": "../IGovernor.sol",
-        "id": 4015,
+        "id": 9900,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 4054,
-        "sourceUnit": 1502,
-        "src": "58:26:13",
+        "scope": 9939,
+        "sourceUnit": 7320,
+        "src": "137:26:37",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -1159,56 +1314,56 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 4017,
+              "id": 9902,
               "name": "IGovernor",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1501,
-              "src": "233:9:13"
+              "referencedDeclaration": 7319,
+              "src": "312:9:37"
             },
-            "id": 4018,
+            "id": 9903,
             "nodeType": "InheritanceSpecifier",
-            "src": "233:9:13"
+            "src": "312:9:37"
           }
         ],
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 4016,
+          "id": 9901,
           "nodeType": "StructuredDocumentation",
-          "src": "86:107:13",
+          "src": "165:107:37",
           "text": " @dev Extension of the {IGovernor} for timelock supporting modules.\n _Available since v4.3._"
         },
         "fullyImplemented": false,
-        "id": 4053,
+        "id": 9938,
         "linearizedBaseContracts": [
-          4053,
-          1501,
-          8855
+          9938,
+          7319,
+          15090
         ],
         "name": "IGovernorTimelock",
-        "nameLocation": "212:17:13",
+        "nameLocation": "291:17:37",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "anonymous": false,
-            "id": 4024,
+            "id": 9909,
             "name": "ProposalQueued",
-            "nameLocation": "255:14:13",
+            "nameLocation": "334:14:37",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 4023,
+              "id": 9908,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4020,
+                  "id": 9905,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "278:10:13",
+                  "nameLocation": "357:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4024,
-                  "src": "270:18:13",
+                  "scope": 9909,
+                  "src": "349:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1216,10 +1371,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4019,
+                    "id": 9904,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "270:7:13",
+                    "src": "349:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1229,14 +1384,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 4022,
+                  "id": 9907,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "eta",
-                  "nameLocation": "298:3:13",
+                  "nameLocation": "377:3:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4024,
-                  "src": "290:11:13",
+                  "scope": 9909,
+                  "src": "369:11:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1244,10 +1399,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4021,
+                    "id": 9906,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "290:7:13",
+                    "src": "369:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1256,38 +1411,38 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "269:33:13"
+              "src": "348:33:37"
             },
-            "src": "249:54:13"
+            "src": "328:54:37"
           },
           {
             "functionSelector": "d33219b4",
-            "id": 4029,
+            "id": 9914,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "timelock",
-            "nameLocation": "318:8:13",
+            "nameLocation": "397:8:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4025,
+              "id": 9910,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "326:2:13"
+              "src": "405:2:37"
             },
             "returnParameters": {
-              "id": 4028,
+              "id": 9913,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4027,
+                  "id": 9912,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4029,
-                  "src": "358:7:13",
+                  "scope": 9914,
+                  "src": "437:7:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1295,10 +1450,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 4026,
+                    "id": 9911,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "358:7:13",
+                    "src": "437:7:37",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1308,36 +1463,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "357:9:13"
+              "src": "436:9:37"
             },
-            "scope": 4053,
-            "src": "309:58:13",
+            "scope": 9938,
+            "src": "388:58:37",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "public"
           },
           {
             "functionSelector": "ab58fb8e",
-            "id": 4036,
+            "id": 9921,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "proposalEta",
-            "nameLocation": "382:11:13",
+            "nameLocation": "461:11:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4032,
+              "id": 9917,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4031,
+                  "id": 9916,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "402:10:13",
+                  "nameLocation": "481:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4036,
-                  "src": "394:18:13",
+                  "scope": 9921,
+                  "src": "473:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1345,10 +1500,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4030,
+                    "id": 9915,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "394:7:13",
+                    "src": "473:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1357,21 +1512,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "393:20:13"
+              "src": "472:20:37"
             },
             "returnParameters": {
-              "id": 4035,
+              "id": 9920,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4034,
+                  "id": 9919,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4036,
-                  "src": "443:7:13",
+                  "scope": 9921,
+                  "src": "522:7:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1379,10 +1534,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4033,
+                    "id": 9918,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "443:7:13",
+                    "src": "522:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1391,36 +1546,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "442:9:13"
+              "src": "521:9:37"
             },
-            "scope": 4053,
-            "src": "373:79:13",
+            "scope": 9938,
+            "src": "452:79:37",
             "stateMutability": "view",
             "virtual": true,
             "visibility": "public"
           },
           {
             "functionSelector": "160cbed7",
-            "id": 4052,
+            "id": 9937,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "queue",
-            "nameLocation": "467:5:13",
+            "nameLocation": "546:5:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 4048,
+              "id": 9933,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4039,
+                  "id": 9924,
                   "mutability": "mutable",
                   "name": "targets",
-                  "nameLocation": "499:7:13",
+                  "nameLocation": "578:7:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "482:24:13",
+                  "scope": 9937,
+                  "src": "561:24:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1429,19 +1584,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4037,
+                      "id": 9922,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "482:7:13",
+                      "src": "561:7:37",
                       "stateMutability": "nonpayable",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 4038,
+                    "id": 9923,
                     "nodeType": "ArrayTypeName",
-                    "src": "482:9:13",
+                    "src": "561:9:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[]"
@@ -1451,13 +1606,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4042,
+                  "id": 9927,
                   "mutability": "mutable",
                   "name": "values",
-                  "nameLocation": "533:6:13",
+                  "nameLocation": "612:6:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "516:23:13",
+                  "scope": 9937,
+                  "src": "595:23:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1466,18 +1621,18 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4040,
+                      "id": 9925,
                       "name": "uint256",
                       "nodeType": "ElementaryTypeName",
-                      "src": "516:7:13",
+                      "src": "595:7:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 4041,
+                    "id": 9926,
                     "nodeType": "ArrayTypeName",
-                    "src": "516:9:13",
+                    "src": "595:9:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[]"
@@ -1487,13 +1642,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4045,
+                  "id": 9930,
                   "mutability": "mutable",
                   "name": "calldatas",
-                  "nameLocation": "564:9:13",
+                  "nameLocation": "643:9:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "549:24:13",
+                  "scope": 9937,
+                  "src": "628:24:37",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1502,18 +1657,18 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 4043,
+                      "id": 9928,
                       "name": "bytes",
                       "nodeType": "ElementaryTypeName",
-                      "src": "549:5:13",
+                      "src": "628:5:37",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes_storage_ptr",
                         "typeString": "bytes"
                       }
                     },
-                    "id": 4044,
+                    "id": 9929,
                     "nodeType": "ArrayTypeName",
-                    "src": "549:7:13",
+                    "src": "628:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
                       "typeString": "bytes[]"
@@ -1523,13 +1678,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 4047,
+                  "id": 9932,
                   "mutability": "mutable",
                   "name": "descriptionHash",
-                  "nameLocation": "591:15:13",
+                  "nameLocation": "670:15:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "583:23:13",
+                  "scope": 9937,
+                  "src": "662:23:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1537,10 +1692,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 4046,
+                    "id": 9931,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "583:7:13",
+                    "src": "662:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1549,21 +1704,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "472:140:13"
+              "src": "551:140:37"
             },
             "returnParameters": {
-              "id": 4051,
+              "id": 9936,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 4050,
+                  "id": 9935,
                   "mutability": "mutable",
                   "name": "proposalId",
-                  "nameLocation": "645:10:13",
+                  "nameLocation": "724:10:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 4052,
-                  "src": "637:18:13",
+                  "scope": 9937,
+                  "src": "716:18:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1571,10 +1726,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 4049,
+                    "id": 9934,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "637:7:13",
+                    "src": "716:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1583,50 +1738,59 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "636:20:13"
+              "src": "715:20:37"
             },
-            "scope": 4053,
-            "src": "458:199:13",
+            "scope": 9938,
+            "src": "537:199:37",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "public"
           }
         ],
-        "scope": 4054,
-        "src": "194:465:13",
+        "scope": 9939,
+        "src": "273:465:37",
         "usedErrors": []
       }
     ],
-    "src": "33:627:13"
+    "src": "112:627:37"
   },
   "compiler": {
     "name": "solc",
     "version": "0.8.5+commit.a4f2e591.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.4.3",
-  "updatedAt": "2022-03-18T21:34:02.577Z",
+  "schemaVersion": "3.3.3",
+  "updatedAt": "2022-06-23T01:08:52.709Z",
   "devdoc": {
     "details": "Extension of the {IGovernor} for timelock supporting modules. _Available since v4.3._",
     "kind": "dev",
     "methods": {
       "COUNTING_MODE()": {
-        "details": "A description of the possible `support` values for {castVote} and the way these votes are counted, meant to be consumed by UIs to show correct vote options and interpret the results. The string is a URL-encoded sequence of key-value pairs that each describe one aspect, for example `support=bravo&quorum=for,abstain`. There are 2 standard keys: `support` and `quorum`. - `support=bravo` refers to the vote options 0 = For, 1 = Against, 2 = Abstain, as in `GovernorBravo`. - `quorum=bravo` means that only For votes are counted towards quorum. - `quorum=for,abstain` means that both For and Abstain votes are counted towards quorum. NOTE: The string can be decoded by the standard https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams[`URLSearchParams`] JavaScript class."
+        "details": "A description of the possible `support` values for {castVote} and the way these votes are counted, meant to be consumed by UIs to show correct vote options and interpret the results. The string is a URL-encoded sequence of key-value pairs that each describe one aspect, for example `support=bravo&quorum=for,abstain`. There are 2 standard keys: `support` and `quorum`. - `support=bravo` refers to the vote options 0 = Against, 1 = For, 2 = Abstain, as in `GovernorBravo`. - `quorum=bravo` means that only For votes are counted towards quorum. - `quorum=for,abstain` means that both For and Abstain votes are counted towards quorum. If a counting module makes use of encoded `params`, it should  include this under a `params` key with a unique name that describes the behavior. For example: - `params=fractional` might refer to a scheme where votes are divided fractionally between for/against/abstain. - `params=erc721` might refer to a scheme where specific NFTs are delegated to vote. NOTE: The string can be decoded by the standard https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams[`URLSearchParams`] JavaScript class."
       },
       "castVote(uint256,uint8)": {
         "details": "Cast a vote Emits a {VoteCast} event."
       },
       "castVoteBySig(uint256,uint8,uint8,bytes32,bytes32)": {
-        "details": "Cast a vote using the user cryptographic signature. Emits a {VoteCast} event."
+        "details": "Cast a vote using the user's cryptographic signature. Emits a {VoteCast} event."
       },
       "castVoteWithReason(uint256,uint8,string)": {
-        "details": "Cast a with a reason Emits a {VoteCast} event."
+        "details": "Cast a vote with a reason Emits a {VoteCast} event."
+      },
+      "castVoteWithReasonAndParams(uint256,uint8,string,bytes)": {
+        "details": "Cast a vote with a reason and additional encoded parameters Emits a {VoteCast} event."
+      },
+      "castVoteWithReasonAndParamsBySig(uint256,uint8,string,bytes,uint8,bytes32,bytes32)": {
+        "details": "Cast a vote with a reason and additional encoded parameters using the user's cryptographic signature. Emits a {VoteCast} event."
       },
       "execute(address[],uint256[],bytes[],bytes32)": {
         "details": "Execute a successful proposal. This requires the quorum to be reached, the vote to be successful, and the deadline to be reached. Emits a {ProposalExecuted} event. Note: some module can modify the requirements for execution, for example by adding an additional timelock."
       },
       "getVotes(address,uint256)": {
         "details": "Voting power of an `account` at a specific `blockNumber`. Note: this can be implemented in a number of ways, for example by reading the delegated balance from one (or multiple), {ERC20Votes} tokens."
+      },
+      "getVotesWithParams(address,uint256,bytes)": {
+        "details": "Voting power of an `account` at a specific `blockNumber` given additional encoded parameters."
       },
       "hasVoted(uint256,address)": {
         "details": "Returns weither `account` has cast a vote on `proposalId`."
@@ -1638,16 +1802,16 @@
         "details": "Name of the governor instance (used in building the ERC712 domain separator)."
       },
       "proposalDeadline(uint256)": {
-        "details": "timestamp at which votes close."
+        "details": "Block number at which votes close. Votes close at the end of this block, so it is possible to cast a vote during this block."
       },
       "proposalSnapshot(uint256)": {
-        "details": "block number used to retrieve user's votes and quorum."
+        "details": "Block number used to retrieve user's votes and quorum. As per Compound's Comp and OpenZeppelin's ERC20Votes, the snapshot is performed at the end of this block. Hence, voting for this proposal starts at the beginning of the following block."
       },
       "propose(address[],uint256[],bytes[],string)": {
         "details": "Create a new proposal. Vote start {IGovernor-votingDelay} blocks after the proposal is created and ends {IGovernor-votingPeriod} blocks after the voting starts. Emits a {ProposalCreated} event."
       },
       "quorum(uint256)": {
-        "details": "Minimum number of cast voted required for a proposal to be successful. Note: The `blockNumber` parameter corresponds to the snaphot used for counting vote. This allows to scale the quroum depending on values such as the totalSupply of a token at this block (see {ERC20Votes})."
+        "details": "Minimum number of cast voted required for a proposal to be successful. Note: The `blockNumber` parameter corresponds to the snapshot used for counting vote. This allows to scale the quorum depending on values such as the totalSupply of a token at this block (see {ERC20Votes})."
       },
       "state(uint256)": {
         "details": "Current state of a proposal, following Compound's convention"
@@ -1659,10 +1823,10 @@
         "details": "Version of the governor instance (used in building the ERC712 domain separator). Default: \"1\""
       },
       "votingDelay()": {
-        "details": "delay, in number of block, between the proposal is created and the vote starts. This can be increassed to leave time for users to buy voting power, of delegate it, before the voting of a proposal starts."
+        "details": "Delay, in number of block, between the proposal is created and the vote starts. This can be increassed to leave time for users to buy voting power, of delegate it, before the voting of a proposal starts."
       },
       "votingPeriod()": {
-        "details": "delay, in number of blocks, between the vote start and vote ends. Note: the {votingDelay} can delay the start of the vote. This must be considered when setting the voting duration compared to the voting delay."
+        "details": "Delay, in number of blocks, between the vote start and vote ends. NOTE: The {votingDelay} can delay the start of the vote. This must be considered when setting the voting duration compared to the voting delay."
       }
     },
     "version": 1
@@ -1674,6 +1838,9 @@
         "notice": "module:voting"
       },
       "getVotes(address,uint256)": {
+        "notice": "module:reputation"
+      },
+      "getVotesWithParams(address,uint256,bytes)": {
         "notice": "module:reputation"
       },
       "hasVoted(uint256,address)": {

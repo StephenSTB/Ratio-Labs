@@ -1,4 +1,5 @@
-const {CID} = require('ipfs');
+const {CID} = require('multiformats/cid');
+
 const path = require('path');  
 //const fs = require("fs-extra");
 
@@ -8,16 +9,51 @@ const mime = require('mime-types');
 
 const {sync: mime_kind} = require('mime-kind');
 
+const all = require("it-all");
+
+const uint8arrays = require('uint8arrays');
+
 const uploadPath = path.join(__dirname, 'gatenft/'); // Register the upload path
 //fs.ensureDir(uploadPath); // Make sure that he upload path exits
 
 var uri_ext = ["jpg", "jpeg", "png", "gif", "svg", "mp3", "mpga", "wav", "ogg", "oga", "mp4", "webm", "glb", "gltf"];
 
 routes = (app, db, ipfs, web3) =>{
+
     app.get("/", (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.send({greet: "Welcome to Ratio Gateway"})
         console.log("Pinged")
+    })
+
+    app.get("/leaves", async(req, res) =>{
+        try{
+            var cid = req.query.cid;
+            console.log(`Leaves Request: \n     { cid: ${cid} }`);
+
+            if(cid === ""){
+                res.status(400).json({status:"failed", reason: "Invalid root"})
+                return
+            }
+           
+            var leavesBuf = fs.readFileSync(__dirname + "/leaves/" + cid + ".json", (e) =>{
+                if(e)
+                {
+                    res.status(400).json({status:"failed", reason: "Invalid leaves request."})
+                    return
+                }
+            });
+            console.log(`leaves json:`)
+
+            var leavesJSON = JSON.parse(leavesBuf.toString());
+
+            res.status(200).json({status:"success", leaves: leavesJSON.leaves})
+        }
+        catch(e)
+        {
+            res.status(400).json({status: "failed", reason: "Invalid query"})
+        }
+        return;
     })
 
     app.get("/state", async (req, res) =>{

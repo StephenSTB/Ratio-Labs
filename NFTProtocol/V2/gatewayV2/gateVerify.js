@@ -1,30 +1,12 @@
-const contract = require('@truffle/contract');
-
-const deployedContracts = require('../../../src/data/Deployed_Contracts.json');
-
-const networkData = require('../../../src/data/Network_Data.json');
-
 const { CID } = require('multiformats');
 
-const NFTProtocol = contract(require('../../../src/contracts/NFTProtocol.json'));
+const uint8arrays = require('uint8arrays');
 
-var nftProtocol;
+const all = require("it-all");
 
-gateVerify = async (db, web3) =>{
+const fs = require("fs");
 
-    var provider = await web3.eth.currentProvider;
-
-    var chainId = await web3.eth.getChainId();
-
-    var providerName = networkData[chainId].chainName;
-
-    console.log(await web3.eth.getChainId())
-
-    await NFTProtocol.setProvider(provider);
-
-    console.log(`NFTProtocol Address: ${deployedContracts[providerName].NFTProtocol.address}`)
-
-    nftProtocol = await NFTProtocol.at(deployedContracts[providerName].NFTProtocol.address);
+gateVerify = async (db, ipfs, nftProtocol) =>{
 
     nftProtocol.verificationRequest().on('data', async (event) => {
         
@@ -50,6 +32,39 @@ gateVerify = async (db, web3) =>{
         })
     
     });
+
+    nftProtocol.blockSubmitted().on('data', async (event) =>{
+        var block = event.returnValues._block;
+
+        // Get leaves
+        
+        while(true){
+            try{
+
+                var leavesArr = uint8arrays.concat(await all(await ipfs.cat(block._leaves, {timeout: 2000})));
+
+                var leavesDecode = new TextDecoder().decode(leavesArr).toString();
+
+                var leaves = JSON.parse(leavesDecode);
+
+                //console.log("leaves obj:")
+                //console.log(leaves);
+
+                fs.writeFile(__dirname + "/leaves/" + block._leaves + ".json", JSON.stringify(leaves, null, 4), (e) =>{
+                    if(e){
+                        console.log(e)
+                    }
+                })
+                console.log(`Block Retrieved:\n { root: ${block._root}, leaves: ${block._leaves} }`);
+                break;
+
+            }catch(e){
+                console.log(e)
+            }
+            await new Promise(p => setTimeout(p, 2000))
+        }
+        
+    })
 
    
 }

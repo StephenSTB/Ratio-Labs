@@ -13,13 +13,13 @@ import {Image, Segment, Divider, Card, Icon} from 'semantic-ui-react';
 
 import './Home.css';
 
-import oracleLogo from "../../logos/home/RatioOracleLogo.png";
+//import oracleLogo from "../../logos/home/RatioOracleLogo.png";
 
-import progressLogo  from "../../logos/home/RatioProgressLogo0.png";
+//import progressLogo  from "../../logos/home/RatioProgressLogo0.png";
 
-import rocketLogo from "../../logos/home/RatioRocketLogo.png";
+//import rocketLogo from "../../logos/home/RatioRocketLogo.png";
 
-import placeImage from "../../logos/content/white-image.png";
+// placeImage from "../../logos/content/white-image.png";
 
 import hotWallet from "../../logos/home/HotWalletLogo.png";
 
@@ -51,7 +51,7 @@ class Home extends Component{
                     <div id="projectsHeader">Ratio Labs Projects</div>
                     <div id="projects">
                         <div className="projectCard">
-                            <img src={hotWallet} className="projectImg"/>
+                            <img alt="Hot Wallet" src={hotWallet} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
                             <Card.Header className="projectCardHead">Hot Wallet</Card.Header>
                             <Card.Content className="projectCardDesc">
@@ -59,7 +59,7 @@ class Home extends Component{
                             </Card.Content>
                         </div>
                         <div className="projectCard" >
-                            <img src={cryptoMonkey} className="projectImg"/>
+                            <img alt="Crypto Monkey NFT" src={cryptoMonkey} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
                             <Card.Header className="projectCardHead">Non-Fungible Token Protocol</Card.Header>
                             <Card.Content className="projectCardDesc">
@@ -67,7 +67,7 @@ class Home extends Component{
                             </Card.Content>
                         </div>
                         <div className="projectCard">
-                            <img src={cryptoGame} className="projectImg"/>
+                            <img alt="Crypto Game Meta" src={cryptoGame} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
                             <Card.Header className="projectCardHead">Crypto Game</Card.Header>
                             <Card.Content className="projectCardDesc">
@@ -75,7 +75,7 @@ class Home extends Component{
                             </Card.Content>
                         </div>
                         <div className="projectCard">
-                            <img src={bridgeLogo} className="projectImg"/>
+                            <img alt="Bridge" src={bridgeLogo} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
                             <Card.Header className="projectCardHead">Bridge</Card.Header>
                             <Card.Content className="projectCardDesc">
@@ -83,7 +83,7 @@ class Home extends Component{
                             </Card.Content>
                         </div>
                         <div className="projectCard" >
-                            <img src={governLogo} className="projectImg"/>
+                            <img alt="Govern" src={governLogo} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
                             <Card.Header className="projectCardHead">Govern</Card.Header>
                             <Card.Content className="projectCardDesc">
@@ -96,7 +96,7 @@ class Home extends Component{
                     <div id="socials">
                         <Icon name="github" inverted size="huge" color="purple"/>
                         <a href="https://twitter.com/0xRatioLabs"><Icon name="twitter" inverted size="huge" color="blue"/></a>
-                        <Icon ><img src={gitcoinLogo} id="gitcoinLogo"/></Icon>
+                        <Icon ><img alt="Gitcoin" src={gitcoinLogo} id="gitcoinLogo"/></Icon>
                         
                     </div>
                     <div id="copywrite">

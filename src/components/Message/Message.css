@@ -1,0 +1,19 @@
+@import '../../App.css';
+
+.messageCard{
+    border: solid 1px var(--black);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: clamp(75vw, 80vw, 90vw);
+    height: clamp(20vh, 500px, 40vh);
+}
+
+.message{
+    color: var(--black);
+    font-family: Milkshake;
+    font-size: 32pt;
+    text-align: center;
+}

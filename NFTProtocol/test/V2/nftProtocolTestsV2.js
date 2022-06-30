@@ -14,11 +14,7 @@ const all = require("it-all");
 
 const uint8arrays = require('uint8arrays');
 
-const IPFS = require('ipfs');
-
 const { CID } = require('multiformats');
-
-const ipfs_http = require('ipfs-http-client');
 
 var ipfs; 
 
@@ -30,6 +26,8 @@ const deployedContracts = require('../../../src/data/Deployed_Contracts.json');
 
 const networkData = require('../../../src/data/Network_Data.json');
 
+const keccak256 = require('keccak256');
+
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 const fs = require("fs");
@@ -39,9 +37,6 @@ const mnemonic = fs.readFileSync(".secret").toString().trim();
 const providers = require('../../../src/data/Providers.json');
 
 const GatewayApi = require("../V2/nftGatewayAPIaxiosV2.js");
-
-const keccak256 = require('keccak256');
-const { verify } = require('crypto');
 
 const gatewayApi = new GatewayApi("http://localhost:3002")
 
@@ -75,6 +70,10 @@ main = async () =>{
     console.log(`Starting NFT Protocol Testing...\n`)
     accounts = await web3.eth.getAccounts()
     console.log(`Accounts: \n${accounts[0]}\n`)
+
+    const IPFS = await import('ipfs');
+
+    const ipfs_http = await import('ipfs-http-client');
 
     ipfs = await IPFS.create({repo: "nft-test", start: false})
     /*
@@ -152,49 +151,68 @@ cidTest = async() =>{
     return;
 }
 
-createNFTs = async() => { 
+var dir  = "./testfiles/";
 
-    var contents = [/*{content: {name: "Ratio Card", image: "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ?filename=Ratio_Base_Card.png"}, files:["./images/RatioCard/Ratio_Card_Base.png"]},*/ 
-                    /*{content: {name: "Ratio Bad Card", image: "ipfs://QmeZKMuW65SniEtQXrX5quck4ndkrMMvNAKo4bJUXThbJJ", audio:"ipfs://QmRGmpo7UGntccewabLQjRiKk7KvRxcrE7h5Qi5KbL3zm9"}, files: ["./images/RatioCard/RatioCardBase.png", "./sounds/game-success.wav"]},*/
-                    /*{content: {name: "Poly Card Ten Common", image: "ipfs://Qmci4x92WCPfTM6ux53gDBzWU2nqcDg8Q9zt5E5SbvfW6G?filename=PolyCard_Ten_Common.gif", model: "ipfs://QmPv3bW8iFLJQAUUawCjJD6ciDbjzECKfFDvPEXczkbhvm?filename=ethereum_3d_logo.gltf"}, files: ["./images/PolygonCards/Card/Complete/Ten/Common/PolyCard_Ten_Common.gif", "./models/ethereum_3d_logo/scene.gltf"]}*/
-                    {content: {name:"Ratio Card Base File", image: "ipfs://QmbUnBLPLFTbsbKAqLw998sYREst8F3Hg6UHEqbeB1m6Kn?filename=RatioCardBase.svg"}, files: ["./images/RatioCard/RatioCardBase.svg"]}
-                    ]
+var nftMap = {
+    "RatioCard" : { content: {name:"Ratio Card", image: "ipfs://QmcLZTfyPJxvmGQUKqpiMtVa2qTmPS2MvEPm4gyTkm6mrZ?filename=Ratio_Card_Base.png"} , files: [dir + "Ratio_Card_Base.png"], mintCost: 1, claimValue: 1, burnable: false},
+    //"PolyCard" : {content: {name:"Poly Card", image: "ipfs://QmPSmyxBAhRa5qckBcA7W5LtSF7bAnJ8p2Rs1DLn8FU7BZ?filename=PolyCard.gif"} , files: [dir + "PolyCard.gif"], mintCost: 100, claimValue: 0, burnable: true} ,
+    /*"ETHCard": {content: {name: "ETH Card", image: "ipfs://QmRrZCCTzWgFzM6FbwxDifgQkHtZePErNTxLZbJw3SLMiS?filename=ETHCard.gif", model: "ipfs://QmPv3bW8iFLJQAUUawCjJD6ciDbjzECKfFDvPEXczkbhvm?filename=ethereum.gltf"} , files: [dir + "ETHCard.gif", dir + "ethereum.gltf"]}*/
+    //"PremierBall":  {content: {name: "Premier Ball", model: "ipfs://QmeFQtBPgMLL1NohoxXXE1Tpbx9GmwMsrvqFGMSfQZPnpG?filename=PremierBall.glb", audio: "ipfs://Qmf2Kv39DEdWFAQPVL5TDtqUZNtUeJ3hmjNoqk7aXcj4sa?filename=Poke_Sound.mp3"}, files: [dir + "pokesound.mp3", dir + "PremierBall.glb"], mintCost: 1, claimValue: 0.5, burnable: true},
+};
 
-    for(var c of contents){
+createNFTs = async () =>{
 
-        var createdNFT = await createNFT(1, c.content);
+    for(var n in nftMap){
+        console.log(`Creating ${n} NFT...`);
+        
+        var nft = nftMap[n];
 
-        console.log(`BaseURI nft: ${createdNFT.baseURI} Contract address: ${createdNFT.contract.address} NFT content: ${JSON.stringify(createdNFT.nft)}`)
+        var content = nftMap[n].content;
 
-        var block = (await createdNFT.contract.setBaseURI(createdNFT.baseURI, true, protocolAddress, {from: accounts[1], value: utils.toWei(".01", "ether")})).receipt.blockNumber;
+        var files = nftMap[n].files;
 
-        console.log(`Request block: ${block}`);
+        try{
+            var createdNFT = await createNFT(0, content, nft.mintCost.toString(), nft.claimValue.toString(), nft.burnable);
 
-        //console.log(createdNFT)
+            //console.log(`   BaseURI nft: ${createdNFT.baseURI} Contract address: ${createdNFT.contract.address} NFT content: ${JSON.stringify(createdNFT.nft)}, Files: ${files}`)
+        
+            var block = (await createdNFT.contract.setBaseURI(createdNFT.baseURI, true, protocolAddress, {from: accounts[0], value: utils.toWei(".01", "ether")})).receipt.blockNumber;
+            
+            //console.log(`   Request block: ${block}`);
 
-        await gateVerify(createdNFT, c.files);
+            await gateVerify(createdNFT, files);
 
-        var latestBlock = await waitForBlock();
+            var latestBlock = await waitForBlock();
 
-        await verifyNFT(1, createdNFT, latestBlock, block)
+            await verifyNFT(0, createdNFT, latestBlock, block)
 
-        var nft = createdNFT.nft;
+            /*
 
-        await createdNFT.contract.setSubURIs(nft.content.image !== undefined ? nft.content.image : "" ,
-                                             nft.content.audio !== undefined ? nft.content.audio : "" ,
-                                             nft.content.vidoe !== undefined ? nft.content.video : "",
-                                             nft.content.model !== undefined ? nft.content.model : "", {from: accounts[1]});
+            var nft = createdNFT.nft;
 
-        var info = await createdNFT.contract.contract.methods.info().call();
+            await createdNFT.contract.setSubURIs(nft.content.image !== undefined ? nft.content.image : "" ,
+                                                nft.content.audio !== undefined ? nft.content.audio : "" ,
+                                                nft.content.vidoe !== undefined ? nft.content.video : "",
+                                                nft.content.model !== undefined ? nft.content.model : "", {from: accounts[0]});
 
-        console.log(`info: ${JSON.stringify(info, null, 4)}`);
+            var info = await createdNFT.contract.contract.methods.info().call();*/
 
+            //console.log(`info: ${JSON.stringify(info, null, 4)}`);
+
+            //await viewContractState(createdNFT.contract.address)
+        
+        }
+        catch(e){
+            console.log(`Error attempting to create ${n}:` + e)
+            return;
+        }
     }
+
 }
 
 gateVerify = async (nftObj, files) =>{
 
-    console.log("Gate Verification Request.")
+    //console.log("Gate Verification Request.")
 
     var nft = nftObj.nft;
 
@@ -202,19 +220,22 @@ gateVerify = async (nftObj, files) =>{
 
     form.append(nft.content.contract, JSON.stringify(nft))
 
-    for(var file of files){
-        
-        var type = mime_kind(file).mime;
+    var content = nftObj.nft.content
 
-        type = type.includes("image") ? "image" : type.includes("audio") ? "audio" : type.includes("video") ? "video" : type.includes("model") ? "model" : "error";
+    var subURIs = [content.image, content.audio, content.video, content.model]
 
-        console.log(`   type: ${type}: name: ${nft.content[type]}`)
-
-        form.append( nft.content[type], fs.createReadStream(file))
+    var f = 0;
+    for(var i = 0; i < subURIs.length; i++){
+        if(subURIs[i] === undefined){
+            continue;
+        }
+        ///console.log(`   subURI: ${subURIs[i]} file: ${files[f]}`)
+        form.append(subURIs[i], fs.createReadStream(files[f]));
+        f++;
     }
 
     try{
-        console.log("Getting nft state.")
+        //console.log("Getting nft state.")
 
         console.log(nft.content.contract)
 
@@ -252,10 +273,10 @@ gateVerify = async (nftObj, files) =>{
     }
 }
 
-createNFT = async(account, content) =>{
+createNFT = async(account, content, mintCost, claimValue, burnable) =>{
     var nft = {}
 
-    var contract = await RatioSingleNFT.new(content.name, "RC", 10000, new BN(utils.toWei("1", "ether")), {from: accounts[account]});
+    var contract = await RatioSingleNFT.new(content.name, "RC", 10000, new BN(utils.toWei(mintCost, "ether")), new BN(utils.toWei(claimValue, "ether")), burnable, {from: accounts[account]});
 
     nft.content = content;
     nft.content.contract = contract.address;
@@ -290,20 +311,48 @@ verifyNFT = async(account, nft, latestBlock, block) =>{
     
     var leaf;
     switch(subURIs.length){
-        case "1":
+        case 1:
             leaf = utils.soliditySha3(nft.contract.address, nft.nft.content.distributor, nft.baseURI, subURIs[0], block)
             break;
-        case "2":
+        case 2:
             leaf = utils.soliditySha3(nft.contract.address, nft.nft.content.distributor, nft.baseURI, subURIs[0], subURIs[1], block)
             break;
-        case "3":
+        case 3:
             leaf = utils.soliditySha3(nft.contract.address, nft.nft.content.distributor, nft.baseURI, subURIs[0], subURIs[1], subURIs[2], block)
             break;
-        case "4":
+        case 4:
             leaf = utils.soliditySha3(nft.contract.address, nft.nft.content.distributor, nft.baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
             break;
     }
 
+    // Get leaves from gateway api
+
+    console.log(latestBlock._leaves)
+
+    var leavesRequest = await gatewayApi.leaves(latestBlock._leaves);
+
+    while(leavesRequest.status !== 200){
+        console.log(leavesRequest.response.data)
+        await new Promise(p => setTimeout(p, 2000));
+        leavesRequest = await gatewayApi.leaves(latestBlock._leaves);     
+    }
+
+    console.log(leavesRequest.data);
+
+    console.log(leaf)
+
+    var leaves = leavesRequest.data.leaves;
+
+    if(leaves.includes(leaf)){
+        var tree = new MerkleTree(leaves, keccak256, {sort:true});
+        var proof = tree.getHexProof(leaf);
+        var nftStruct = {_contract: nft.contract.address, _distributor: nft.nft.content.distributor, _baseURI: nft.baseURI, _subURIs: subURIs, _block: block}
+        await nftProtocol.verifyNFT(proof, latestBlock._root, leaf, nftStruct, {from: accounts[account]});
+        await viewContractState(nft.contract.address)
+    }
+
+
+    /*
     if(latestBlock._leaves.includes(leaf)){
         console.log(`Leaf included..`)
 
@@ -316,7 +365,7 @@ verifyNFT = async(account, nft, latestBlock, block) =>{
         await nftProtocol.verifyNFT(proof, latestBlock._root, leaf, nftStruct, {from: accounts[account]});
 
         await viewContractState(nft.contract.address)
-    }
+    }*/
 }
 
 waitForBlock = async() =>{

@@ -3,6 +3,10 @@ import 'semantic-ui-css/semantic.min.css';
 
 import {Segment, Container} from 'semantic-ui-react';
 
+import "./Govern.css";
+
+import Message from '../Message/Message';
+
 class Govern extends Component{
     constructor(props){
         super();
@@ -10,12 +14,16 @@ class Govern extends Component{
     }
     render(){
         return(
-            <div id="mainComponent">
-                <Segment basic inverted id="banner" style={{"marginTop": "5vh", height: "25vh"}}>
-                        <Container textAlign="left">
-                            <div id="bannerText">Govern</div>
-                        </Container>
-                </Segment>
+            <div id="baseComponent">
+                <div id="subSpace"/>
+                <div id="subComponent">
+                    <Segment basic inverted id="banner">
+                            <Container textAlign="left">
+                                <div id="bannerText">Govern</div>
+                            </Container>
+                    </Segment>
+                    <Message message={"Research In Progress..."}/>
+                </div>
             </div>
         );
     }

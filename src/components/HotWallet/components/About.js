@@ -26,7 +26,7 @@ class About extends Component{
                 <Divider/>
                 <div>
                     <h3>How it works.</h3>
-                    <img src={diagram} id="diagram"/>
+                    <img alt="Diagram" src={diagram} id="diagram"/>
                 </div>
             </div>
         );

@@ -1,18 +1,11 @@
-@font-face { font-family: Milkshake; 
-  src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
-
-@font-face { font-family: Lato; 
-  src: url('../../fonts/Lato/Lato-Bold.ttf'); } 
-
-@font-face { font-family: OpenSans; 
-  src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+@import "../../App.css";
 
 
 /* Desktop */
 @media screen and (min-width: 900px) {
 
   #particles-js{ 
-    background-image: url("../../logos/content/RatioColors.png"); 
+    background-image: url("../../logos/content/RatioColorsAnalogous.png"); 
     background-repeat: no-repeat;
     height: 50vh;
   }
@@ -27,7 +20,7 @@
 
   #description1{
     align-self: center;
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     width: 40vw;
     font-size: 35pt;
@@ -38,7 +31,7 @@
   
   #description2{
     align-self: center;
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     width: 35vw;
     font-size: 35pt;
@@ -47,7 +40,7 @@
   }
 
   #projectsHeader{
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     font-size: 35pt;
     margin-top: 8vh;
@@ -69,7 +62,7 @@
   .projectCard{
     display: flex;
     flex-direction: column;
-    border: solid 1px #44abc6;
+    border: solid 1px var(--teal);
     border-radius: 20px;
     width: 30vw;
     background: none !important;
@@ -83,7 +76,7 @@
   }
 
   .projectCardHead{
-    color: #54c18a;
+    color: var(--green);
     margin-top: 4vh;
     font-size: 32pt;
     font-family: Milkshake;
@@ -110,7 +103,7 @@
 @media screen and (max-width: 600px) {
 
   #particles-js{ 
-    background-image: url("../../logos/content/RatioColors.png"); 
+    background-image: url("../../logos/content/RatioColorsAnalogous.png"); 
     background-repeat: no-repeat;
     height: 36vh;
     background-size: 105vw 100vh;
@@ -126,7 +119,7 @@
 
   #description1{
     align-self: center;
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     width: 99vw;
     font-size: 20pt;
@@ -137,7 +130,7 @@
   
   #description2{
     align-self: center;
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     width: 90vw;
     font-size: 20pt;
@@ -147,7 +140,7 @@
   }
 
   #projectsHeader{
-    color: #54c18a;
+    color: var(--green);
     font-family: Milkshake;
     font-size: 30pt;
     margin-top: 8vh;
@@ -168,7 +161,7 @@
   .projectCard{
     display: flex;
     flex-direction: column;
-    border: solid 1px #44abc6;
+    border: solid 1px var(--teal);
     border-radius: 20px;
     width: 100%;
     background: none !important;
@@ -180,7 +173,7 @@
   }
 
   .projectCardHead{
-    color: #54c18a;
+    color: var(--green);
     margin-top: 4vh;
     font-size: 32pt;
     font-family: Milkshake;
@@ -203,7 +196,7 @@
 }
 
 .Home{
-  background-color: black;
+  background-color: var(--black);
   display: flex;
   flex-direction: column;
   
@@ -225,11 +218,11 @@
 }
 
 #exploreButton{
-  color: #44abc6;
+  color: var(--teal);
   height: 35px;
   width: 200px;
   align-self: center;
-  border: 1px solid #44abc6;
+  border: 1px solid var(--teal);
   background: none;
   border-radius: 20px;
   z-index: 0;
@@ -241,7 +234,7 @@
 }
 
 .projectCardDesc{
-  color: #4db8c6;
+  color: var(--teal);
   margin-top: 3vh !important;
   margin-bottom: 3vh !important;
   font-size: 12pt !important;
@@ -252,7 +245,7 @@
 #missionHeader,#designHeader{
   font-family: Milkshake;
   margin-top: 5vh; 
-  color: #54c18a;
+  color: var(--green);
 }
 
 #missionHeader{
@@ -272,7 +265,7 @@
   font-family: Lato;
   margin-top: 3vh;
   font-size: 12pt;
-  color: #54c18a;
+  color: var(--green);
 }
 
 #socialsDiv{
@@ -296,7 +289,7 @@
 
 .listItem{
   font-size : medium;
-  color: #54c18a;
+  color: var(--green);
 }
 
 #oracleImg{

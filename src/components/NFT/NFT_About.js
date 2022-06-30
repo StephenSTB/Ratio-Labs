@@ -25,7 +25,7 @@ class NFT_About extends Component{
 
     render(){
         return(
-            <div id="mainComponent">
+            <div id="subComponent">
                 <Segment basic inverted id="banner" style={{height: "25vh"}}>
                         <Container textAlign="left">
                             <div id="bannerText">About</div>
@@ -51,8 +51,8 @@ class NFT_About extends Component{
                                 </p>
                                 <div id="nftDilemmaSpace"/>
                                 <div id="nftModels">
-                                    <img src={basicNFTmodel} id="basicNFTmodel"/>
-                                    <img src={basicRatioNFTmodel} id="basicRatioNFTmodel"/>
+                                    <img src={basicNFTmodel} id="basicNFTmodel" alt=""/>
+                                    <img src={basicRatioNFTmodel} id="basicRatioNFTmodel" alt=""/>
                                 </div>
                             </div>
                             <h2>The Current NFT Standard.</h2>
@@ -75,7 +75,7 @@ class NFT_About extends Component{
                                     but does not provide a direct link to initial on-chain ownership of the asset which enables quick proofs of asset ownership regardless of blockchain transaction order 
                                     or human intervention.  
                                 </p>
-                                <img src={typicalNFTcreation} id="typicalNFTcreation"/>
+                                <img src={typicalNFTcreation} id="typicalNFTcreation" alt=""/>
                                 {/*<h3 id="worstCaseHeader">The Worst Case.</h3>
                                 <p className="aboutP">
                                     &emsp;&emsp;A worst case scenario which attempts to illustrate the inefficiencies of the format shown above is as follows. 
@@ -112,8 +112,7 @@ class NFT_About extends Component{
                                         <h3 >How It Works.</h3>
                                     </p>
                             </div>
-                                <img id="nftProtocolDiagram" src={nftProtocolDiagram}/>
-                            
+                            <img id="nftProtocolDiagram" src={nftProtocolDiagram} alt=""/>
                 </Container>
             </div>
         );

@@ -18,7 +18,7 @@
         "chainId": "0x539",
         "chainName": "Ganache",
         "rpcUrls": [
-            "http://172.21.138.6:8545"
+            "http://172.31.141.208:8545"
         ],
         "nativeCurrency": {
             "name": "Ganache",

@@ -55,7 +55,7 @@ contract NFTProtocol is Ownable {
     struct nftBlock{
         bytes32 _prev;
         bytes32 _root;
-        bytes32[] _leaves;
+        string _leaves;
         uint _block;
     }
 
@@ -66,7 +66,7 @@ contract NFTProtocol is Ownable {
     mapping(bytes32 => nftBlock) public blockMap;
 
     // Event emitted when a new nft block is submitted.
-    event blockSubmited(nftBlock _block);
+    event blockSubmitted(nftBlock _block);
 
     // Event emitted when a verification request is submitted.
     event verificationRequest(address _contract, address _distributor, string _baseURI, uint _block);
@@ -83,7 +83,7 @@ contract NFTProtocol is Ownable {
     // Constructor
     constructor(uint _minimumRequestValue){
         minimumRequestValue = _minimumRequestValue;
-        nftBlock memory n = nftBlock(bytes32(0), bytes32(0) , new bytes32[](0), block.number);
+        nftBlock memory n = nftBlock(bytes32(0), bytes32(0) , "", block.number);
         nftBlocks.push(n);
     }
     
@@ -170,7 +170,7 @@ contract NFTProtocol is Ownable {
         _block._block = block.number;
         nftBlocks.push(_block);
         blockMap[_block._root] = nftBlocks[nftBlocks.length-1];
-        emit blockSubmited(_block);
+        emit blockSubmitted(_block);
     }
 
     // Function to _slashNFTs via Oracle

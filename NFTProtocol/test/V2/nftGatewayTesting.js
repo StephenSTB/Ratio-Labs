@@ -14,11 +14,9 @@ const all = require("it-all");
 
 const uint8arrays = require('uint8arrays');
 
-const IPFS = require('ipfs');
-
 const { CID } = require('multiformats');
 
-const ipfs_http = require('ipfs-http-client');
+//const ipfs_http = require('ipfs-http-client');
 
 var ipfs; 
 
@@ -74,6 +72,8 @@ main = async () =>{
     console.log(`Starting NFT Protocol Testing...\n`)
     accounts = await web3.eth.getAccounts()
     console.log(`Accounts: \n${accounts[0]}\n`)
+
+    const IPFS = await import('ipfs');
 
     ipfs = await IPFS.create({repo: "nft-test", start: false})
     /*
@@ -888,9 +888,22 @@ validNFT = async () =>{
 
 }
 
+retrieveLeaves = async () =>{
+    var leaves = (await nftProtocol.latestBlock())._leaves
+
+    console.log(leaves)
+
+    var leavesRequest = await gatewayApi.leaves(leaves);
+
+    console.log(leavesRequest)
+
+    console.log
+
+}
+
 mainTesting = async () =>{
     
-    await noRequestInGate();/*
+   /* await noRequestInGate();
 
     await notNewRequestInGate();
 
@@ -926,7 +939,9 @@ mainTesting = async () =>{
 
     await fileTypeInvalid();*/
 
-    await validNFT()
+    await retrieveLeaves()
+
+    //await validNFT()
 }
 
 gateVerify = async (nftObj, files) =>{

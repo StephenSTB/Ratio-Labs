@@ -80,11 +80,6 @@ class Display extends Component{
         }
     }
 
-    searchChange = (e, data) =>{
-        var searchText = data.value;
-        this.setState({searchText})
-    }
-
     getNFTinfo = async () =>{
         console.log("NFT INFO")
         
@@ -148,7 +143,7 @@ class Display extends Component{
         //console.log(content[0].src)
 
 
-        for(var i = 0; i < content.length; i++){
+        for(i = 0; i < content.length; i++){
             if(content[i].src === ""){
                 content.splice(i, 1)
                 i--;
@@ -162,7 +157,7 @@ class Display extends Component{
         content[0].active = true;
 
         var display = content[0].type === "image" ? 
-                        <img src={content[0].src}  id="uploadedContent"/> :
+                        <img src={content[0].src}  id="uploadedContent" alt=""/> :
                       content[0].type === "audio" ? 
                         <audio id="uploadedContent" controls="Pause, Play"> <source src={content[0].src} /></audio> :
                       content[0].type === "video" ? 
@@ -259,7 +254,7 @@ class Display extends Component{
             content[mediaIndex].active = true;
             
             var display = content[mediaIndex].type === "image" ? 
-                                <img src={content[mediaIndex].src}  id="uploadedContent"/> :
+                                <img src={content[mediaIndex].src}  id="uploadedContent" alt=""/> :
                         content[mediaIndex].type === "audio" ? 
                                 <audio id="uploadedContent" controls="Pause, Play"> <source src={content[mediaIndex].src} /></audio> :
                         content[mediaIndex].type === "video" ? 
@@ -371,7 +366,7 @@ class Display extends Component{
     render(){
 
         return(
-            <div id="mainComponent">
+            <div id="subComponent">
                 <Segment basic inverted id="banner" style={{height: "25vh"}}>
                         <Container textAlign="left">
                             <div id="bannerText">Display</div>

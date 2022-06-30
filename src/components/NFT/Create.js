@@ -139,7 +139,7 @@ class Create extends Component{
             this.setState({addSection:false})
             
             if(type === "image"){
-                content.push(<div id="contentSize"><img src ={event.target.result}  id="uploadedContent"/></div>)
+                content.push(<div id="contentSize"><img alt="" src ={event.target.result}  id="uploadedContent"/></div>)
                 contentType.push(type);
                 files.push(file);
             }
@@ -162,12 +162,11 @@ class Create extends Component{
 
             if(content.length < 4){
                 //console.log("add")
-                var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection}/><Button icon="plus" color="black" onClick={this.addContentSection}/></div>
-                this.setState({contentButtons})
+                
+                this.setState({contentButtons: <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection}/><Button icon="plus" color="black" onClick={this.addContentSection}/></div>})
             }
             else{
-                var contentButtons = <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection} /><Button icon="plus" color="black" disabled/></div>
-                this.setState({contentButtons})
+                this.setState({contentButtons: <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection} /><Button icon="plus" color="black" disabled/></div>})
             }
 
             
@@ -360,13 +359,13 @@ class Create extends Component{
         // Place files uri content into contentJSON
         for(var i = 0; i < files.length; i++){
             console.log(`adding file '${files[i].name}' to nft`)
-            var result = await ipfs.add(files[i]);
-            console.log(`${files[i].name} cid: ${result.cid.toString()}`);
+            var res = await ipfs.add(files[i]);
+            console.log(`${files[i].name} cid: ${res.cid.toString()}`);
             switch(this.state.contentType[i]){
-                case "image": contentJSON["image"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
-                case "video": contentJSON["video"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
-                case "audio": contentJSON["audio"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
-                case "model": contentJSON["model"] = "ipfs://" + result.cid.toString() + "?filename=" + files[i].name; break;
+                case "image": contentJSON["image"] = "ipfs://" + res.cid.toString() + "?filename=" + files[i].name; break;
+                case "video": contentJSON["video"] = "ipfs://" + res.cid.toString() + "?filename=" + files[i].name; break;
+                case "audio": contentJSON["audio"] = "ipfs://" + res.cid.toString() + "?filename=" + files[i].name; break;
+                case "model": contentJSON["model"] = "ipfs://" + res.cid.toString() + "?filename=" + files[i].name; break;
                 default:
                     break;
             }
@@ -377,7 +376,7 @@ class Create extends Component{
 
         var subURIs = [];
 
-        for(var i = 0; i < subURIsT.length; i++ ){
+        for(i = 0; i < subURIsT.length; i++ ){
             if(subURIsT[i] !== undefined){
                 subURIs.push(subURIsT[i])
                 continue;
@@ -433,15 +432,13 @@ class Create extends Component{
         var web3 = this.props.web3;
 
         if(this.props.networkError !== ""){
-            var createError = this.props.networkError
-            this.setState({createError, stepText: ""});
+            this.setState({createError: this.props.networkError, stepText: ""});
             return;
         }
 
         // Deploy NFT Contract
         if(this.props.account === undefined){
-            var createError = "Connect Wallet to Create your NFT."
-            this.setState({createError, stepText: ""});
+            this.setState({createError: "Connect Wallet to Create your NFT.", stepText: ""});
             return;
         }
 
@@ -615,24 +612,43 @@ class Create extends Component{
                     break; 
                 case 4:
                     leaf = web3.utils.soliditySha3(ratioNFT.address, this.props.account, baseURI, subURIs[0], subURIs[1], subURIs[2], subURIs[3], block)
+                    break;
+                default:
                     break; 
             }
+            var valBlocks = 0;
 
-            var currentBlock = await nftProtocol.latestBlock();
+            var leaves;
 
-            while(currentBlock._block === latestBlock._block){
-                console.log("Waiting for new block...")
-                await new Promise(p => setTimeout(p, 2000));
-                currentBlock = await nftProtocol.latestBlock();
+            while(valBlocks < 2){   
+                var currentBlock = await nftProtocol.latestBlock();
+
+                while(currentBlock._block === latestBlock._block){
+                    console.log("Waiting for new block...")
+                    await new Promise(p => setTimeout(p, 2000));
+                    currentBlock = await nftProtocol.latestBlock();
+                }
+
+                var leavesRequest = await gatewayApi.leaves(currentBlock._leaves)
+
+                while(leavesRequest.status !== "success"){
+                    console.log("Waiting for valid leaves request...")
+                    await new Promise(p => setTimeout(p, 2000));
+                    leavesRequest = await gatewayApi.leaves(currentBlock._leaves)
+                }
+
+                leaves = leavesRequest.data.leaves;
+
+                if(!leaves.includes(leaf)){
+                    console.log("leaf was not in current block.")
+                    latestBlock = currentBlock;
+                    valBlocks++
+                    continue
+                }
+                break;
             }
 
-            while(!currentBlock._leaves.includes(leaf)){
-                console.log("Waiting for block to include leaf...")
-                await new Promise(p => setTimeout(p, 2000));
-                currentBlock = await nftProtocol.latestBlock();
-            }
-
-            var tree = new MerkleTree(currentBlock._leaves, keccak256, {sort: true})
+            var tree = new MerkleTree(leaves, keccak256, {sort: true})
 
             var proof = tree.getHexProof(leaf)
 
@@ -673,7 +689,7 @@ class Create extends Component{
         var createButton = this.props.loading ?  <Button id="createButton" color="black" loading size="huge">Loading</Button> : <Button id="createButton" color="black" onClick={this.createNFT} size="huge">Create NFT</Button> 
 
         return(
-            <div id="mainComponent">
+            <div id="subComponent">
                 <Segment basic inverted id="banner">
                         <Container textAlign="left">
                             <div id="bannerText">Create</div>

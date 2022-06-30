@@ -7,7 +7,6 @@
 
 @media screen and (min-width: 900px) {
     #TopMenu{
-        background-image: url("../../logos/content/RatioColors.png") !important;
         height: 60px !important;
         width: 100vw;
     }
@@ -16,11 +15,14 @@
 @media screen and (max-width: 600px) {
 
     #TopMenu{
-        background-image: url("../../logos/content/RatioColors.png") !important;
         height: 60px !important;
         width: 100vw;
     }
 
+}
+
+#TopMenu, #mobileMenu, .cardStyle, .mobileCardStyle{
+    background-image: url("../../logos/content/RatioColorsAnalogous.png") !important;
 }
 
 #link, #connect{
@@ -56,7 +58,6 @@
 }
 
 #mobileMenu{
-    background-image: url("../../logos/content/RatioColors.png") !important;
     background-repeat: no-repeat;
     background-position: left !important;
     height: 50vh;
@@ -65,14 +66,12 @@
 
 .cardStyle{
     width: 500px;
-    background-image: url("../../logos/content/RatioColors.png") !important;
-    background-position: right !important;
+    background-position: right top !important;
 }
 
 .mobileCardStyle{
     width: 100vw;
-    background-image: url("../../logos/content/RatioColors.png") !important;
-    background-position: right !important;
+    background-position: right top !important;
 }
 
 

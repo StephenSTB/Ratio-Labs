@@ -12,8 +12,6 @@ const fs = require("fs");
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-const ipfs_http = require('ipfs-http-client');
-
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 const providers = require('../../../src/data/Providers.json');
@@ -23,9 +21,6 @@ var provider = null;
 var web3 = null;
 
 const core = require('./core.js');
-
-// IPFS
-const IPFS = require("ipfs");
 
 var ipfs;
 
@@ -85,12 +80,6 @@ mongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true}, asyn
         console.log("couldn't CREATE transactions collection");
     }
     try{
-        await db.createCollection("slash");
-    }
-    catch{
-        console.log("couldn't CREATE slash collection");
-    }
-    try{
         await db.createCollection("logs");
     }
     catch{
@@ -142,6 +131,10 @@ web3init = async () =>{
 }
 
 ipfsinit = async () =>{
+    // IPFS
+    const IPFS = await import("ipfs");
+
+    const ipfs_http = await import('ipfs-http-client');
 
     if(args.includes("HTTP")){
         ipfs = await ipfs_http.create('/ip4/127.0.0.1/tcp/5002/http');

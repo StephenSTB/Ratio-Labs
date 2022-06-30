@@ -1,29 +1,9 @@
-@font-face { font-family: OpenSans; 
-    src: url('../../fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf'); } 
+@import '../../App.css';
 
-@font-face { font-family: Milkshake; 
-    src: url("../../fonts/Milkshake/Milkshake 400.ttf"); } 
 
-:root{
-    --green: #54c18a;
-    --purple:  #41227f;
-    --teal: #44abc6;
-    --red: #70181e;
-    --black : #1a1a1a;
-}
+
 /* Desktop */
 @media screen and (min-width: 900px) {
-
-    #banner{
-        height: 25vh;
-    }
-
-    #bannerText{
-        margin-top: 10vh;
-        font-size: 6em;
-        color: #54c18a;
-        font-family: Milkshake !important;
-    }
 
     #prompt, #required{
         font-size: medium;
@@ -49,13 +29,6 @@
 /*Mobile*/
 @media screen and (max-width: 600px) {
 
-    #bannerText{
-        margin-top: 5vh;
-        font-size: 6em;
-        color: #54c18a;
-        font-family: Milkshake !important;
-    }
-    
     #required{
         margin-top: 1vh;
     }
@@ -80,36 +53,6 @@
     }
 } 
 
-#NFT{
-    background-color: var(--green);
-    color: black;
-    border: none;
-    margin-top: 60px;
-    height: 100vh;
-}
-
-#NFT_Menu{
-    background-image: url("../../logos/content/RatioColors.png") !important; 
-    border: none;
-    margin: auto;
-    height: 60px;
-    border-radius: 0px !important;
-}
-
-#mainComponent{
-    background-color: var(--green);
-    min-height: 88vh;
-    display: flex;
-    flex-direction: column;
-}
-
-#bannerSub{
-    margin-top: 40px;
-    font-size: 2em;
-    color: #54c18a;
-    font-family: Milkshake !important;
-    padding-left: 100px;
-}
 
 #networkError{
     color: var(--red);
@@ -519,7 +462,7 @@
 
 #badNFT{
     width: 750px;
-    height: 40vh;
+    height: 50vh;
     border: none;
     resize: none;
     background: none;
@@ -535,15 +478,13 @@
     padding-left: 1.5vh;
 }
 
-
 #cryptoMonkeyRatioNFT{
     width: 1200px;
-    height: 50vh;
+    height: 55vh;
     border: none;
     resize: none;
     background: none;
     font-family: OpenSans;
-    
 }
 
 #nftProtocol{

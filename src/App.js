@@ -16,7 +16,7 @@ import networkData from "./data/Network_Data.json";
 
 import * as contract from "@truffle/contract";
 
-import deployedContracts from "./data/Deployed_Contracts.json"
+//import deployedContracts from "./data/Deployed_Contracts.json"
 
 import RatioSingleNFT from './contracts/RatioSingleNFT.json';
 
@@ -48,6 +48,7 @@ class App extends Component{
     this.state = {selectedAccount: "Connect Wallet", network: null, networkHex: networkData["80001"].chainId , selectedProviderImage: images["80001"], unlocked: false, loading: false,
                     NFTProtocol: null, RatioSingleNFT: null,
                     networkError: "",
+                    prod: true,
                   }
     this.updateWeb3 = this.updateWeb3.bind(this);
     this.updateWallet = this.updateWallet.bind(this);

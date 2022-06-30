@@ -5,7 +5,7 @@ AFRAME.registerComponent(`target-marker`, {
         let el = this.el;
         this.addMarker = function(e){
             let p = e.detail.intersection.point;
-            let scene = document.querySelector('a-scene');
+            //let scene = document.querySelector('a-scene');
 
             let newMark = document.createElement('a-entity');
 

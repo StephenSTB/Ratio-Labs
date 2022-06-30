@@ -5,7 +5,7 @@ import {Menu} from 'semantic-ui-react';
 
 import {Link, Routes, Route, useParams} from 'react-router-dom';
 
-import { createMedia } from '@artsy/fresnel';
+//import { createMedia } from '@artsy/fresnel';
 
 import "./NFT.css";
 
@@ -13,8 +13,7 @@ import Create from "./Create";
 
 import Display from "./Display";
 
-import NFT_About from "./NFT_About";
-
+//import NFT_ABOUT from "./NFT_About";
 
 class NFT_Menu extends Component{
     constructor(props){
@@ -28,8 +27,8 @@ class NFT_Menu extends Component{
         }
 
         return(
-            <div id="NFT">
-                <Menu id="NFT_Menu" borderless>
+            <div id="baseComponent">
+                <Menu id="subMenu" borderless>
                     <Menu.Menu position="right">
                         <Menu.Item>
                             <Link to="Create"><div id="link">Create</div></Link>
@@ -43,14 +42,13 @@ class NFT_Menu extends Component{
                     </Menu.Menu>
                     <Menu.Menu position="right">
                         <Menu.Item>
-                            
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
                 <Routes>
                     <Route path="Create" element = {<Create {...this.props} setLoading = {this.props.setLoading}/>}/>
                     <Route path="Display/:searchContract" element = {<DisplayW/>}/>
-                    <Route path="NFT_About" element = {<NFT_About/>}/>
+                    {/*<Route path="NFT_About" element = {<NFT_ABOUT/>}/>*/}
                 </Routes>
             </div>
         );

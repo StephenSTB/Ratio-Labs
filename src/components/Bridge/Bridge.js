@@ -5,6 +5,8 @@ import {Segment, Container} from 'semantic-ui-react';
 
 import "./Bridge.css"
 
+import Message from "../Message/Message";
+
 class Bridge extends Component{
     constructor(props){
         super();
@@ -12,12 +14,16 @@ class Bridge extends Component{
     }
     render(){
         return(
-            <div id="bridgeComponent">
-                <Segment basic inverted id="banner" style={{"marginTop": "5vh", height: "25vh"}}>
-                        <Container textAlign="left">
-                            <div id="bannerText">Bridge</div>
-                        </Container>
-                </Segment>
+            <div id='baseComponent'>
+                <div id="subSpace" />
+                <div id="subComponent" >
+                    <Segment basic inverted id="banner">
+                            <Container textAlign="left">
+                                <div id="bannerText">Bridge</div>
+                            </Container>
+                    </Segment>
+                    <Message message={"Research In Progress..."}/>
+                </div>
             </div>
         );
     }

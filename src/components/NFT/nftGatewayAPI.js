@@ -30,27 +30,28 @@ module.exports = class nftGatewayAPI{
     
         return null;
     }
-    /*
-    verify = async(nft) =>{
+
+    leaves = async(cid) =>{
         try{
-            const resp = await fetch(host + "/verify", {
-                method: 'POST',
+            const resp = await fetch(host + "/leaves?cid=" + cid, {
+                method: 'GET',
                 mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 redirect: 'follow',
                 referrerPolicy: 'no-referrer',
-                body: JSON.stringify(nft)
+                
             });
-        
-            //console.log(await resp.json());
+            /*
+            console.log("res:");
+            console.log(await resp.json())*/
             return await resp.json();
         }
         catch{}
-        
+    
         return null;
-    }*/
+    }
 
 
     verify = async(data) =>{

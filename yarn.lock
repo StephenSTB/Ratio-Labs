@@ -14293,13 +14293,6 @@
   dependencies:
     "minimist" "^1.2.6"
 
-"mmmagic@^0.5.3":
-  "integrity" "sha512-xLqCu7GJYTzJczg0jafXFuh+iPzQL/ru0YYf4GiTTz8Cehru/wiXtUS8Pp8Xi77zNaiVndJ0OO1yAFci6iHyFg=="
-  "resolved" "https://registry.npmjs.org/mmmagic/-/mmmagic-0.5.3.tgz"
-  "version" "0.5.3"
-  dependencies:
-    "nan" "^2.13.2"
-
 "mnemonist@^0.38.0":
   "integrity" "sha512-bZTFT5rrPKtPJxj8KSV0WkPyNxl72vQepqqVUAW2ARUpUSF2qXMB6jZj7hW5/k7C1rtpzqbD/IIbJwLXUjCHeg=="
   "resolved" "https://registry.npmjs.org/mnemonist/-/mnemonist-0.38.5.tgz"
@@ -14453,7 +14446,7 @@
     "buffer" "^5.6.0"
     "varint" "^5.0.0"
 
-"multiformats@^9.0.0", "multiformats@^9.0.2", "multiformats@^9.0.4", "multiformats@^9.1.0", "multiformats@^9.4.2", "multiformats@^9.4.5", "multiformats@^9.4.7", "multiformats@^9.5.1", "multiformats@^9.5.4", "multiformats@^9.6.3", "multiformats@^9.6.4", "multiformats@^9.6.5":
+"multiformats@^9.0.0", "multiformats@^9.0.2", "multiformats@^9.0.4", "multiformats@^9.1.0", "multiformats@^9.4.2", "multiformats@^9.4.5", "multiformats@^9.4.7", "multiformats@^9.5.1", "multiformats@^9.5.4", "multiformats@^9.6.3", "multiformats@^9.6.4":
   "integrity" "sha512-vMwf/FUO+qAPvl3vlSZEgEVFY/AxeZq5yg761ScF3CZsXgmTi/HGkicUiNN0CI4PW8FiY2P0OLklOcmQjdQJhw=="
   "resolved" "https://registry.npmjs.org/multiformats/-/multiformats-9.6.5.tgz"
   "version" "9.6.5"
@@ -16973,13 +16966,6 @@
   "resolved" "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   "version" "1.5.1"
 
-"qr-scanner@^1.4.1":
-  "integrity" "sha512-xiR90NONHTfTwaFgW/ihlqjGMIZg6ExHDOvGQRba1TvV+WVw7GoDArIOt21e+RO+9WiO4AJJq+mwc5f4BnGH3w=="
-  "resolved" "https://registry.npmjs.org/qr-scanner/-/qr-scanner-1.4.1.tgz"
-  "version" "1.4.1"
-  dependencies:
-    "@types/offscreencanvas" "^2019.6.4"
-
 "qrcode@^1.5.0":
   "integrity" "sha512-9MgRpgVc+/+47dFvQeD6U2s0Z92EsKzcHogtum4QB+UNd025WOJSHvn/hjk9xmzj7Stj95CyUAs31mrjxliEsQ=="
   "resolved" "https://registry.npmjs.org/qrcode/-/qrcode-1.5.0.tgz"
@@ -18316,21 +18302,6 @@
     "escape-html" "~1.0.3"
     "parseurl" "~1.3.3"
     "send" "0.18.0"
-
-"serve@^13.0.2":
-  "integrity" "sha512-71R6fKvNgKrqARAag6lYJNnxDzpH7DCNrMuvPY5PLVaC2PDhJsGTj/34o4o4tPWhTuLgEXqvgnAWbATQ9zGZTQ=="
-  "resolved" "https://registry.npmjs.org/serve/-/serve-13.0.2.tgz"
-  "version" "13.0.2"
-  dependencies:
-    "@zeit/schemas" "2.6.0"
-    "ajv" "6.12.6"
-    "arg" "2.0.0"
-    "boxen" "5.1.2"
-    "chalk" "2.4.1"
-    "clipboardy" "2.3.0"
-    "compression" "1.7.3"
-    "serve-handler" "6.1.3"
-    "update-check" "1.5.2"
 
 "servify@^0.1.12":
   "integrity" "sha512-/xE6GvsKKqyo1BAY+KxOWXcLpPsUUyji7Qg3bVD7hh1eRze5bR1uYiuDA/k3Gof1s9BTzQZEJK8sNcNGFIzeWw=="
