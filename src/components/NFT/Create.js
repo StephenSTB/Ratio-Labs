@@ -1,9 +1,12 @@
 import React, { Component } from "react";
+
 import 'semantic-ui-css/semantic.min.css';
 
-import {Container, Segment, Form, Icon, Button, Divider, Radio, Popup, TextArea} from 'semantic-ui-react';
+import {Container, Segment, Form, Icon, Button, Divider, Radio, Popup, TextArea, Flag} from 'semantic-ui-react';
 
 import  "@google/model-viewer";
+
+import {create} from "ipfs-core"
 
 import deployedContracts from "../../data/Deployed_Contracts.json"
 
@@ -17,6 +20,10 @@ import * as keccak256 from 'keccak256';
 
 import * as mime from 'mime-types';
 
+import all from "it-all";
+
+import * as uint8arrays from "uint8arrays"
+
 var gatewayApi;
 
 var prod = false;
@@ -26,6 +33,8 @@ var host;
 var uri_ext = ["jpg", "jpeg", "png", "gif", "svg", "mp3", "mpga", "wav", "ogg", "oga", "mp4", "webm", "glb", "gltf"];
 
 var max_size = 100_000_000;
+
+var zeroAddress = "0x0000000000000000000000000000000000000000";
 
 class Create extends Component{
 
@@ -37,11 +46,11 @@ class Create extends Component{
                                         <Icon name="plus square outline" size="huge"></Icon>
                                     </div>
                                     <div id="addIcon" >(Image, Video, Audio, or Model)</div>
-                                </label>], contentType: [], files: [],
+                                </label>], contentType: [], files: [], fileCIDs: [],
                         contentButtons: null, addSection: true, contentError: null,
                         animation_url: null, animation_type: null,
                         name: "", description: "",
-                        attributes:[],
+                        properties: [], attributes:[],
                         options:[{key: "number", text:"Number", value:"number"}, {key:"string", text:"Word", value:"string"}, ],
                         createLoading: false,
                         burnable: false,
@@ -65,24 +74,57 @@ class Create extends Component{
         if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== ""){
             return;   
         }
-        
-        /*this.NFTProtocol.setProvider(this.props.web3.currentProvider)*/
+       
+        try{
+            var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
 
-        //console.log(`NFTProtocol address: ${deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address}`)
+            console.log("NFT Protocol Address:" + protocolAddress)
+
+            var nftProtocol = await this.props.NFTProtocol.at(protocolAddress)
+
+            console.log("NFT Protocol Address:" + nftProtocol.address)
+
+            this.setState({nftProtocol})
+            
+        }
+        catch(e)
+        {
+            this.setState({nftProtocol: undefined})
+            console.log(e)
+        }
+
     }
 
     componentDidUpdate = async (prevProps) =>{
-
         //console.log("update")
-        
         if(this.props.web3 === undefined || this.props.account === undefined || this.props.networkError !== "" || prevProps === undefined)
         {
             return;
         }
 
+        if(prevProps !== this.props){
+            try{
+                var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
+    
+                console.log("NFT Protocol Address:" + protocolAddress)
+    
+                var nftProtocol = await this.props.NFTProtocol.at(protocolAddress)
+    
+                console.log("NFT Protocol Address:" + nftProtocol.address)
+    
+                this.setState({nftProtocol})
+                
+            }
+            catch(e)
+            {
+                this.setState({nftProtocol: undefined})
+                console.log(e)
+            }
+        }
+        
     }
 
-    addContent = (file) =>{
+    addContent = async (file) =>{
 
         var curSize = 0;
         for(var f of this.state.files){
@@ -125,8 +167,31 @@ class Create extends Component{
         }
 
         if(this.state.contentType.includes(type)){
-            var error = "A " + type + " has already been added. Only one content object per type is allowed."
-            this.setState({contentError: error})
+            this.setState({contentError: "A " + type + " has already been added. Only one content object per type is allowed."})
+            return;
+        }
+
+        var nftProtocol = this.state.nftProtocol;
+
+        if(nftProtocol === undefined || global.ipfs === undefined){
+            this.setState({contentError: "NFT Protocol address not defined."})
+            return
+        }
+
+        var blob = new Blob([file])
+
+        console.log(blob);
+
+        var uri = "ipfs://" + (await global.ipfs.add(blob)).cid.toString() + "?filename=" + file.name;
+
+        console.log(`file uri: ${uri}`);
+
+        var exists = await nftProtocol.contract.methods.subURIContract(uri).call();
+
+        if(exists !== zeroAddress){
+            console.log("uri exists:")
+            console.log(exists)
+            this.setState({contentError: "Content already exists in Ratio NFT Protocol."})
             return;
         }
                  
@@ -140,36 +205,28 @@ class Create extends Component{
             
             if(type === "image"){
                 content.push(<div id="contentSize"><img alt="" src ={event.target.result}  id="uploadedContent"/></div>)
-                contentType.push(type);
-                files.push(file);
             }
             if(type === "audio"){
                 content.push(<div id="contentSize"><audio id="uploadedContent" controls="Pause, Play"> <source src={event.target.result} /></audio></div>)
-                contentType.push(type);
-                files.push(file);
             }
             if(type === "video"){
                 content.push(<div id="contentSize"><video id="uploadedContent" autoPlay muted> <source src={event.target.result} /></video></div>)
-                contentType.push(type);
-                files.push(file);
             }
             if(type === "model"){
                 content.push(<div id="contentSize"><model-viewer id="uploadedContent" src={event.target.result} camera-controls/></div>)
-                contentType.push(type);
-                files.push(file);
             }
+
+            contentType.push(type);
+            files.push(file);
+
             this.setState({content, contentType, files});
 
             if(content.length < 4){
-                //console.log("add")
-                
                 this.setState({contentButtons: <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection}/><Button icon="plus" color="black" onClick={this.addContentSection}/></div>})
             }
             else{
                 this.setState({contentButtons: <div id="contentButtons"><Button icon="minus" color="black" onClick={this.removeContentSection} /><Button icon="plus" color="black" disabled/></div>})
             }
-
-            
         })
         reader.readAsDataURL(file)
     }
@@ -290,7 +347,6 @@ class Create extends Component{
 
     claimValueChange = (e) =>{
         var claimValue = e.target.value;
-        
         this.setState({claimValue})
     }
 
@@ -299,9 +355,10 @@ class Create extends Component{
         this.setState({burnable: !burnable})
     }
 
-    addMetaData(nftJSON){
-
+    addMetaData(){
         var result = {success: false}
+
+        var nftJSON = {}
 
         if(this.state.name.length < 5){
             var createError = "*Name must be at least 5 characters."
@@ -336,11 +393,9 @@ class Create extends Component{
         }
 
         return {success: true, nftJSON}
-
     }
 
     createContent = async(files, ipfs) =>{
-
         var result = {success: false}
 
         this.props.setLoading(true);
@@ -416,6 +471,32 @@ class Create extends Component{
 
         result.success = true;
         return result;
+    }
+
+    ipfsHost = async (ipfs, nftJSON, files) =>{
+
+        console.time('IPFS Started')
+        await ipfs.start();
+        console.timeEnd('IPFS Started')
+
+        console.log("adding files");
+
+        var addNFT = await ipfs.add(JSON.stringify(nftJSON))
+
+        console.log(addNFT.cid.toString());
+
+        await ipfs.pin.add(addNFT.cid)
+
+        for(var f of files){
+            console.log(f.name)
+            var blob = new Blob([f]);
+
+            var addBlob = await ipfs.add(blob);
+
+            console.log("file cid: " + addBlob.cid.toString());
+
+            await ipfs.pin.add(addBlob.cid)
+        }
     }
 
     createNFT = async () =>{
@@ -505,24 +586,18 @@ class Create extends Component{
 
             var contentHash = web3.utils.soliditySha3(JSON.stringify(contentJSON))
             console.log(web3.eth.personal)
-            var signedContent = await web3.eth.sign(contentHash, this.props.account) //this.wallet.unlocked ? wallet.sign(contentHash) : 
+            var signedContent = await web3.eth.personal.sign(contentHash, this.props.account) 
             //console.log(signedContent)
             nftJSON["content"] = contentJSON;
             nftJSON["signature"] = signedContent;
 
             console.log(JSON.stringify(nftJSON))
 
-            //Add 
-
             var nft = await ipfs.add(JSON.stringify(nftJSON));
 
             var baseURI = "ipfs://" + nft.cid.toString()
 
             console.log(`   BaseURI: ${baseURI}`);
-
-            var protocolAddress = deployedContracts[networkData[this.props.network].chainName].NFTProtocol.address;
-
-            console.log("NFT Protocol Address:" + protocolAddress)
 
             this.setState({stepText: "Setting NFT Contract BaseURI..."});
 
@@ -536,19 +611,27 @@ class Create extends Component{
                 return;
             }*/
 
-            var block = (await ratioNFT.setBaseURI(baseURI, true, protocolAddress, {from: this.props.account, value: web3.utils.toWei(".01", "ether")})).receipt.blockNumber;
+            console.log(`${this.state.nftProtocol.address}`);
+
+            var block = (await ratioNFT.setBaseURI(baseURI, true, this.state.nftProtocol.address, {from: this.props.account, value: web3.utils.toWei(".01", "ether")})).receipt.blockNumber;
 
             console.log(`NFT Verificaiton Request Block Number: ${block}`);
 
             console.log(` ${nftJSON.content.contract}`);
 
-            this.setState({stepText: "Sending Ratio Labs NFT For Verification..."})
+            this.setState({stepText: `Hosting NFT For Ratio Labs Verification...`})
 
-            var nftProtocol = await this.props.NFTProtocol.at(protocolAddress);
+            var nftProtocol = this.state.nftProtocol;
 
             var latestBlock = await nftProtocol.latestBlock();
 
             console.log(`latestBlock: ${latestBlock}`);
+
+            // TOOD: IPFS hosting.
+
+            await this.ipfsHost(ipfs, nftJSON, files)
+
+            /*
             
             var state = await gatewayApi.state(nftJSON.content.contract);
 
@@ -574,7 +657,7 @@ class Create extends Component{
             }
 
             // Send data to Ratio
-
+            
             const form = new FormData();
 
             const nftString = JSON.stringify(nftJSON);
@@ -595,9 +678,12 @@ class Create extends Component{
             console.log(`verify: ${verify}`);
 
             state = await gatewayApi.state(nftJSON.content.contract);
-            console.log(`   State: ${JSON.stringify(state)}`);
+            console.log(`   State: ${JSON.stringify(state)}`);*/
+            
 
             this.setState({stepText: "Waiting for Ratio Labs Verification..."})
+
+            // TODO: Handle transaction.
 
             var leaf;
             switch(subURIs.length){
@@ -629,6 +715,7 @@ class Create extends Component{
                     currentBlock = await nftProtocol.latestBlock();
                 }
 
+                /*
                 var leavesRequest = await gatewayApi.leaves(currentBlock._leaves)
 
                 while(leavesRequest.status !== "success"){
@@ -644,8 +731,55 @@ class Create extends Component{
                     latestBlock = currentBlock;
                     valBlocks++
                     continue
+                }*/
+
+                console.log(currentBlock._leaves)
+
+                var leaves;
+
+                var inBlock = true;
+
+                var leavesRequest = 0;
+                
+                while(leavesRequest < 2){
+                    try{
+                        var leavesData = uint8arrays.concat(await all(await ipfs.cat("/ipfs/" + currentBlock._leaves, {timeout: 2000})))
+
+                        var leavesDecode = new TextDecoder().decode(leavesData).toString();
+
+                        var leavesJSON = JSON.parse(leavesDecode);
+
+                        leaves = leavesJSON.leaves;
+
+                        console.log(`leaves: ${leaves}`);
+
+                        if(!leaves.includes(leaf)){
+                            inBlock = false;  
+                        }
+                        break;
+                    }
+                    catch(e){
+                        console.log(e)
+                        leavesRequest++
+                        await new Promise(p => setTimeout(p, 2000))
+                    }
+                    if(leavesRequest === 2){
+                        this.setState({createError: "Unexpected IPFS retreival error!", stepText: ""}); // Potential valid nft error. TODO: verification tool
+                    }
                 }
+
+                if(!inBlock){
+                    continue;
+                }
+
                 break;
+            }
+
+            try{
+                await ipfs.stop()
+            }
+            catch{
+                console.log("ipfs couldn't be stopped.")
             }
 
             var tree = new MerkleTree(leaves, keccak256, {sort: true})
@@ -677,6 +811,9 @@ class Create extends Component{
         }
         catch(err){
             console.log(err)
+            try{
+                await ipfs.stop();
+            }catch{}
         }
 
         //var version =  await global.ipfs.version()

@@ -6,6 +6,7 @@
   "dependencies": {
     "@artsy/fresnel": "^3.5.0",
     "@google/model-viewer": "^1.12.0",
+    "@idena/vrf-js": "^1.0.1",
     "@openzeppelin/contracts": "^4.6.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
@@ -19,6 +20,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.1",
+    "eccrypto": "^1.1.6",
     "express": "^4.18.1",
     "express-rate-limit": "^6.4.0",
     "file-type": "^17.1.2",
@@ -27,7 +29,7 @@
     "fs-extra": "^10.1.0",
     "ganache": "^7.3.0",
     "hdkey": "^2.0.1",
-    "ipfs": "^0.63.3",
+    "ipfs": "^0.63.5",
     "ipfs-http-client": "^57.0.1",
     "it-all": "^1.0.6",
     "it-to-buffer": "^2.0.2",
@@ -50,8 +52,12 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.1.3",
     "truffle": "^5.5.18",
+    "truffle-contract-size": "^2.0.1",
     "tsparticles": "^2.0.6",
+    "typescript": "^4.7.4",
     "uint8arrays": "^3.0.0",
+    "vrf-solidity": "^0.2.3",
+    "vrf.js": "^0.0.5",
     "web-vitals": "^2.1.4"
   },
   "resolutions": {
@@ -75,10 +81,12 @@
     "oracle-ganache": "nodemon --ignore ./NFTProtocol/V2/oracleV2/nft --ignore ./NFTProtocol/V2/oracleV2/leaves --ignore ./src --ignore ./NFTProtocol/V2/gatewayV2 ./NFTProtocol/V2/oracleV2/oracle.js Ganache HTTP",
     "oracle-mumbai": "nodemon --ignore ./NFTProtocol/V2/oracleV2/nft --ignore ./NFTProtocol/V2/oracleV2/leaves --ignore ./src --ignore ./NFTProtocol/V2/gatewayV2 ./NFTProtocol/V2/oracleV2/oracle.js Mumbai HTTP",
     "contractsTest": "truffle test ./test/MockGovernor.js --compile-none",
-    "cryptoGameTest": "truffle test ./test/CryptoGame.js --compile-none",
+    "cryptoGameTruffle": "truffle test ./test/CryptoGame.js",
+    "cryptoMonkey": "tsc ./CryptoMonkeys/CryptoMonkeysVRF.ts",
+    "cryptoGameTest": "run-s cryptoGameTruffle",
     "nftProtocol": "truffle test ./test/NFTProtocol.js",
     "ipfs-execute": "node ./IPFS/ipfs-execute.js",
-    "deploy-ganache": "node --no-deprecation ./deployment/deploy.js Ganache NFTProtocol",
+    "deploy-ganache": "node --no-deprecation ./deployment/deploy.js Ganache NFTProtocol NFTMinter CryptoMonkeys",
     "deploy-mumbai": "node --no-deprecation ./deployment/deploy.js Mumbai NFTProtocol",
     "migrate": "truffle migrate --network development --compile-none",
     "ganache": "bash ganache.sh",
@@ -90,7 +98,11 @@
     "nftGateTest": "node ./NFTProtocol/test/V2/nftGatewayTesting.js",
     "nftOracleTesting": "node ./NFTProtocol/test/V2/nftOracleTesting.js",
     "nftOracleTest": "run-s deployTest nftOracleTesting",
-    "init": "node ./init/init.js"
+    "init": "node ./init/init.js",
+    "oracle": "node --loader ts-node/esm ./Oracle/Oracle.ts",
+    "cryptoMonkeys": "node --loader ts-node/esm ./CryptoMonkeys/CryptoMonkeysVRF.ts Ganache",
+    "cryptoMonkeysTest": "node --loader ts-node/esm ./CryptoMonkeys/test/CryptoMonkeysTest.ts Ganache",
+    "cmtest": "run-s deploy-ganache cryptoMonkeysTest"
   },
   "eslintConfig": {
     "extends": [

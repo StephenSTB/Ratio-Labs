@@ -37,6 +37,15 @@ const PolyCard = contract(require('../src/contracts/PolyCard.json'));
 
 const RatioNFT = contract(require('../src/contracts/RatioSingleNFT.json'));
 
+const CryptoMonkeys = contract(require(`../src/contracts/CryptoMonkeys.json`));
+
+var nftProtocol;
+
+var nftChef;
+
+var nftMinter;
+
+var cryptoGame;
 
 // State Variables
 var provider;
@@ -46,6 +55,8 @@ var web3;
 var accounts;
 
 var contractDeploy = [];
+
+var delay = false;
 
 // Main Deployment Entry Point.
 deploy = async() =>{
@@ -100,12 +111,20 @@ deploy = async() =>{
             case "all":
                 contractDeploy.push("all")
                 break;
-            case "polyCards":
-                contractDeploy.push("polyCards");
+            case "PolyCards":
+                contractDeploy.push("PolyCards");
                 break;
             case "NFTProtocol":
                 contractDeploy.push("NFTProtocol");
                 break;
+            case "NFTMinter":
+                contractDeploy.push("NFTMinter");
+                break;
+            case "CryptoMonkeys":
+                contractDeploy.push("CryptoMonkeys");
+                break;
+            case "Delay":
+                delay = true;
             default:
                 break
         }
@@ -122,7 +141,7 @@ deploy = async() =>{
 
         NFTProtocol.setProvider(provider);
 
-        var nftProtocol = await NFTProtocol.new(utils.toWei(".01", "ether"), {from: accounts[4]});
+        nftProtocol = await NFTProtocol.new(utils.toWei(".01", "ether"), {from: accounts[4]});
 
         console.log(nftProtocol.transactionHash)
 
@@ -137,17 +156,33 @@ deploy = async() =>{
         console.log(` NFTProtocol deployed to '${nftProtocol.address}' on ${args[0]}`)
     }
 
+    
     // NFT Minter
-    if(contractDeploy.includes("all") || contractDeploy.includes("nftMinter")){
-        var cryptoGame = await CryptoGame.new({from: accounts[4]});
+    if(contractDeploy.includes("all") || contractDeploy.includes("NFTMinter")){
+
+        console.log("Attempting to create CryptoGame contracts:")
+
+        CryptoGame.setProvider(provider);
+
+        NFTChef.setProvider(provider)
+
+        NFTMinter.setProvider(provider)
+
+        cryptoGame = await CryptoGame.new({from: accounts[4]});
+
+        console.log(` CryptoGame token deployed to '${cryptoGame.address}' on ${args[0]}`)
 
         var block = await web3.eth.getBlockNumber();
-        
-        var nftChef = await NFTChef.new(cryptoGame.address, accounts[4], utils.toWei('10', "ether"), block, (block + 201600), {from: accounts[0]})
+
+        nftChef = await NFTChef.new(cryptoGame.address, accounts[4], utils.toWei('10', "ether"), block, (block + 201600), {from: accounts[4]})
+
+        console.log(` NFTChef deployed to '${nftChef.address}' on ${args[0]}`)
         
         await cryptoGame.transferOwnership(nftChef.address, {from: accounts[4]});
         
-        var nftMinter = await NFTMinter.new(nftChef.address, {from: accounts[4]});
+        nftMinter = await NFTMinter.new(nftChef.address, {from: accounts[4]});
+
+        console.log(` NFTMinter deployed to '${nftChef.address}' on ${args[0]}`)
 
         await nftChef.transferOwnership(nftMinter.address, {from: accounts[4]});
 
@@ -156,10 +191,24 @@ deploy = async() =>{
         deployedContracts[args[0]]["NFTChef"] = {address: nftChef.address};
 
         deployedContracts[args[0]]["NFTMinter"] = {address: nftMinter.address};
+
+    }
+
+    // CryptoMonkeys
+    if(contractDeploy.includes("all") || contractDeploy.includes("CryptoMonkeys")){
+
+        CryptoMonkeys.setProvider(provider);
+
+        cryptoMonkeys = await CryptoMonkeys.new(cryptoGame.address, nftProtocol.address, utils.toWei("1", "ether"), {from: accounts[4]})
+
+        console.log(` CryptoMonkeys deployed to '${cryptoMonkeys.address}' on ${args[0]}`)
+
+        deployedContracts[args[0]]["CryptoMonkeys"] = {address: cryptoMonkeys.address};
+
     }
 
     // PolyCards
-    if(contractDeploy.includes("all") || contractDeploy.includes("polyCards")){
+    if(contractDeploy.includes("all") || contractDeploy.includes("PolyCards")){
 
         WMatic.setProvider(provider);
 
@@ -226,11 +275,14 @@ deploy = async() =>{
         }
     })
 
-    console.log(`Waiting for Oracle reboot...`)
+    if(delay){
+        console.log(`Waiting for Oracle reboot...`)
 
-    await new Promise(p => setTimeout(p, 10000));
+        await new Promise(p => setTimeout(p, 10000));
 
-    console.log(`Waiting Complete`)
+        console.log(`Waiting Complete`)
+    }
+    
 
     process.exit(0);
 }

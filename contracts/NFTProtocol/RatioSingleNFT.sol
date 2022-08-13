@@ -69,10 +69,10 @@ contract RatioSingleNFT is ERC721Enumerable{
         _;
     }
 
-    constructor(string memory _name, string memory _symbol, uint _supply, uint _mintValue, uint _claimValue, bool _burnable)payable ERC721(_name, _symbol){
+    constructor(string memory _name, string memory _symbol, uint _maxSupply, uint _mintValue, uint _claimValue, bool _burnable)payable ERC721(_name, _symbol){
         require(_claimValue <= _mintValue);
         distributor = msg.sender;
-        maxSupply = _supply;
+        maxSupply = _maxSupply;
         mintValue = _mintValue;
         claimValue = _claimValue;
         burnable = _burnable;

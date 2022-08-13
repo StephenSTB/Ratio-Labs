@@ -36,9 +36,12 @@ class NFT_Menu extends Component{
                         <Menu.Item as={Link} to="Display/0x">
                             <div id="link">Display</div>
                         </Menu.Item>
-                        <Menu.Item>
+                        {/*
+                            <Menu.Item>
                             <Link to="NFT_About"><div id="link">About</div></Link>
-                        </Menu.Item>
+                        </Menu.Item>*/
+                        }
+                        
                     </Menu.Menu>
                     <Menu.Menu position="right">
                         <Menu.Item>

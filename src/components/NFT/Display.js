@@ -142,7 +142,6 @@ class Display extends Component{
 
         //console.log(content[0].src)
 
-
         for(i = 0; i < content.length; i++){
             if(content[i].src === ""){
                 content.splice(i, 1)
@@ -152,7 +151,7 @@ class Display extends Component{
             content[i].src = "https://" + content[i].src;
         }
 
-        //console.log(`${content[0].src}`)
+        console.log(`${content[0]}`)
 
         content[0].active = true;
 
@@ -167,19 +166,6 @@ class Display extends Component{
 
 
         console.log('https://ipfs.io/ipfs/' + info._base.replace("ipfs://", ""))
-
-        try{
-            var nft =  await axios({
-                method: 'get',
-                url: 'https://ipfs.io/ipfs/' + info._base.replace("ipfs://", ""),
-                timeout: 2000 // only wait for 2s
-            })
-    
-            console.log(nft)
-        }
-        catch(e){
-            
-        }
 
         var details = false;
         

@@ -214,7 +214,7 @@ core = async (db, web3, ipfs) =>{
 
         for(var i = 0; i < subURIs.length; i++){
             try{
-                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + subCIDs[i], {length: 100000000, timeout:2000})));
+                var data = uint8arrays.concat(await all(ipfs.cat("/ipfs/" + subCIDs[i], {length: 100000000, timeout:2000})));
 
                 var buf = Buffer.from(data);
 
@@ -331,7 +331,7 @@ core = async (db, web3, ipfs) =>{
             var nft;
             
             try{
-                var data = uint8arrays.concat(await all(ipfs.files.read("/ipfs/" + baseCID, {length: 100000, timeout: 2000})));
+                var data = uint8arrays.concat(await all(ipfs.cat("/ipfs/" + baseCID, {length: 100000, timeout: 2000})));
 
                 var decodedData = new TextDecoder().decode(data).toString();
 
@@ -344,7 +344,7 @@ core = async (db, web3, ipfs) =>{
                     continue;
                 }
             }catch(err){
-                //console.log("   BaseCID Read Error: " + err + "\n")
+                console.log("   BaseCID Read Error: " + err + "\n")
                 if(Number(n.block) <= rejectBlock){
                     await db.collection('nft').updateOne({contract: n.contract}, {$set: {state: "rejected"}})
                     console.log(`   ${n.contract} : ${n.baseCID} is rejected.`)

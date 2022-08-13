@@ -5,7 +5,7 @@
 @media screen and (min-width: 900px) {
 
   #particles-js{ 
-    background-image: url("../../logos/content/RatioColorsAnalogous.png"); 
+    background-image: var(--ratioColors); 
     background-repeat: no-repeat;
     height: 50vh;
   }
@@ -103,7 +103,7 @@
 @media screen and (max-width: 600px) {
 
   #particles-js{ 
-    background-image: url("../../logos/content/RatioColorsAnalogous.png"); 
+    background-image: var(--ratioColors);
     background-repeat: no-repeat;
     height: 36vh;
     background-size: 105vw 100vh;

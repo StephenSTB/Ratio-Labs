@@ -1,6 +1,7 @@
 import React, { Component} from "react";
 
 //import 'fomantic-ui-css/semantic.min.css';
+import { create } from 'ipfs-core'
 
 import './App.css';
 
@@ -30,8 +31,6 @@ import ganache from "./logos/wallet/chains/ganache.png";
 
 import kovan from "./logos/wallet/chains/kovan.png";
 
-import * as IPFS from 'ipfs-core';
-
 import Wallet from './components/HotWallet/Wallet.js'
 
 var images  = {
@@ -40,6 +39,8 @@ var images  = {
                   "1337": ganache,
                   "42": kovan
               }
+
+let ipfs;
 
 class App extends Component{
 
@@ -62,8 +63,12 @@ class App extends Component{
 
   componentDidMount = async () =>{
 
-    // Wallet INIT;
+    //console.log(wallet.web3.currentProvider)
 
+    
+
+    // Wallet INIT;
+    
     this.wallet = new Wallet()
 
     this.setState({wallet : this.wallet})
@@ -72,44 +77,50 @@ class App extends Component{
 
     //wallet.unlockWallet("password1234","80001");
 
-    //console.log(wallet.web3.currentProvider)
 
     //IPFS INIT
-    console.log(global.ipfs)
 
     if(global.ipfs === undefined){
-      
-      try{
-        
-        global.ipfs = await IPFS.create({
-          repo: 'ipfs-browser', // Math.random()
-          /*
-          config: {
-            Addresses: {
-              Swarm: [
-                '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
-                '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
-                '/dns4/localhost/tcp/13579/ws/p2p-webrtc-star/',
-              ]
-            },
-            Bootstrap: []
-          },*/
-          start: false
-        });
+      try {
+          console.time('IPFS Started')
+          global.ipfs = await create({repo: "ipfs-browser-" + Math.random(),
+                                config: {
+                                  Addresses: {
+                                    Swarm: [
+                                        '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+                                        '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+                                        '/ip4/192.168.1.115/tcp/13579/ws/p2p-webrtc-star'
+                                      ]
+                                  },
+                                 },
+                                 start: false
+                                })
+          console.timeEnd('IPFS Started')
+    
+          setInterval(async () => {
+            try{
+              var swarm = await ipfs.swarm.addrs()
+    
+              console.log(`ipfs peers: ${swarm.length}`)
+            }
+            catch(e){
+              console.log()
+            }
+            
+          }, 10000)
+    
+        } catch (error) {
+          console.error('IPFS init error:', error)
+          
+        }
+  }
 
-        console.log(global.ipfs)
-
-      }catch(err){
-        console.log(err)
-      }
-     
-    }
     /*
     if (window.ethereum) {
       this.updateWeb3(null);
     }*/
   }
-
+  
   componentDidUpdate = async (prevProps, prevState) =>{
         ///console.log("update")
   }
@@ -234,10 +245,12 @@ class App extends Component{
   render(){
     return (
       <div >
-        <BrowserRouter >
-            <TopBar {...this.state} updateWeb3 = {this.updateWeb3} updateWallet = {this.updateWallet} setLoading = {this.setLoading}/>
-            <Main {...this.state} setLoading = {this.setLoading}/>
-        </BrowserRouter>
+        {
+          <BrowserRouter >
+              <TopBar {...this.state} updateWeb3 = {this.updateWeb3} updateWallet = {this.updateWallet} setLoading = {this.setLoading}/>
+              <Main {...this.state} setLoading = {this.setLoading}/>
+          </BrowserRouter>
+        }
       </div>
     );
   }

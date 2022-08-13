@@ -230,6 +230,10 @@ contract NFTProtocol is Ownable {
         return distributorContracts[_distributor];
     }
 
+    function getMinimumRequestValue() public view returns(uint _minimumRequestValue){
+        return minimumRequestValue;
+    }
+
     /**  
     *** Contract Helper Functions
     **/

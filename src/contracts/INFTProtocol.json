@@ -1,0 +1,280 @@
+{
+  "contractName": "INFTProtocol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "requestVerification",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getMinimumRequestValue",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_minimumRequestValue",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.5+commit.a4f2e591\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getMinimumRequestValue\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_minimumRequestValue\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"requestVerification\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/stephenstb/Ratio-Labs/ratio-labsV0/contracts/NFTProtocol/interfaces/INFTProtocol.sol\":\"INFTProtocol\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/stephenstb/Ratio-Labs/ratio-labsV0/contracts/NFTProtocol/interfaces/INFTProtocol.sol\":{\"keccak256\":\"0x954fc5e4d4560ce7d08e67013b29ba2e6c5cb077f87ff42eb4a3421e9ad6d2e0\",\"urls\":[\"bzz-raw://68d29e4c0a51805b6ebfe864a1dc623f8de0f54780cd33a678d79ab7206abba2\",\"dweb:/ipfs/QmcYoYCUotgHfDYFcbELbx6AK41o9tzHo8GPq6AoLgZJQg\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "\n\ninterface INFTProtocol{\n\n    function requestVerification() external payable;\n\n    function getMinimumRequestValue() external view returns(uint _minimumRequestValue);\n\n}",
+  "sourcePath": "/home/stephenstb/Ratio-Labs/ratio-labsV0/contracts/NFTProtocol/interfaces/INFTProtocol.sol",
+  "ast": {
+    "absolutePath": "/home/stephenstb/Ratio-Labs/ratio-labsV0/contracts/NFTProtocol/interfaces/INFTProtocol.sol",
+    "exportedSymbols": {
+      "INFTProtocol": [
+        1832
+      ]
+    },
+    "id": 1833,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1832,
+        "linearizedBaseContracts": [
+          1832
+        ],
+        "name": "INFTProtocol",
+        "nameLocation": "12:12:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "07ec3039",
+            "id": 1826,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestVerification",
+            "nameLocation": "40:19:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1824,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "59:2:6"
+            },
+            "returnParameters": {
+              "id": 1825,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "78:0:6"
+            },
+            "scope": 1832,
+            "src": "31:48:6",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "4436fda7",
+            "id": 1831,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMinimumRequestValue",
+            "nameLocation": "94:22:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1827,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "116:2:6"
+            },
+            "returnParameters": {
+              "id": 1830,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1829,
+                  "mutability": "mutable",
+                  "name": "_minimumRequestValue",
+                  "nameLocation": "146:20:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1831,
+                  "src": "141:25:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1828,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "141:4:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "140:27:6"
+            },
+            "scope": 1832,
+            "src": "85:83:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1833,
+        "src": "2:169:6",
+        "usedErrors": []
+      }
+    ],
+    "src": "2:169:6"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/stephenstb/Ratio-Labs/ratio-labsV0/contracts/NFTProtocol/interfaces/INFTProtocol.sol",
+    "exportedSymbols": {
+      "INFTProtocol": [
+        1832
+      ]
+    },
+    "id": 1833,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 1832,
+        "linearizedBaseContracts": [
+          1832
+        ],
+        "name": "INFTProtocol",
+        "nameLocation": "12:12:6",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "07ec3039",
+            "id": 1826,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestVerification",
+            "nameLocation": "40:19:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1824,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "59:2:6"
+            },
+            "returnParameters": {
+              "id": 1825,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "78:0:6"
+            },
+            "scope": 1832,
+            "src": "31:48:6",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "4436fda7",
+            "id": 1831,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMinimumRequestValue",
+            "nameLocation": "94:22:6",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1827,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "116:2:6"
+            },
+            "returnParameters": {
+              "id": 1830,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1829,
+                  "mutability": "mutable",
+                  "name": "_minimumRequestValue",
+                  "nameLocation": "146:20:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1831,
+                  "src": "141:25:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1828,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "141:4:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "140:27:6"
+            },
+            "scope": 1832,
+            "src": "85:83:6",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 1833,
+        "src": "2:169:6",
+        "usedErrors": []
+      }
+    ],
+    "src": "2:169:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.5+commit.a4f2e591.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.3",
+  "updatedAt": "2022-07-16T02:04:07.349Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

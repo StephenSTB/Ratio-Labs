@@ -1,7 +1,19 @@
 {
     "Ganache": {
         "NFTProtocol": {
-            "address": "0xAD2e691Fd2fc4950D0Ab8b89C347d69F13103486"
+            "address": "0xEB97F89b5CabA098F6a2582c1487A0d0aE4C969a"
+        },
+        "CryptoGame": {
+            "address": "0xdC2E4ABb41b5c0DB426F10fA55B9dedF5A4FdD39"
+        },
+        "NFTChef": {
+            "address": "0x5826B2fDEe181eeD51eFD3c5D026E3C04E78e174"
+        },
+        "NFTMinter": {
+            "address": "0x83217095bf1e947a35b8db0b13bB087eF3A05C69"
+        },
+        "CryptoMonkeys": {
+            "address": "0xabcc62dbE03fAA94eed6091069E3dA084Df7C0e0"
         }
     },
     "Mumbai": {

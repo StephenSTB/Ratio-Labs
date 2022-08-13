@@ -12,9 +12,18 @@ const WMatic = artifacts.require("WMatic");
 
 const PolyCard = artifacts.require("PolyCard");
 
+const CryptoMonkeys = artifacts.require("CryptoMonkeys");
+
+const NFTProtocol = artifacts.require("NFTProtocol");
+
+const {utils, ecvrf, sortition} = require('vrf.js');
+
+var eccrypto = require("eccrypto");
+
 const fs = require("fs");
 
-describe("BNBCard Mint Testing", function(){
+
+describe("CryptoGame Testing", function(){
 
     let accounts;
 
@@ -34,7 +43,11 @@ describe("BNBCard Mint Testing", function(){
 
     var tenCommon;
 
-    const NFT_CID =  JSON.parse(fs.readFileSync("./IPFS/NFT_CID.json"));
+    var cryptoMonkeys;
+
+    var nftProtocol;
+
+    const NFT_CID =  JSON.parse(fs.readFileSync("./src/data/NFT_CID.json"));
 
     before(async function () {
         accounts = await web3.eth.getAccounts();
@@ -67,7 +80,7 @@ describe("BNBCard Mint Testing", function(){
         
         wmatic = await WMatic.new(utils.toWei("10000", "ether"), {from: accounts[0]});
         
-        tenCommon = await PolyCard.new(wmatic.address, NFT_CID["PolyCard_Ten_Common.gif"], "PoylCard_Ten_Common", "PCTC", {from: accounts[0]});
+        tenCommon = await PolyCard.new("PoylCard_Ten_Common", "PCTC", {from: accounts[0]});
 
         await tenCommon.transferOwnership(nftMinter.address, {from: accounts[0]});
 
@@ -75,8 +88,7 @@ describe("BNBCard Mint Testing", function(){
 
         //console.log("URI: " + await tenCommon.contract.methods.URI.call().call({from: accounts[0]}))*/
         
-
-        assert.equal(await tenCommon.contract.methods.URI.call().call({from: accounts[0]}), NFT_CID["PolyCard_Ten_Common.gif"])
+        //assert.equal(await tenCommon.contract.methods.tokenURI().call().call({from: accounts[0]}), "ipfs://" + NFT_CID["PolyCard_Ten_Common.gif"])
 
         assert.equal(await cryptoGame.owner(), nftChef.address)
 
@@ -100,6 +112,23 @@ describe("BNBCard Mint Testing", function(){
         });
 
         console.log(await tenCommon.tokenURI(id));
+    })
+
+    it("Handle Crypto Monkey Testing", async function(){
+
+        nftProtocol = await NFTProtocol.new(utils.toWei("1", "ether"), {from: accounts[0]})
+
+        cryptoMonkeys = await CryptoMonkeys.new(cryptoGame.address, nftProtocol.address, utils.toWei("1", "ether"), {from: accounts[0]});
+
+        var wallet = web3.eth.accounts.wallet;
+
+        console.log(wallet)
+        
+        console.log(wallet.Wallet)
+
+        //await cryptoMonkeys.init();
+
+        //await cryptoMonkeys.monkey({id: 1, prev: })
     })
 
     /*

@@ -15,7 +15,6 @@ var provider = new HDWalletProvider({mnemonic: mnemonic, providerOrUrl: "http://
 var web3 = new Web3(provider)
 
 
-
 create = async() =>{
     
     var accounts =  await web3.eth.getAccounts();

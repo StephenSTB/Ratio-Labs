@@ -10,6 +10,7 @@
   --purple:  #8347e6;
   --red: #701420;
   --black : #1a1a1a;
+  --ratioColors: url("./logos/content/RatioColorsAnalogous.png");
 }
 
 /*
@@ -57,7 +58,7 @@
 }
 
 #subMenu{
-  background-image: url("./logos/content/RatioColorsAnalogous.png") !important; 
+  background-image: var(--ratioColors) !important; 
   border: none;
   margin: auto;
   margin-top: 60px;

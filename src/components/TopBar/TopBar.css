@@ -22,7 +22,7 @@
 }
 
 #TopMenu, #mobileMenu, .cardStyle, .mobileCardStyle{
-    background-image: url("../../logos/content/RatioColorsAnalogous.png") !important;
+    background-image: var(--ratioColors) !important;
 }
 
 #link, #connect{

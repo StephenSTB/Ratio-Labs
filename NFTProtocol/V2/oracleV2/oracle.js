@@ -137,7 +137,7 @@ ipfsinit = async () =>{
     const ipfs_http = await import('ipfs-http-client');
 
     if(args.includes("HTTP")){
-        ipfs = await ipfs_http.create('/ip4/127.0.0.1/tcp/5002/http');
+        ipfs = await ipfs_http.create('/ip4/127.0.0.1/tcp/5002/http');//ipfs_http.create('/ip4/127.0.0.1/tcp/5001');
     }
     else{
         ipfs = await IPFS.create();
