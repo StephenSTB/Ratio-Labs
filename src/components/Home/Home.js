@@ -74,6 +74,8 @@ class Home extends Component{
                                 A multi-stage NFT GameFi experience focused on exploring concepts such as NFT's, GameFi and VRF Oracle Systems.
                             </Card.Content>
                         </div>
+                        {
+                            /*
                         <div className="projectCard">
                             <img alt="Bridge" src={bridgeLogo} className="projectImg"/>
                             <Divider className="projectCardDivder"/>
@@ -89,7 +91,8 @@ class Home extends Component{
                             <Card.Content className="projectCardDesc">
                                 A protocol enabling multi-chain DAO governance via the Ratio token and POS VRF oracle.
                             </Card.Content>
-                        </div>
+                        </div>*/
+                        }
                     </div>
 
                     <Divider id="socialsDiv"/>

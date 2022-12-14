@@ -6,8 +6,6 @@ import {Container, Segment, Form, Icon, Button, Divider, Radio, Popup, TextArea,
 
 import  "@google/model-viewer";
 
-import {create} from "ipfs-core"
-
 import deployedContracts from "../../data/Deployed_Contracts.json"
 
 import networkData from "../../data/Network_Data.json"

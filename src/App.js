@@ -246,7 +246,7 @@ class App extends Component{
     return (
       <div >
         {
-          <BrowserRouter >
+          <BrowserRouter>
               <TopBar {...this.state} updateWeb3 = {this.updateWeb3} updateWallet = {this.updateWallet} setLoading = {this.setLoading}/>
               <Main {...this.state} setLoading = {this.setLoading}/>
           </BrowserRouter>

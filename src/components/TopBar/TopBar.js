@@ -101,9 +101,11 @@ class TopBar extends Component{
                 <Menu fixed='top' id="TopMenu" borderless>
                     <Menu.Menu position="left" >
                         <Menu.Item><Link to="/"><Image src={RatioSymbol} /></Link></Menu.Item>
+                        
                         <Menu.Item>
                             <Link to="/NFT_Menu/Create"><div id="link">NFT</div></Link>
                         </Menu.Item>
+                        {/*
                         <Menu.Item>
                             <Link to="/CryptoGameMenu/Mint"><div id="link">CryptoGame</div></Link>
                         </Menu.Item>
@@ -112,7 +114,7 @@ class TopBar extends Component{
                         </Menu.Item>
                         <Menu.Item>
                             <Link to="/Govern"><div id="link">Govern</div></Link>
-                        </Menu.Item>
+                        </Menu.Item>*/}
                     </Menu.Menu>
                     
                     <Menu.Menu position="right" />
@@ -170,18 +172,20 @@ class TopBar extends Component{
                     <Menu.Item > 
                         <Link to="/"><div id="link">Home</div></Link>
                     </Menu.Item>
-                    <Menu.Item>
-                        <Link to="/NFT_Menu/Create"><div id="link">NFT</div></Link>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Link to="/CryptoGameMenu/Mint"><div id="link">CryptoGame</div></Link>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Link to="/Bridge"><div id='link'>Bridge</div></Link>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Link to="/Govern"><div id="link">Govern</div></Link>
-                    </Menu.Item>
+                    {/*
+                        <Menu.Item>
+                            <Link to="/NFT_Menu/Create"><div id="link">NFT</div></Link>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Link to="/CryptoGameMenu/Mint"><div id="link">CryptoGame</div></Link>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Link to="/Bridge"><div id='link'>Bridge</div></Link>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Link to="/Govern"><div id="link">Govern</div></Link>
+                        </Menu.Item>
+                    */ }
                 </Menu>
             )
     }
